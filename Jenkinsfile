@@ -2,6 +2,8 @@
 
 nodeJob {
   // General
-  projectName = "linkurious/ogma-helper"
+  projectName = "linkurious/shared"
+
+  createGitTag = true
 
 }

@@ -1,0 +1,8 @@
+# Dependency directory
+node_modules
+
+# IDEA config
+.idea
+
+# Compiled code
+dist

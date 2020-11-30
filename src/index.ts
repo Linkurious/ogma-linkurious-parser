@@ -25,7 +25,6 @@ import {
 } from './tools/tools';
 import {StylesViz, StylesConfig, FILTER_OPACITY} from './ogma/features/styles';
 import {CaptionsViz, CaptionState} from './ogma/features/captions';
-import {OgmaState} from './ogma/features/reactive';
 import {
   getSelectionSize,
   getSelectionState,
@@ -73,5 +72,4 @@ export {
   StyleType,
   ItemAttributes,
   Legend,
-  OgmaState,
 };
