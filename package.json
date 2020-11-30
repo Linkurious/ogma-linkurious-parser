@@ -29,19 +29,13 @@
   "license": "ISC",
   "homepage": "",
   "dependencies": {
-    "@linkurious/rest-client": "2.9.7",
-    "@types/lodash": "4.14.147",
-    "@types/lodash-es": "4.17.3",
-    "@types/sha1": "^1.1.2",
-    "lodash": "4.17.15",
-    "lodash-es": "4.17.15",
-    "nearley": "2.19.1",
     "ogma": "github:Linkurious/ogma-release#2.7.16",
     "rxjs": "6.5.3",
-    "sha1": "1.1.1",
-    "valcheck": "1.2.1"
+    "sha1": "1.1.1"
   },
   "devDependencies": {
+    "@types/sha1": "^1.1.2",
+    "@linkurious/rest-client": "2.9.7",
     "@types/chai": "4.2.11",
     "@types/mocha": "5.2.7",
     "@types/nearley": "2.11.1",
