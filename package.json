@@ -1,0 +1,65 @@
+{
+  "name": "ogma-helper",
+  "version": "1.0.0",
+  "description": "helper library to facilitate interaction with OGMA",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "prepare": "tsc",
+    "build": "tsc",
+    "compile": "tsc -b",
+    "tsc": "tsc",
+    "test": "./node_modules/.bin/mocha -r ts-node/register/transpile-only tests/**/*.spec.ts",
+    "test:unit": "nyc --reporter=text-summary --reporter=cobertura --report-dir=reports  mocha -r ts-node/register/transpile-only --reporter mocha-multi-reporters --reporter-options configFile=.test-reporters.json tests/**/*.spec.ts",
+    "dev": "./node_modules/.bin/tsc && node exemple/test_node.js",
+    "clean": "rm -rf node_modules; rm -rf package-lock.json; rm -rf dist",
+    "lint": "eslint --fix --ext .ts .",
+    "lint:ci": "eslint -f checkstyle -o reports/checkstyle.xml --ext .ts .",
+    "bump:patch": "bump2version patch && npm version --no-git-tag-version patch",
+    "bump:minor": "bump2version minor && npm version --no-git-tag-version minor",
+    "bump:major": "bump2version major && npm version --no-git-tag-version major"
+  },
+  "repository": {
+    "type": "",
+    "url": ""
+  },
+  "license": "ISC",
+  "homepage": "",
+  "dependencies": {
+    "@linkurious/rest-client": "2.9.7",
+    "@types/lodash": "4.14.147",
+    "@types/lodash-es": "4.17.3",
+    "@types/sha1": "^1.1.2",
+    "lodash": "4.17.15",
+    "lodash-es": "4.17.15",
+    "nearley": "2.19.1",
+    "ogma": "github:Linkurious/ogma-release#2.7.16",
+    "rxjs": "6.5.3",
+    "sha1": "1.1.1",
+    "valcheck": "1.2.1"
+  },
+  "devDependencies": {
+    "@types/chai": "4.2.11",
+    "@types/mocha": "5.2.7",
+    "@types/nearley": "2.11.1",
+    "@typescript-eslint/eslint-plugin": "2.25.0",
+    "@typescript-eslint/parser": "2.25.0",
+    "chai": "4.2.0",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.1",
+    "eslint-plugin-import": "2.20.2",
+    "eslint-plugin-prettier": "3.1.2",
+    "mocha": "5.2.0",
+    "mocha-junit-reporter": "^2.0.0",
+    "mocha-multi-reporters": "^1.1.7",
+    "nyc": "^15.1.0",
+    "prettier": "2.0.2",
+    "request": "2.88.2",
+    "should": "11.1.0",
+    "ts-node": "6.2.0",
+    "typescript": "3.7.5"
+  }
+}
