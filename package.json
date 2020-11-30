@@ -29,7 +29,7 @@
   "license": "ISC",
   "homepage": "",
   "dependencies": {
-    "ogma": "github:Linkurious/ogma-release#2.7.16",
+    "ogma": "github:Linkurious/ogma-release#3.2.2",
     "rxjs": "6.5.3",
     "sha1": "1.1.1"
   },
