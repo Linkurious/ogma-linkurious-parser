@@ -13,7 +13,6 @@
 import {BehaviorSubject, Observable} from 'rxjs';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 
-import * as tools from '../../tools/tools';
 
 import {DummyNodeList, OgmaState} from './reactive';
 

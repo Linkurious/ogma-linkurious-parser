@@ -7,18 +7,37 @@ import {
   VizNode
 } from '@linkurious/rest-client';
 
-import {Tools} from '..';
-
 import {StylesViz} from './features/styles';
 import {CaptionsViz} from './features/captions';
-import {EdgeList, NodeList} from './models';
-import {Ogma} from './ogma';
+import {RxViz} from "./features/reactive";
+import {OgmaStore} from "./features/OgmaStore";
+import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher} from 'ogma';
 
 export const ANIMATION_DURATION = 750;
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
+
+  // TODO check the use of the watchers
+  public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData,
+    LkEdgeData> = this.schema.watchNodeNonObjectProperty({
+    path: 'categories',
+    unwindArrays: true,
+    filter: 'all'
+  });
+  public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData,
+    LkEdgeData> = this.schema.watchEdgeNonObjectProperty({
+    path: 'type',
+    filter: 'all'
+  });
+
+  // TODO check the need of RxViz
+  private _reactive: RxViz;
+  public store: OgmaStore;
+
+  //TODO add back multiSelection logic
+  // private readonly _multiSelectionKey: string;
 
   constructor(_configuration: IOgmaConfig) {
     // set Ogma global configuration
@@ -37,6 +56,9 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
         }
       }
     });
+
+    this._reactive = new RxViz(this);
+    this.store = this._reactive.store;
 
     // TODO: need to override  in LKE
     this.initSelection();

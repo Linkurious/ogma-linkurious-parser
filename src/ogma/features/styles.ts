@@ -10,8 +10,7 @@ import {
   TextOptions
 } from '@linkurious/rest-client';
 
-import {NodeList} from '../models';
-import {BASE_GREY, EdgeAttributes, LKOgma, NodeAttributes, StyleRule, Tools} from '../..';
+import {BASE_GREY, EdgeAttributes, LKOgma, NodeAttributes, StyleRule} from '../..';
 
 export interface StylesConfig {
   nodeColorStyleRules: Array<StyleRule>;
@@ -23,7 +22,7 @@ export interface StylesConfig {
   edgeShapeStyleRules?: Array<StyleRule>;
 }
 
-const HOVERED_SELECTED_NODE_STYLE: o.NodeAttributesValue = {
+const HOVERED_SELECTED_NODE_STYLE: o.NodeAttributesValue<LkNodeData, LkEdgeData> = {
   text: {
     style: 'bold',
     backgroundColor: '#fff',
@@ -33,7 +32,7 @@ const HOVERED_SELECTED_NODE_STYLE: o.NodeAttributesValue = {
   outline: false
 };
 
-const HOVERED_SELECTED_EDGE_STYLE: o.EdgeAttributesValue = {
+const HOVERED_SELECTED_EDGE_STYLE: o.EdgeAttributesValue<LkEdgeData, LkNodeData> = {
   text: {
     style: 'bold',
     backgroundColor: '#fff',
@@ -47,7 +46,7 @@ const NODE_HALO_CONFIGURATION = {
   size: 7,
   scalingMethod: 'scaled',
   strokeWidth: 0,
-  hideNonAdjacentEdges: true
+  hideNonAdjacentEdges: false
 } as {
   color: '#FFF';
   size: 7;
@@ -98,12 +97,12 @@ export class StylesViz {
   public setNodesDefaultStyles(
     nodeStyleConf:
       | {
-          nodeRadius?: number;
-          shape?: OgmaNodeShape;
-          text?: TextOptions & {
-            nodePosition?: 'right' | 'left' | 'top' | 'bottom' | 'center';
-          };
-        }
+      nodeRadius?: number;
+      shape?: OgmaNodeShape;
+      text?: TextOptions & {
+        nodePosition?: 'right' | 'left' | 'top' | 'bottom' | 'center';
+      };
+    }
       | undefined
   ): void {
     // setting selection and hover attributes
@@ -180,10 +179,10 @@ export class StylesViz {
   public setEdgesDefaultStyles(
     edgeStyleConf:
       | {
-          edgeWidth?: number;
-          shape?: OgmaEdgeShape;
-          text?: TextOptions;
-        }
+      edgeWidth?: number;
+      shape?: OgmaEdgeShape;
+      text?: TextOptions;
+    }
       | undefined
   ): void {
     // setting selection and hover attributes
@@ -394,7 +393,6 @@ export class StylesViz {
             backgroundColor: null,
             maxLineLength: textWrappingLength ? 30 : 0,
             scale: 0.3,
-            backgroundArrowBaseSize: 0,
             margin: 0,
             scaling: true,
             tip: false
@@ -437,15 +435,13 @@ export class StylesViz {
         badges: {
           topRight: (node) => {
             if (node !== undefined) {
-              const degree = Tools.getHiddenNeighbors(
-                node.toList() as NodeList<LkNodeData, LkEdgeData>
-              );
+              const degree = Tools.getHiddenNeighbors(node.toList());
               const badgeContent = Tools.shortenNumber(degree);
               if (degree > 0) {
                 const nodeColor = Array.isArray(node.getAttribute('color'))
-                  ? node.getAttribute('color')[0]
+                  ? node.getAttribute('color')![0]
                   : node.getAttribute('color');
-                const textColor = Tools.isBright(nodeColor) ? '#000' : '#FFF';
+                const textColor = Tools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
                 const isSupernode = node.getData(['statistics', 'supernode']);
                 let content = null;
                 if (+badgeContent !== 0) {
@@ -478,9 +474,9 @@ export class StylesViz {
           bottomRight: (node) => {
             if (node !== undefined && !node.getAttribute('layoutable')) {
               const nodeColor = Array.isArray(node.getAttribute('color'))
-                ? node.getAttribute('color')[0]
+                ? node.getAttribute('color')![0]
                 : node.getAttribute('color');
-              const textColor = Tools.isBright(nodeColor) ? '#000' : '#FFF';
+              const textColor = Tools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
               return {
                 color: 'inherit',
                 minVisibleSize: 20,
@@ -503,8 +499,8 @@ export class StylesViz {
         self: {attributes: ['layoutable']}
       }
     });
-    this._ogma.events.onNodesAdded(({nodes}) => nodes.addClass('degreeIndicator'));
-    this._ogma.events.onNodesAdded(({nodes}) => nodes.addClass('pinnedIndicator'));
+    this._ogma.events.onNodesAdded((nodesEvent) => nodesEvent!.nodes.addClass('degreeIndicator'));
+    this._ogma.events.onNodesAdded((nodesEvent) => nodesEvent!.nodes.addClass('pinnedIndicator'));
   }
 
   /**

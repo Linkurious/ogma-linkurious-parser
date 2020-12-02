@@ -7,7 +7,7 @@
 
 'use strict';
 import {Color} from 'ogma';
-import {LkNodeData, OgmaNodeShape, StyleIcon, StyleImage} from '@linkurious/rest-client';
+import {IStyleIcon, IStyleImage, LkNodeData, OgmaNodeShape} from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
 import {Tools} from '..';
@@ -15,8 +15,13 @@ import {Tools} from '..';
 import {StyleRule} from './styleRule';
 import {BASE_GREY, ItemAttributes} from './itemAttributes';
 
-export interface OgmaImage extends StyleImage {
+export interface OgmaImage extends IStyleImage {
   url?: string;
+}
+
+export enum NodeSizeExtrema {
+  MIN = 50,
+  MAX = 500
 }
 
 export class NodeAttributes extends ItemAttributes {
@@ -107,7 +112,7 @@ export class NodeAttributes extends ItemAttributes {
   public icon(
     itemData: LkNodeData
   ): {
-    icon?: StyleIcon;
+    icon?: IStyleIcon;
     image?: OgmaImage | null;
   } {
     const rawColors = this.color(itemData);
@@ -173,10 +178,37 @@ export class NodeAttributes extends ItemAttributes {
     let result = undefined;
     if (this._rulesMap.size !== undefined) {
       this.matchStyle(this._rulesMap.size, itemData, (styleRule) => {
-        result = styleRule.style.size;
+        const sizeStyle = styleRule.style.size;
+        if (sizeStyle.type === 'autoRange') {
+          if (
+            sizeStyle.input !== undefined &&
+            sizeStyle.max !== undefined &&
+            sizeStyle.min !== undefined
+          ) {
+            const propertyName: string = sizeStyle.input[1];
+            const propertyValue = Tools.parseNumber(itemData.properties[propertyName]);
+            result = NodeAttributes.getAutomaticRangeSize(propertyValue, styleRule);
+          }
+        } else {
+          result = sizeStyle;
+        }
       });
     }
     return result;
+  }
+
+  /**
+   * return the corresponding size to the value
+   * @param value
+   * @param rule
+   */
+  public static getAutomaticRangeSize(value: number, rule: StyleRule): string {
+    return this.getAutomaticRangeStyle(
+      value,
+      rule.style.size,
+      NodeSizeExtrema.MIN,
+      NodeSizeExtrema.MAX
+    );
   }
 
   /**
@@ -188,8 +220,8 @@ export class NodeAttributes extends ItemAttributes {
     radius?: number | undefined;
     color: Color | Array<Color>;
     shape?: OgmaNodeShape | undefined;
-    icon?: StyleIcon;
-    image?: StyleImage | null;
+    icon?: IStyleIcon;
+    image?: IStyleImage | null;
   } {
     if (!Tools.isDefined(itemData)) {
       return {

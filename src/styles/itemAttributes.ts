@@ -4,14 +4,17 @@
  *
  * Created by maximeallex on 2018-05-21.
  */
+
 'use strict';
 
 import sha1 from 'sha1';
-import {Color} from 'types/utilities';
+import {Color} from 'ogma';
 
 import {Tools} from '..';
 
 import {StyleRule} from './styleRule';
+import {EdgeWidthExtrema} from './edgeAttributes';
+import {NodeSizeExtrema} from './nodeAttributes';
 
 export const BASE_GREY = '#7f7f7f';
 export const PALETTE = [
@@ -116,5 +119,31 @@ export class ItemAttributes {
       return rule.style.color;
     }
     return null;
+  }
+
+  /**
+   * return the corresponding size to the value
+   * @param value
+   * @param lower
+   * @param higher
+   * @param extrema
+   */
+  public static getAutomaticRangeStyle(
+    value: number,
+    {max, min}: {max: number; min: number},
+    lower: EdgeWidthExtrema | NodeSizeExtrema,
+    higher: EdgeWidthExtrema | NodeSizeExtrema
+  ): string {
+    // apply default style when min equal max
+    if (max === min) {
+      return '100%';
+    }
+
+    // calculate the linear function f(x) = ax + b
+    const a = (higher - lower) / (max - min);
+    const b = (lower * max - higher * min) / (max - min);
+    const size = Math.floor(value * a + b);
+
+    return `${size}%`;
   }
 }

@@ -9,8 +9,6 @@
 import {Color} from 'ogma';
 import {LkEdgeData, OgmaEdgeShape} from '@linkurious/rest-client';
 
-import {Tools} from '..';
-
 import {StyleRule} from './styleRule';
 import {BASE_GREY, ItemAttributes} from './itemAttributes';
 

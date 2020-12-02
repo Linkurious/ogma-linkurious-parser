@@ -1,10 +1,7 @@
 'use strict';
 
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
-
-import {Edge, Node, ItemList} from '../models';
-import {Tools} from '../..';
-
+import {Edge, Node, ItemList} from 'ogma';
 import {OgmaState} from './reactive';
 
 export type SelectionState = 'selection' | 'multiSelection' | 'noSelection';
@@ -13,14 +10,14 @@ export type SelectionState = 'selection' | 'multiSelection' | 'noSelection';
  * Return the current size of the selection
  */
 export const getSelectionSize = (state: OgmaState): number => {
-  return (state.selection as ItemList<LkNodeData, LkEdgeData>).size;
+  return (state.selection as ItemList<LkNodeData>).size;
 };
 
 /**
  * Return the current state of the selection
  */
 export const getSelectionState = (state: OgmaState): SelectionState => {
-  switch ((state.selection as ItemList<LkNodeData, LkEdgeData>).size) {
+  switch ((state.selection as ItemList<LkNodeData>).size) {
     case 1:
       return 'selection';
 
@@ -39,7 +36,7 @@ export const getSelectionEntity = (state: OgmaState): 'node' | 'edge' | undefine
   if (state.selection.size === 0) {
     return undefined;
   }
-  return (state.selection as ItemList<LkNodeData, LkEdgeData>).isNode ? 'node' : 'edge';
+  return (state.selection as ItemList<LkNodeData>).isNode ? 'node' : 'edge';
 };
 
 /**
