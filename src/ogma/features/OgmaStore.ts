@@ -1,12 +1,3 @@
-/**
- * LINKURIOUS CONFIDENTIAL
- * Copyright Linkurious SAS 2012 - 2016
- *
- * Created by maxime on 2019-02-12.
- *
- * File: OgmaStore
- * Description :
- */
 
 'use strict';
 
@@ -15,6 +6,7 @@ import {distinctUntilChanged, map} from 'rxjs/operators';
 
 
 import {DummyNodeList, OgmaState} from './reactive';
+import {Tools} from "../../tools/tools";
 
 export class OgmaStore extends BehaviorSubject<OgmaState> {
   constructor(d: OgmaState) {
@@ -34,7 +26,7 @@ export class OgmaStore extends BehaviorSubject<OgmaState> {
   public selectStore<K>(mapFn: (state: OgmaState) => K): Observable<K> {
     return this.pipe(
       map(mapFn),
-      distinctUntilChanged((p, n) => tools.isEqual(p, n))
+      distinctUntilChanged((p, n) => Tools.isEqual(p, n))
     );
   }
 

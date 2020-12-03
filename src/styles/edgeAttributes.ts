@@ -1,16 +1,17 @@
-/**
- * LINKURIOUS CONFIDENTIAL
- * Copyright Linkurious SAS 2012 - 2018
- *
- * Created by maximeallex on 2018-05-21.
- */
 
 'use strict';
 import {Color} from 'ogma';
 import {LkEdgeData, OgmaEdgeShape} from '@linkurious/rest-client';
 
+
 import {StyleRule} from './styleRule';
 import {BASE_GREY, ItemAttributes} from './itemAttributes';
+import {Tools} from "../tools/tools";
+
+export enum EdgeWidthExtrema {
+  MIN = 50,
+  MAX = 200
+}
 
 export class EdgeAttributes extends ItemAttributes {
   constructor(rulesMap: {
@@ -54,7 +55,7 @@ export class EdgeAttributes extends ItemAttributes {
         if (typeof rule.style.color === 'string') {
           color = rule.style.color;
         } else if (typeof rule.style.color === 'object') {
-          const propValue = Tools.getInUnsafe(data, rule.style.color.input);
+          const propValue = Tools.getIn(data, rule.style.color.input);
           color = ItemAttributes.autoColor(`${propValue}`, rule.style.ignoreCase);
         }
         break;
@@ -83,10 +84,38 @@ export class EdgeAttributes extends ItemAttributes {
     let result = undefined;
     if (this._rulesMap.width !== undefined) {
       this.matchStyle(this._rulesMap.width, data, (styleRule) => {
-        result = styleRule.style.width;
+        const widthStyle = styleRule.style.width;
+
+        if (widthStyle.type === 'autoRange') {
+          if (
+            widthStyle.input !== undefined &&
+            widthStyle.max !== undefined &&
+            widthStyle.min !== undefined
+          ) {
+            const propertyName: string = widthStyle.input[1];
+            const propertyValue = Tools.parseNumber(data.properties[propertyName]);
+            result = EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule);
+          }
+        } else {
+          result = widthStyle;
+        }
       });
     }
     return result;
+  }
+
+  /**
+   * return the corresponding width to the value
+   * @param value
+   * @param rule
+   */
+  public static getAutomaticRangeWidth(value: number, rule: StyleRule): string {
+    return this.getAutomaticRangeStyle(
+      value,
+      rule.style.width,
+      EdgeWidthExtrema.MIN,
+      EdgeWidthExtrema.MAX
+    );
   }
 
   /**

@@ -1,19 +1,12 @@
-/**
- * LINKURIOUS CONFIDENTIAL
- * Copyright Linkurious SAS 2012 - 2018
- *
- * Created by maximeallex on 2018-05-21.
- */
-
 'use strict';
 import {Color} from 'ogma';
-import {IStyleIcon, IStyleImage, LkNodeData, OgmaNodeShape} from '@linkurious/rest-client';
+import {LkNodeData, OgmaNodeShape, IStyleImage, IStyleIcon} from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
-import {Tools} from '..';
 
 import {StyleRule} from './styleRule';
 import {BASE_GREY, ItemAttributes} from './itemAttributes';
+import {Tools} from "../tools/tools";
 
 export interface OgmaImage extends IStyleImage {
   url?: string;
@@ -83,7 +76,7 @@ export class NodeAttributes extends ItemAttributes {
         }
         if (rule.canApplyTo(itemData)) {
           if (typeof rule.style.color === 'object') {
-            const propValue = Tools.getInUnsafe(itemData, rule.style.color.input);
+            const propValue = Tools.getIn(itemData, rule.style.color.input);
             if (Array.isArray(propValue)) {
               c = ItemAttributes.autoColor(itemData.categories[i], rule.style.ignoreCase);
             } else {

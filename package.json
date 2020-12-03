@@ -31,11 +31,15 @@
   "dependencies": {
     "ogma": "github:Linkurious/ogma-release#3.2.2",
     "rxjs": "6.5.3",
-    "sha1": "1.1.1"
+    "sha1": "1.1.1",
+    "lodash": "4.17.15",
+    "lodash-es": "4.17.15"
   },
   "devDependencies": {
+    "@types/lodash": "4.14.147",
+    "@types/lodash-es": "4.17.3",
     "@types/sha1": "^1.1.2",
-    "@linkurious/rest-client": "2.9.7",
+    "@linkurious/rest-client": "2.10.2",
     "@types/chai": "4.2.11",
     "@types/mocha": "5.2.7",
     "@typescript-eslint/eslint-plugin": "2.25.0",

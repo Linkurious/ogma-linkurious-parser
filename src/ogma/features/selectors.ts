@@ -56,7 +56,7 @@ export const getUniqSelectionTypes = (state: OgmaState): Array<string> | undefin
   if (uniqSelection === undefined) {
     return undefined;
   }
-  if (Tools.isNode(uniqSelection)) {
+  if (uniqSelection.isNode) {
     return uniqSelection.getData('categories');
   } else {
     return [uniqSelection.getData('type')];

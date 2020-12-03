@@ -1,24 +1,18 @@
-/**
- * LINKURIOUS CONFIDENTIAL
- * Copyright Linkurious SAS 2012 - 2018
- *
- * Created by maximeallex on 2018-04-19.
- */
-
 'use strict';
 
 import {
-  EdgeStyle,
+  IEdgeStyle,
   IStyleRule,
   LkEdgeData,
   LkNodeData,
-  NodeStyle,
+  INodeStyle,
   SelectorType
 } from '@linkurious/rest-client';
 
-import {ItemAttributes, Tools} from '..';
+import {ItemAttributes} from '..';
+import {Tools} from "../tools/tools";
 
-export class StyleRule implements IStyleRule<NodeStyle | EdgeStyle> {
+export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
   public type: SelectorType;
   public input: string[] | undefined;
   public index: number;
@@ -26,7 +20,7 @@ export class StyleRule implements IStyleRule<NodeStyle | EdgeStyle> {
   public value: any;
   public style: any;
 
-  constructor(model: IStyleRule<NodeStyle | EdgeStyle>) {
+  constructor(model: IStyleRule<INodeStyle | IEdgeStyle>) {
     this.type = model.type;
     this.input = model.input;
     this.index = model.index;
@@ -124,7 +118,7 @@ export class StyleRule implements IStyleRule<NodeStyle | EdgeStyle> {
   /**
    * Return true or false on rule type 'any' if the current node match the rule
    */
-  public static checkAny(data: LkNodeData | LkEdgeData, style: NodeStyle | EdgeStyle): boolean {
+  public static checkAny(data: LkNodeData | LkEdgeData, style: INodeStyle | IEdgeStyle): boolean {
     // return true if autoColor by a property and this property exists in node
     if (typeof style.color === 'object') {
       return Tools.isDefined(Tools.getIn(data, style.color.input));
@@ -153,7 +147,7 @@ export class StyleRule implements IStyleRule<NodeStyle | EdgeStyle> {
    * @param comparator
    * @return {boolean}
    */
-  public static checkRange(value: number, comparator: {[key: string]: number}): boolean {
+  public static checkRange(value: number, comparator: { [key: string]: number }): boolean {
     const operators = Object.keys(comparator);
     return operators.every((op) => {
       switch (op) {

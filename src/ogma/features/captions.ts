@@ -3,7 +3,8 @@
 import * as Ogma from 'ogma';
 import {ItemFieldsCaptions} from '@linkurious/rest-client';
 
-import {Captions, LKOgma, Tools} from '../..';
+import {Captions, LKOgma} from '../..';
+import {Tools} from "../../tools/tools";
 
 export interface CaptionState {
   node: ItemFieldsCaptions;

@@ -1,20 +1,15 @@
-/**
- * LINKURIOUS CONFIDENTIAL
- * Copyright Linkurious SAS 2012 - 2018
- *
- * Created by maximeallex on 2018-05-21.
- */
+
 
 'use strict';
 
 import sha1 from 'sha1';
 import {Color} from 'ogma';
 
-import {Tools} from '..';
 
 import {StyleRule} from './styleRule';
-import {EdgeWidthExtrema} from './edgeAttributes';
 import {NodeSizeExtrema} from './nodeAttributes';
+import {Tools} from "../tools/tools";
+import {EdgeWidthExtrema} from "./edgeAttributes";
 
 export const BASE_GREY = '#7f7f7f';
 export const PALETTE = [

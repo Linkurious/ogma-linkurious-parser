@@ -12,6 +12,7 @@ import {CaptionsViz} from './features/captions';
 import {RxViz} from "./features/reactive";
 import {OgmaStore} from "./features/OgmaStore";
 import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher} from 'ogma';
+import {Tools} from "../tools/tools";
 
 export const ANIMATION_DURATION = 750;
 
@@ -69,6 +70,11 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     // init visualization captions
     this.initCaptions(_configuration);
 
+    this.LKStyles.setNodesDefaultHalo();
+    this.LKStyles.setEdgesDefaultHalo();
+    this.LKStyles.setBadgeRule();
+    this.LKStyles.setFilterClass();
+
   }
 
   /**
@@ -76,7 +82,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    */
   public initSelection(): void {
     this.events.onClick((e) => {
-      if (e.button === 'left') {
+      if (e !== undefined && e.button === 'left') {
         if (e.target !== null) {
           const multiSelectionKey = navigator.platform === 'MacIntel' ? 'cmd' : 'ctrl';
           if (this.keyboard.isKeyPressed(multiSelectionKey)) {
@@ -191,3 +197,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   }
 
 }
+
+
+

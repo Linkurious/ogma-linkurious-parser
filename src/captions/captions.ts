@@ -1,20 +1,13 @@
-/**
- * LINKURIOUS CONFIDENTIAL
- * Copyright Linkurious SAS 2012 - 2018
- *
- * Created by maximeallex on 2018-05-21.
- */
-
 'use strict';
+
 import {
-  CaptionConfig,
+  ICaptionConfig,
   ItemFieldsCaptions,
   LkEdgeData,
   LkNodeData,
   LkProperty
 } from '@linkurious/rest-client';
-
-import {CAPTION_HEURISTIC, Tools} from '..';
+import {CAPTION_HEURISTIC, Tools} from "../tools/tools";
 
 export class Captions {
   /**
@@ -59,7 +52,7 @@ export class Captions {
         return Tools.formatDate(
           new Date(
             new Date(propertyValue.value).getTime() +
-              Tools.timezoneToMilliseconds(propertyValue.timezone)
+            Tools.timezoneToMilliseconds(propertyValue.timezone)
           ).toISOString()
         );
       }
@@ -79,7 +72,7 @@ export class Captions {
    */
   public static generateNodeCaption(
     itemData: LkNodeData,
-    schema: {[key: string]: CaptionConfig}
+    schema: { [key: string]: ICaptionConfig }
   ): string {
     const categories = itemData.categories;
     const caption: Array<string | null> = [];
@@ -108,7 +101,7 @@ export class Captions {
    */
   public static generateEdgeCaption(
     itemData: LkEdgeData,
-    schema: {[key: string]: CaptionConfig}
+    schema: { [key: string]: ICaptionConfig }
   ): string {
     const type = itemData.type;
     const caption: Array<string | null> = [];

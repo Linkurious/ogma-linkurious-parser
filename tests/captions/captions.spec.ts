@@ -1,9 +1,4 @@
-/**
- * LINKURIOUS CONFIDENTIAL
- * Copyright Linkurious SAS 2012 - 2018
- *
- * Created by maximeallex on 2018-05-21.
- */
+
 
 'use strict';
 

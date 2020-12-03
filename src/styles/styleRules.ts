@@ -1,28 +1,19 @@
-/**
- * LINKURIOUS CONFIDENTIAL
- * Copyright Linkurious SAS 2012 - 2018
- *
- * Created by maximeallex on 2018-05-21.
- */
-
 'use strict';
 
 import {
-  EdgeStyle,
+  IEdgeStyle,
   IStyleRule,
   LkEdgeData,
   LkNodeData,
-  NodeStyle,
+  INodeStyle,
   SelectorType,
-  StyleIcon,
-  StyleImage
+  IStyleIcon,
+  IStyleImage
 } from '@linkurious/rest-client';
-
-import {sortBy} from '../tools/tools';
-import {Tools} from '..';
 
 import {StyleRule} from './styleRule';
 import {ItemAttributes} from './itemAttributes';
+import {sortBy, Tools} from "../tools/tools";
 
 export enum StyleType {
   COLOR = 'color',
@@ -34,15 +25,15 @@ export enum StyleType {
 }
 
 export interface Legend {
-  [key: string]: Array<{label: string; value: string | StyleIcon | StyleImage | number}>;
+  [key: string]: Array<{ label: string; value: string | IStyleIcon | IStyleImage | number }>;
 }
 
 export const SORTING_RULE = ['specificity', 'itemType', 'index'];
 
 export class StyleRules {
-  private _rules: Array<IStyleRule<NodeStyle | EdgeStyle>>;
+  private _rules: Array<IStyleRule<INodeStyle | IEdgeStyle>>;
 
-  constructor(rules: Array<IStyleRule<NodeStyle | EdgeStyle>>) {
+  constructor(rules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
     this._rules = rules;
   }
 
@@ -111,7 +102,7 @@ export class StyleRules {
    *
    * @return {any}
    */
-  public get nodeRules(): {[key: string]: Array<StyleRule>} {
+  public get nodeRules(): { [key: string]: Array<StyleRule> } {
     return {
       color: this.color,
       icon: this.icon,
@@ -126,7 +117,7 @@ export class StyleRules {
    *
    * @return {any}
    */
-  public get edgeRules(): {[key: string]: Array<StyleRule>} {
+  public get edgeRules(): { [key: string]: Array<StyleRule> } {
     return {
       color: this.color,
       shape: this.shape,
@@ -162,8 +153,8 @@ export class StyleRules {
     styleType: string,
     styles: Array<StyleRule>,
     itemsData: Array<LkNodeData | LkEdgeData>
-  ): Array<{label: string; value: string | number | StyleIcon | StyleImage}> {
-    const result: Array<{label: string; value: string | number | StyleIcon | StyleImage}> = [];
+  ): Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }> {
+    const result: Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }> = [];
     const data = itemsData.filter((i) => i);
     for (let i = 0; i < styles.length; i++) {
       const styleRule = new StyleRule(styles[i]);
@@ -177,7 +168,7 @@ export class StyleRules {
           // style is a custom icon
           const label = Tools.isDefined(styleRule.input)
             ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${
-                styleRule.input![1]
+              styleRule.input![1]
               } ${StyleRules.sanitizeValue(styleRule.type, styleRule.value)}`
             : `${StyleRules.getTypeLabel(styleRule.itemType)}`;
           const value = styleRule.style.image;
@@ -185,7 +176,7 @@ export class StyleRules {
         } else {
           const label = Tools.isDefined(styleRule.input)
             ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${
-                styleRule.input![1]
+              styleRule.input![1]
               } ${StyleRules.sanitizeValue(styleRule.type, styleRule.value)}`
             : `${StyleRules.getTypeLabel(styleRule.itemType)}`;
           const value = styleRule.style[styleType];
@@ -228,7 +219,7 @@ export class StyleRules {
   public static addLegendAutoColors(
     itemsData: Array<LkNodeData | LkEdgeData>,
     styleRule: StyleRule,
-    currentLegend: Array<{label: string; value: string | number | StyleIcon | StyleImage}>
+    currentLegend: Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }>
   ): void {
     const propertyKey: string = styleRule.style.color.input[1];
     itemsData.forEach((data) => {
@@ -262,8 +253,8 @@ export class StyleRules {
    * Check if a legend item already exists and overwrite it / push it
    */
   public static updateLegend(
-    legend: Array<{label: string; value: string | number | StyleIcon | StyleImage}>,
-    {label, value}: {[key: string]: string}
+    legend: Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }>,
+    {label, value}: { [key: string]: string }
   ): void {
     const indexOfLegendItem = legend.map((r) => r.label).indexOf(label);
     if (indexOfLegendItem < 0) {
@@ -278,10 +269,10 @@ export class StyleRules {
    */
   public static getBy(
     styleType: StyleType,
-    rules: Array<IStyleRule<NodeStyle | EdgeStyle>>
+    rules: Array<IStyleRule<INodeStyle | IEdgeStyle>>
   ): Array<StyleRule> {
     return rules
-      .filter((style: IStyleRule<NodeStyle | EdgeStyle>) => {
+      .filter((style: IStyleRule<INodeStyle | IEdgeStyle>) => {
         switch (styleType) {
           case StyleType.COLOR:
             return style.style.color !== undefined;
@@ -302,14 +293,14 @@ export class StyleRules {
             return 'width' in style.style && style.style.width !== undefined;
         }
       })
-      .map((style: IStyleRule<NodeStyle | EdgeStyle>) => StyleRules.getRule(style, styleType));
+      .map((style: IStyleRule<INodeStyle | IEdgeStyle>) => StyleRules.getRule(style, styleType));
   }
 
   /**
    * From a RawStyle, generate a StyleRule of a specific style
    */
   public static getRule(
-    rawRule: IStyleRule<NodeStyle | EdgeStyle>,
+    rawRule: IStyleRule<INodeStyle | IEdgeStyle>,
     styleType: StyleType
   ): StyleRule {
     const rule = Tools.clone(rawRule);

@@ -1,11 +1,3 @@
-/**
- * LINKURIOUS CONFIDENTIAL
- * Copyright Linkurious SAS 2012 - 2018
- *
- * Created by maximeallex on 2018-06-01.
- */
-
-
 'use strict';
 
 import {expect} from 'chai';
@@ -259,6 +251,7 @@ describe('NodeAttributes', function () {
             itemType: undefined,
             input: undefined,
             style: {
+              // @ts-ignore
               color: {
                 type: 'auto',
                 input: ['categories']
@@ -275,7 +268,7 @@ describe('NodeAttributes', function () {
           {
             index: 0,
             type: SelectorType.IS,
-            itemType: null,
+            itemType: undefined,
             input: ['properties', 'name'],
             value: 'Dijon',
             style: {color: 'red'}
@@ -306,13 +299,12 @@ describe('NodeAttributes', function () {
           {
             index: 0,
             type: SelectorType.IS,
-            itemType: null,
+            itemType: undefined,
             input: ['properties', 'name'],
             value: 'Dijon',
             style: {color: 'red'}
           }
         ])).color(widgetNode_2_category.data)).to.eql(['green', '#17becf']);
-
       expect(
         new NodeAttributes(new StyleRules([
           {
@@ -321,6 +313,7 @@ describe('NodeAttributes', function () {
             itemType: undefined,
             input: undefined,
             style: {
+              // @ts-ignore
               color: {
                 type: 'auto',
                 input: ['categories']
@@ -337,7 +330,7 @@ describe('NodeAttributes', function () {
           {
             index: 0,
             type: SelectorType.IS,
-            itemType: null,
+            itemType: undefined,
             input: ['properties', 'name'],
             value: 'Dijon',
             style: {color: 'red'}
@@ -352,6 +345,7 @@ describe('NodeAttributes', function () {
             itemType: undefined,
             input: undefined,
             style: {
+              // @ts-ignore
               color: {
                 type: 'auto',
                 input: ['categories']
@@ -368,7 +362,7 @@ describe('NodeAttributes', function () {
           {
             index: 0,
             type: SelectorType.IS,
-            itemType: null,
+            itemType: undefined,
             input: ['properties', 'name'],
             value: 'Dijon',
             style: {color: 'red'}

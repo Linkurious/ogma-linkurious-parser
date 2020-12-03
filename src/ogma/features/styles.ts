@@ -11,6 +11,7 @@ import {
 } from '@linkurious/rest-client';
 
 import {BASE_GREY, EdgeAttributes, LKOgma, NodeAttributes, StyleRule} from '../..';
+import {Tools} from "../../tools/tools";
 
 export interface StylesConfig {
   nodeColorStyleRules: Array<StyleRule>;

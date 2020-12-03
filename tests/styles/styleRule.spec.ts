@@ -1,24 +1,23 @@
-/**
- * LINKURIOUS CONFIDENTIAL
- * Copyright Linkurious SAS 2012 - 2018
- *
- * Created by maximeallex on 2018-05-31.
- */
-
-
 'use strict';
 
 import {expect} from 'chai';
 import 'mocha';
 import {StyleRule} from '../../src';
-import {OgmaNodeShape, SelectorType, NodeStyle} from "@linkurious/rest-client";
+import {OgmaNodeShape, SelectorType, INodeStyle} from "@linkurious/rest-client";
 
 describe('StyleRule', () => {
   describe('StyleRule.specificity', () => {
     it('should return 4', () => {
       expect(
         new StyleRule(
-          {type: SelectorType.ANY, itemType: 'CITY', input: ['properties', 'name'], value: 'name', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.ANY,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            value: 'name',
+            style: {color: 'red'},
+            index: 0
+          }
         ).specificity
       ).to.equal(4);
     });
@@ -26,7 +25,14 @@ describe('StyleRule', () => {
     it('should return 3', () => {
       expect(
         new StyleRule(
-          {type: SelectorType.ANY, itemType: undefined, input: ['properties', 'name'], value: 'name', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.ANY,
+            itemType: undefined,
+            input: ['properties', 'name'],
+            value: 'name',
+            style: {color: 'red'},
+            index: 0
+          }
         ).specificity
       ).to.equal(3);
     });
@@ -76,7 +82,14 @@ describe('StyleRule', () => {
 
       expect(
         new StyleRule(
-          {type: SelectorType.IS, itemType: 'CITY', input: ['properties', 'name'], value: 'Paris', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.IS,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            value: 'Paris',
+            style: {color: 'red'},
+            index: 0
+          }
         ).matchValues('CITY', ['name'], 'Paris')
       ).to.be.true;
     });
@@ -96,25 +109,53 @@ describe('StyleRule', () => {
 
       expect(
         new StyleRule(
-          {type: SelectorType.IS, itemType: 'CITY', input: ['properties', 'name'], value: 'Paris', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.IS,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            value: 'Paris',
+            style: {color: 'red'},
+            index: 0
+          }
         ).matchValues('CITY', undefined, undefined)
       ).to.be.false;
 
       expect(
         new StyleRule(
-          {type: SelectorType.IS, itemType: 'CITY', input: ['properties', 'name'], value: 'Paris', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.IS,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            value: 'Paris',
+            style: {color: 'red'},
+            index: 0
+          }
         ).matchValues('CITY', ['name'], 'Dijon')
       ).to.be.false;
 
       expect(
         new StyleRule(
-          {type: SelectorType.IS, itemType: null, input: ['properties', 'name'], value: 'Paris', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.IS,
+            itemType: null,
+            input: ['properties', 'name'],
+            value: 'Paris',
+            style: {color: 'red'},
+            index: 0
+          }
         ).matchValues('CITY', ['name'], 'Dijon')
       ).to.be.false;
 
       expect(
         new StyleRule(
-          {type: SelectorType.IS, itemType: 'CITY', input: ['properties', 'name'], value: 'Paris', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.IS,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            value: 'Paris',
+            style: {color: 'red'},
+            index: 0
+          }
         ).matchValues('CITY', ['nom'], 'Paris')
       ).to.be.false;
     });
@@ -124,7 +165,14 @@ describe('StyleRule', () => {
     it('should return true', () => {
       expect(
         new StyleRule(
-          {type: SelectorType.ANY, itemType: 'CITY', input: ['properties', 'name'], value: 'Paris', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.ANY,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            value: 'Paris',
+            style: {color: 'red'},
+            index: 0
+          }
         ).canApplyTo(
           {categories: ['CITY'], properties: {name: 'Paris'}, geo: {}, readAt: 0}
         )
@@ -132,7 +180,14 @@ describe('StyleRule', () => {
 
       expect(
         new StyleRule(
-          {type: SelectorType.IS, itemType: 'CITY', input: ['properties', 'name'], value: 'Paris', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.IS,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            value: 'Paris',
+            style: {color: 'red'},
+            index: 0
+          }
         ).canApplyTo(
           {categories: ['CITY'], properties: {name: 'Paris'}, geo: {}, readAt: 0}
         )
@@ -148,7 +203,13 @@ describe('StyleRule', () => {
 
       expect(
         new StyleRule(
-          {type: SelectorType.NO_VALUE, itemType: 'CITY', input: ['properties', 'name'], style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.NO_VALUE,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            style: {color: 'red'},
+            index: 0
+          }
         ).canApplyTo(
           {categories: ['CITY'], properties: {}, geo: {}, readAt: 0}
         )
@@ -156,7 +217,13 @@ describe('StyleRule', () => {
 
       expect(
         new StyleRule(
-          {type: SelectorType.NO_VALUE, itemType: 'CITY', input: ['properties', 'name'], style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.NO_VALUE,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            style: {color: 'red'},
+            index: 0
+          }
         ).canApplyTo(
           {categories: ['CITY'], properties: {name: ''}, geo: {}, readAt: 0}
         )
@@ -164,7 +231,13 @@ describe('StyleRule', () => {
 
       expect(
         new StyleRule(
-          {type: SelectorType.NO_VALUE, itemType: 'CITY', input: ['properties', 'name'], style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.NO_VALUE,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            style: {color: 'red'},
+            index: 0
+          }
         ).canApplyTo(
           {categories: ['CITY'], properties: {name: null}, geo: {}, readAt: 0}
         )
@@ -182,7 +255,14 @@ describe('StyleRule', () => {
     it('should return false', () => {
       expect(
         new StyleRule(
-          {type: SelectorType.IS, itemType: 'CITY', input: ['properties', 'name'], value: 'Paris', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.IS,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            value: 'Paris',
+            style: {color: 'red'},
+            index: 0
+          }
         ).canApplyTo(
           {categories: ['CITY'], properties: {name: 'Dijon'}, geo: {}, readAt: 0}
         )
@@ -190,7 +270,14 @@ describe('StyleRule', () => {
 
       expect(
         new StyleRule(
-          {type: SelectorType.IS, itemType: 'CITY', input: ['properties', 'name'], value: 'Paris', style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.IS,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            value: 'Paris',
+            style: {color: 'red'},
+            index: 0
+          }
         ).canApplyTo(
           {categories: ['COMPANY'], properties: {name: 'Paris'}, geo: {}, readAt: 0}
         )
@@ -206,7 +293,13 @@ describe('StyleRule', () => {
 
       expect(
         new StyleRule(
-          {type: SelectorType.NO_VALUE, itemType: 'CITY', input: ['properties', 'name'], style: {color: 'red'}, index: 0}
+          {
+            type: SelectorType.NO_VALUE,
+            itemType: 'CITY',
+            input: ['properties', 'name'],
+            style: {color: 'red'},
+            index: 0
+          }
         ).canApplyTo(
           {categories: ['CITY'], properties: {name: 'Paris'}, geo: {}, readAt: 0}
         )
@@ -226,15 +319,15 @@ describe('StyleRule', () => {
     it('should return true', () => {
       expect(
         StyleRule.checkAny(
-         {categories: ['CITY'], properties: {name: 'Paris'}, geo: {}, readAt: 0},
-          { color: {type: 'auto', input: ['categories'], ignoreCase: true}} as NodeStyle
+          {categories: ['CITY'], properties: {name: 'Paris'}, geo: {}, readAt: 0},
+          {color: {type: 'auto', input: ['categories'], ignoreCase: true}} as INodeStyle
         )
       ).to.be.true;
 
       expect(
         StyleRule.checkAny(
-         {categories: ['CITY'], properties: {name: 'Paris'}, geo: {}, readAt: 0},
-          { shape: OgmaNodeShape.SQUARE }
+          {categories: ['CITY'], properties: {name: 'Paris'}, geo: {}, readAt: 0},
+          {shape: OgmaNodeShape.SQUARE}
         )
       ).to.be.true;
     });
@@ -243,7 +336,7 @@ describe('StyleRule', () => {
       expect(
         StyleRule.checkAny(
           {categories: ['CITY'], properties: {name: 'Paris'}, geo: {}, readAt: 0},
-          { color: {type: 'auto', input: ['properties', 'latitude'], ignoreCase: true}} as NodeStyle
+          {color: {type: 'auto', input: ['properties', 'latitude'], ignoreCase: true}} as INodeStyle
         )
       ).to.be.false;
     });
@@ -262,29 +355,29 @@ describe('StyleRule', () => {
       )).to.be.true;
 
       expect(StyleRule.checkNoValue(
-        {categories: ['CITY'],  properties: { name: null}, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: null}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.true;
 
       expect(StyleRule.checkNoValue(
-        {categories: ['CITY'],  properties: { name: undefined}, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: undefined}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.true;
 
       expect(StyleRule.checkNoValue(
-        {categories: ['CITY'],  properties: { name: ''}, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: ''}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.true;
     });
 
     it('should return false', () => {
       expect(StyleRule.checkNoValue(
-        {categories: ['CITY'],  properties: { name: 0 }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: 0}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.false;
 
       expect(StyleRule.checkNoValue(
-        {categories: ['CITY'],  properties: { name: 'toto' }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: 'toto'}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.false;
     });
@@ -293,39 +386,39 @@ describe('StyleRule', () => {
   describe('StyleRule.checkNan', () => {
     it('should return true', () => {
       expect(StyleRule.checkNan(
-        {categories: ['CITY'],  properties: { name: 'toto' }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: 'toto'}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.true;
     });
 
     it('should return false', () => {
       expect(StyleRule.checkNan(
-        {categories: ['CITY'],  properties: { name: '2' }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: '2'}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.false;
 
       expect(StyleRule.checkNan(
-        {categories: ['CITY'],  properties: { name: '2.6' }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: '2.6'}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.false;
 
       expect(StyleRule.checkNan(
-        {categories: ['CITY'],  properties: { name: '2,6' }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: '2,6'}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.false;
 
       expect(StyleRule.checkNan(
-        {categories: ['CITY'],  properties: { name: 2 }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: 2}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.false;
 
       expect(StyleRule.checkNan(
-       {categories: ['CITY'],  properties: { name: 2.6 }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: 2.6}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.false;
 
       expect(StyleRule.checkNan(
-        {categories: ['CITY'],  properties: { name: 0 }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: 0}, geo: {}, readAt: 0},
         ['properties', 'name']
       )).to.be.false;
     });
@@ -425,31 +518,31 @@ describe('StyleRule', () => {
   describe('StyleRule.checkIs', () => {
     it('should return true', () => {
       expect(StyleRule.checkIs(
-        {categories: ['CITY'],  properties: { name: 0 }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: 0}, geo: {}, readAt: 0},
         ['properties', 'name'],
         0
       )).to.be.true;
 
       expect(StyleRule.checkIs(
-        {categories: ['CITY'],  properties: { name: 'Paris'} , geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: 'Paris'}, geo: {}, readAt: 0},
         ['properties', 'name'],
         'Paris'
       )).to.be.true;
 
       expect(StyleRule.checkIs(
-        {categories: ['CITY'],  properties: { name: null }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: null}, geo: {}, readAt: 0},
         ['properties', 'name'],
         null
       )).to.be.true;
 
       expect(StyleRule.checkIs(
-        {categories: ['CITY'],  properties: { name: undefined }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: undefined}, geo: {}, readAt: 0},
         ['properties', 'name'],
         undefined
       )).to.be.true;
 
       expect(StyleRule.checkIs(
-        {categories: ['CITY'],  properties: { name: '' }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: ''}, geo: {}, readAt: 0},
         ['properties', 'name'],
         ''
       )).to.be.true;
@@ -457,19 +550,19 @@ describe('StyleRule', () => {
 
     it('should return false', () => {
       expect(StyleRule.checkIs(
-        {categories: ['CITY'],  properties: { name: 0 }, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: 0}, geo: {}, readAt: 0},
         ['properties', 'name'],
         'test'
       )).to.be.false;
 
       expect(StyleRule.checkIs(
-        {categories: ['CITY'],  properties: {}, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {}, geo: {}, readAt: 0},
         ['properties', 'name'],
         'test'
       )).to.be.false;
 
       expect(StyleRule.checkIs(
-        {categories: ['CITY'],  properties: {name: 'Test'}, geo: {}, readAt: 0},
+        {categories: ['CITY'], properties: {name: 'Test'}, geo: {}, readAt: 0},
         ['properties', 'name'],
         'test'
       )).to.be.false;
@@ -521,22 +614,22 @@ describe('StyleRule', () => {
   describe('StyleRule.getTypeColor', () => {
     it('should return a color', () => {
       expect(new StyleRule({
-        type:SelectorType.ANY,
-        input:undefined,
-        index:0,
-        itemType:'CITY',
-        value:undefined,
-        style:{
+        type: SelectorType.ANY,
+        input: undefined,
+        index: 0,
+        itemType: 'CITY',
+        value: undefined,
+        style: {
           color: 'red'
         }
       }).getTypeColor('CITY')).to.be.equal('red');
       expect(new StyleRule({
-        type:SelectorType.ANY,
-        input:undefined,
-        index:0,
-        itemType:undefined,
-        value:undefined,
-        style:{
+        type: SelectorType.ANY,
+        input: undefined,
+        index: 0,
+        itemType: undefined,
+        value: undefined,
+        style: {
           color: {
             type: 'auto',
             input: ['categories']
@@ -544,12 +637,12 @@ describe('StyleRule', () => {
         }
       }).getTypeColor('CITY')).to.be.equal('#2ca02c');
       expect(new StyleRule({
-        type:SelectorType.ANY,
-        input:undefined,
-        index:0,
-        itemType:'CITY',
-        value:undefined,
-        style:{
+        type: SelectorType.ANY,
+        input: undefined,
+        index: 0,
+        itemType: 'CITY',
+        value: undefined,
+        style: {
           color: {
             type: 'auto',
             input: ['categories']
@@ -560,45 +653,45 @@ describe('StyleRule', () => {
 
     it('should return undefined', () => {
       expect(new StyleRule({
-        type:SelectorType.IS,
-        input:undefined,
-        index:0,
-        itemType:'CITY',
-        value:undefined,
-        style:{
+        type: SelectorType.IS,
+        input: undefined,
+        index: 0,
+        itemType: 'CITY',
+        value: undefined,
+        style: {
           color: 'red'
         }
       }).getTypeColor('CITY')).to.be.equal(undefined);
 
       expect(new StyleRule({
-        type:SelectorType.ANY,
-        input:['properties', 'name'],
-        index:0,
-        itemType:'CITY',
-        value:'Paris',
-        style:{
+        type: SelectorType.ANY,
+        input: ['properties', 'name'],
+        index: 0,
+        itemType: 'CITY',
+        value: 'Paris',
+        style: {
           color: 'red'
         }
       }).getTypeColor('CITY')).to.be.equal(undefined);
 
       expect(new StyleRule({
-        type:SelectorType.ANY,
-        input:undefined,
-        index:0,
-        itemType:'CITY',
-        value:undefined,
-        style:{
+        type: SelectorType.ANY,
+        input: undefined,
+        index: 0,
+        itemType: 'CITY',
+        value: undefined,
+        style: {
           size: '200%'
         }
       }).getTypeColor('CITY')).to.be.equal(undefined);
 
       expect(new StyleRule({
-        type:SelectorType.ANY,
-        input:undefined,
-        index:0,
-        itemType:'COMPANY',
-        value:undefined,
-        style:{
+        type: SelectorType.ANY,
+        input: undefined,
+        index: 0,
+        itemType: 'COMPANY',
+        value: undefined,
+        style: {
           color: 'yellow'
         }
       }).getTypeColor('CITY')).to.be.equal(undefined);
