@@ -5,6 +5,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "registry": "https://nexus3.vpc.prod.scw-par1.linkurious.net/repository/npm-linkurious/"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
