@@ -10,7 +10,7 @@ import {
   TextOptions
 } from '@linkurious/rest-client';
 
-import {BASE_GREY, EdgeAttributes, LKOgma, NodeAttributes, StyleRule} from '../..';
+import {BASE_GREY, EdgeAttributes, LKOgma, NodeAttributes, OgmaTools, StyleRule} from '../..';
 import {Tools} from "../../tools/tools";
 
 export interface StylesConfig {
@@ -442,7 +442,7 @@ export class StylesViz {
                 const nodeColor = Array.isArray(node.getAttribute('color'))
                   ? node.getAttribute('color')![0]
                   : node.getAttribute('color');
-                const textColor = Tools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
+                const textColor = OgmaTools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
                 const isSupernode = node.getData(['statistics', 'supernode']);
                 let content = null;
                 if (+badgeContent !== 0) {
@@ -477,7 +477,7 @@ export class StylesViz {
               const nodeColor = Array.isArray(node.getAttribute('color'))
                 ? node.getAttribute('color')![0]
                 : node.getAttribute('color');
-              const textColor = Tools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
+              const textColor = OgmaTools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
               return {
                 color: 'inherit',
                 minVisibleSize: 20,

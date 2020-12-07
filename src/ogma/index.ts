@@ -1,12 +1,11 @@
 import {
   EntityType,
-  IOgmaConfig,
-  LkEdgeData,
-  LkNodeData,
+  IOgmaConfig, LkEdgeData, LkNodeData,
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
 
+export {default as Ogma} from 'ogma';
 import {StylesViz} from './features/styles';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from "./features/reactive";
@@ -17,18 +16,14 @@ import {Tools} from "../tools/tools";
 export const ANIMATION_DURATION = 750;
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
+
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
 
   // TODO check the use of the watchers
-  public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData,
-    LkEdgeData> = this.schema.watchNodeNonObjectProperty({
-    path: 'categories',
-    unwindArrays: true,
-    filter: 'all'
-  });
-  public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData,
-    LkEdgeData> = this.schema.watchEdgeNonObjectProperty({
+  public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>
+  public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>
+    = this.schema.watchEdgeNonObjectProperty({
     path: 'type',
     filter: 'all'
   });
@@ -43,6 +38,16 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   constructor(_configuration: IOgmaConfig) {
     // set Ogma global configuration
     super(_configuration);
+    console.log('new LKOgma')
+    this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
+      path: 'categories',
+      unwindArrays: true,
+      filter: 'all'
+    });
+    this.edgeTypeWatcher = this.schema.watchEdgeNonObjectProperty({
+      path: 'type',
+      filter: 'all'
+    });
     Object.setPrototypeOf(this, new.target.prototype);
     // set ogma max zoom value  and selection with mouse option (false?)
     this.setOptions({
@@ -196,7 +201,21 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       : this.getEdges().filter((i) => i.hasClass('filtered'));
   }
 
+  /**
+   * Do a full reset on ogma and streams of ogma
+   */
+  public shutDown() {
+    this.destroy();
+    if (this.store) {
+      this.store.clear();
+    }
+  }
+
+
 }
+
+
+
 
 
 

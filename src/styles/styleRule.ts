@@ -6,11 +6,16 @@ import {
   LkEdgeData,
   LkNodeData,
   INodeStyle,
-  SelectorType
+  SelectorType,
+  IStyleAutoRange
 } from '@linkurious/rest-client';
 
 import {ItemAttributes} from '..';
 import {Tools} from "../tools/tools";
+
+export enum StyleRuleType {
+  AUTO_RANGE = 'autoRange'
+}
 
 export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
   public type: SelectorType;
@@ -27,6 +32,16 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
     this.itemType = model.itemType;
     this.style = model.style;
     this.value = model.value;
+  }
+
+  public static isAutomaticRange(rule: IStyleRule<IEdgeStyle | INodeStyle>): boolean {
+    return (
+      rule.style !== undefined &&
+      (((rule.style as IEdgeStyle).width !== undefined &&
+        ((rule.style as IEdgeStyle).width as IStyleAutoRange).type === StyleRuleType.AUTO_RANGE) ||
+        ((rule.style as INodeStyle).size !== undefined &&
+          ((rule.style as INodeStyle).size as IStyleAutoRange).type === StyleRuleType.AUTO_RANGE))
+    );
   }
 
   /**

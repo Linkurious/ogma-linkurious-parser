@@ -7,6 +7,7 @@ import sha1 from 'sha1';
 import {StyleRule} from './styleRule';
 import {BASE_GREY, ItemAttributes} from './itemAttributes';
 import {Tools} from "../tools/tools";
+import {OgmaTools} from "..";
 
 export interface OgmaImage extends IStyleImage {
   url?: string;
@@ -126,7 +127,7 @@ export class NodeAttributes extends ItemAttributes {
               content: rules[i].style.icon.content,
               font: rules[i].style.icon.font,
               scale: 0.5,
-              color: Tools.isBright(color) ? '#000000' : '#FFFFFF'
+              color: OgmaTools.isBright(color) ? '#000000' : '#FFFFFF'
             }
           };
         } else if ('image' in rules[i].style) {

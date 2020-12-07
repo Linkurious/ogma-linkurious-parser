@@ -1,6 +1,7 @@
 'use strict';
 
 import * as Ogma from 'ogma';
+import {Node, Edge} from 'ogma';
 import {ItemFieldsCaptions} from '@linkurious/rest-client';
 
 import {Captions, LKOgma} from '../..';
@@ -16,6 +17,7 @@ export class CaptionsViz {
   public edgesCaptionsRule!: Ogma.StyleRule;
   private _ogma: LKOgma;
   private _schema: CaptionState = {node: {}, edge: {}};
+  private _exportCaptionClass!: Ogma.StyleClass;
 
   constructor(
     ogma: LKOgma,
@@ -87,6 +89,39 @@ export class CaptionsViz {
       });
     } else {
       return this.edgesCaptionsRule.refresh();
+    }
+  }
+
+  /**
+   * Set the class for exported nodes and edges
+   */
+  public setExportCaptionClass(textWrappingLength?: boolean): void {
+    if (!this._exportCaptionClass) {
+      this._exportCaptionClass = this._ogma.styles.createClass({
+        name: 'exportedCaption',
+        nodeAttributes: {
+          text: {
+            content: (node: Node | undefined) => {
+              if (node === undefined) {
+                return ``;
+              }
+              return Captions.getText(node.getData(), this._schema.node);
+            }
+          }
+        },
+        nodeDependencies: {self: {data: true}},
+        edgeAttributes: {
+          text: {
+            content: (edge: Edge | undefined) => {
+              if (edge === undefined) {
+                return ``;
+              }
+              return Captions.getText(edge.getData(), this._schema.edge);
+            }
+          }
+        },
+        edgeDependencies: {self: {data: true}}
+      });
     }
   }
 
