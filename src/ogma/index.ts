@@ -16,29 +16,19 @@ import {Tools} from "../tools/tools";
 export const ANIMATION_DURATION = 750;
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
-
+  private _reactive: RxViz;
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
-
-  // TODO check the use of the watchers
-  public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>
-  public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>
-    = this.schema.watchEdgeNonObjectProperty({
-    path: 'type',
-    filter: 'all'
-  });
-
-  // TODO check the need of RxViz
-  private _reactive: RxViz;
+  // Trigger an event with node category changes
+  public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
+  // Trigger an event with edge type changes
+  public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   public store: OgmaStore;
 
-  //TODO add back multiSelection logic
-  // private readonly _multiSelectionKey: string;
 
   constructor(_configuration: IOgmaConfig) {
     // set Ogma global configuration
     super(_configuration);
-    console.log('new LKOgma')
     this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
       path: 'categories',
       unwindArrays: true,
@@ -65,13 +55,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
 
     this._reactive = new RxViz(this);
     this.store = this._reactive.store;
-
-    // TODO: need to override  in LKE
+    // init selection behavior
     this.initSelection();
-
     // init ogma styles object
     this.initStyles(_configuration);
-
     // init visualization captions
     this.initCaptions(_configuration);
 
@@ -86,6 +73,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Initialize selection behavior
    */
   public initSelection(): void {
+    console.log('init selection ogma halper')
     this.events.onClick((e) => {
       if (e !== undefined && e.button === 'left') {
         if (e.target !== null) {
@@ -210,7 +198,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this.store.clear();
     }
   }
-
 
 }
 

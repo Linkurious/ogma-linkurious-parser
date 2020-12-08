@@ -1,6 +1,7 @@
 'use strict';
 
 import * as o from 'ogma';
+import {Edge, EdgeAttributesValue, Node, NodeAttributesValue} from 'ogma';
 import {
   GenericObject,
   LkEdgeData,
@@ -23,7 +24,7 @@ export interface StylesConfig {
   edgeShapeStyleRules?: Array<StyleRule>;
 }
 
-const HOVERED_SELECTED_NODE_STYLE: o.NodeAttributesValue<LkNodeData, LkEdgeData> = {
+const HOVERED_SELECTED_NODE_STYLE: NodeAttributesValue<LkNodeData, LkEdgeData> = {
   text: {
     style: 'bold',
     backgroundColor: '#fff',
@@ -33,7 +34,7 @@ const HOVERED_SELECTED_NODE_STYLE: o.NodeAttributesValue<LkNodeData, LkEdgeData>
   outline: false
 };
 
-const HOVERED_SELECTED_EDGE_STYLE: o.EdgeAttributesValue<LkEdgeData, LkNodeData> = {
+const HOVERED_SELECTED_EDGE_STYLE: EdgeAttributesValue<LkEdgeData, LkNodeData> = {
   text: {
     style: 'bold',
     backgroundColor: '#fff',
@@ -44,23 +45,23 @@ const HOVERED_SELECTED_EDGE_STYLE: o.EdgeAttributesValue<LkEdgeData, LkNodeData>
 
 const NODE_HALO_CONFIGURATION = {
   color: '#FFF',
-  size: 7,
+  width: 7,
   scalingMethod: 'scaled',
   strokeWidth: 0,
   hideNonAdjacentEdges: false
 } as {
   color: '#FFF';
-  size: 7;
+  width: 7;
   strokeWidth: 0;
 };
 
 const EDGE_HALO_CONFIGURATION = {
   color: '#FFF',
   scalingMethod: 'scaled',
-  size: 4
+  width: 4
 } as {
   color: '#FFF';
-  size: 4;
+  width: 4;
 };
 
 export const FILTER_OPACITY = 0.2;
@@ -247,7 +248,7 @@ export class StylesViz {
     // setting default halo style
     this._nodeDefaultHaloRules = this._ogma.styles.addRule({
       nodeAttributes: {
-        halo: (node: o.Node | undefined) => {
+        halo: (node: Node<LkNodeData> | undefined) => {
           if (
             node !== undefined &&
             !node.hasClass('filtered') &&
@@ -268,7 +269,7 @@ export class StylesViz {
               scalingMethod: this._ogma.geo.enabled() ? 'fixed' : 'scaled'
             } as {
               color: '#FFF';
-              size: 7;
+              width: 7;
               strokeWidth: 0;
             };
           }
@@ -285,7 +286,7 @@ export class StylesViz {
     // setting default halo styles
     this._edgeDefaultHaloRules = this._ogma.styles.addRule({
       edgeAttributes: {
-        halo: (edge: o.Edge | undefined) => {
+        halo: (edge: Edge<LkEdgeData> | undefined) => {
           if (
             edge !== undefined &&
             !edge.hasClass('filtered') &&
@@ -301,7 +302,7 @@ export class StylesViz {
               scalingMethod: this._ogma.geo.enabled() ? 'fixed' : 'scaled'
             } as {
               color: '#FFF';
-              size: 4;
+              width: 4;
             };
           }
           return null;
