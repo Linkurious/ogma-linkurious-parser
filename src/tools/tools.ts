@@ -2,8 +2,8 @@
 
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
-import {Node, NodeList} from "ogma";
-import {LkNodeData, LkProperty} from "@linkurious/rest-client";
+import {Node, NodeList} from 'ogma';
+import {LkNodeData, LkProperty} from '@linkurious/rest-client';
 
 export {sortBy};
 const URL_PATTERN = /([a-zA-Z][a-zA-Z0-9\+\-\.]*:\/\/[^\s]+)/i;
@@ -134,7 +134,6 @@ export class Tools {
       return sign + Math.floor(nn) + suffix;
     }
   }
-
 
   /**
    * Return true if a string is not composed only by invisible char

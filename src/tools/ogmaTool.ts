@@ -1,13 +1,10 @@
 'use strict';
 import {Color, NodeList, Node, EdgeList, Edge} from 'ogma';
-import {
-  GenericObject,
-  LkEdgeData,
-  LkNodeData,
-} from '@linkurious/rest-client';
-import {Tools} from "./tools";
+import {GenericObject, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
-export const HTML_COLORS: GenericObject<{ hex: string; rgb: string }> = {
+import {Tools} from './tools';
+
+export const HTML_COLORS: GenericObject<{hex: string; rgb: string}> = {
   lightsalmon: {hex: '#FFA07A', rgb: 'rbg(255,160,122)'},
   salmon: {hex: '#FA8072', rgb: 'rgb(250,128,114)'},
   darksalmon: {hex: '#E9967A', rgb: 'rgb(233,150,122)'},
@@ -150,7 +147,6 @@ export const HTML_COLORS: GenericObject<{ hex: string; rgb: string }> = {
 };
 
 export class OgmaTools {
-
   /**
    * Get the amount of hidden neighbors from a list of nodes
    *

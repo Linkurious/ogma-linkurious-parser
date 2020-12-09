@@ -1,6 +1,8 @@
 import {
   EntityType,
-  IOgmaConfig, LkEdgeData, LkNodeData,
+  IOgmaConfig,
+  LkEdgeData,
+  LkNodeData,
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
@@ -25,7 +27,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   // Trigger an event with edge type changes
   public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   public store: OgmaStore;
-
 
   constructor(_configuration: IOgmaConfig) {
     // set Ogma global configuration
@@ -73,7 +74,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Initialize selection behavior
    */
   public initSelection(): void {
-    console.log('init selection ogma halper')
+    console.log('init selection ogma halper');
     this.events.onClick((e) => {
       if (e !== undefined && e.button === 'left') {
         if (e.target !== null) {
@@ -198,8 +199,4 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this.store.clear();
     }
   }
-
 }
-
-
-
