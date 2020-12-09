@@ -19,6 +19,7 @@ import {
   hasSelectionProperties
 } from './ogma/features/selectors';
 import {LKOgma, ANIMATION_DURATION} from './ogma';
+import {Filters} from './filters/filters'
 
 export {
   Captions,
@@ -44,5 +45,6 @@ export {
   BASE_GREY,
   StyleType,
   ItemAttributes,
-  Legend
+  Legend,
+  Filters
 };

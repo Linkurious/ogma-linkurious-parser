@@ -540,4 +540,38 @@ export class Tools {
     n = Tools.parseNumber(n);
     return Tools.isDefined(n) && n === n;
   }
+
+  /**
+   * return the correct property value
+   */
+  public static getPropertyValue(
+      property: LkProperty,
+      invalidAsString?: boolean,
+      formattedDates?: boolean
+  ): undefined | null | string | number | boolean | Array<string> {
+    if (typeof property === 'object' && !Array.isArray(property)) {
+      if (!('status' in property)) {
+        if ((property.type === 'date' || property.type === 'datetime') && formattedDates) {
+          return Tools.formatDate(property.value, property.type === 'datetime');
+        } else if (property.type === 'date' || property.type === 'datetime') {
+          return new Date(property.value).getTime();
+        }
+      } else if (invalidAsString) {
+        return 'original' in property ? property.original : undefined;
+      } else {
+        return undefined;
+      }
+    }
+    return property;
+  }
+
+  /**
+   * Parse the given value and return a float number or NaN
+   *
+   * @param {any} n
+   * @return {number}
+   */
+  public static parseFloat(n: unknown): number {
+    return Tools.parseNumber(n);
+  }
 }
