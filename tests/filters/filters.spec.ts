@@ -5,6 +5,7 @@ import 'mocha';
 import { Filters } from "../../src";
 import Ogma from "ogma";
 import {LkEdgeData, LkNodeData} from "@linkurious/rest-client";
+import {Tools} from '../../src/tools/tools';
 
 describe('Filters', () => {
     const filterEmpty = {edge: [], node: []};
