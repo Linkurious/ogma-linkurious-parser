@@ -2,14 +2,12 @@
 
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
-import {Color, Node, NodeList} from "ogma";
-import {GenericObject, LkNodeData, LkProperty} from "@linkurious/rest-client";
+import {Color, Node, NodeList} from 'ogma';
+import {GenericObject, LkNodeData, LkProperty} from '@linkurious/rest-client';
 
-export {
-  sortBy
-}
+export {sortBy};
 
-const HTML_COLORS: GenericObject<{ hex: string; rgb: string }> = {
+const HTML_COLORS: GenericObject<{hex: string; rgb: string}> = {
   lightsalmon: {hex: '#FFA07A', rgb: 'rbg(255,160,122)'},
   salmon: {hex: '#FA8072', rgb: 'rgb(250,128,114)'},
   darksalmon: {hex: '#E9967A', rgb: 'rgb(233,150,122)'},
@@ -163,9 +161,8 @@ export const CAPTION_HEURISTIC: string[] = [
 ];
 
 export class Tools {
-
   public static isEqual(v1: unknown, v2: unknown): boolean {
-    return isEqual(v1, v2)
+    return isEqual(v1, v2);
   }
 
   /**
@@ -211,17 +208,16 @@ export class Tools {
     return path.reduce((p, c) => (p && p[c] !== undefined ? p[c] : undefined), Tools.clone(ref));
   }
 
-
   /**
    * Return a clone of an object
    */
   public static clone(o: any) {
     return typeof o === 'object'
       ? JSON.parse(
-        JSON.stringify(o, (k, v) => {
-          return v instanceof Set ? {} : v;
-        })
-      )
+          JSON.stringify(o, (k, v) => {
+            return v instanceof Set ? {} : v;
+          })
+        )
       : o;
   }
 
@@ -421,8 +417,8 @@ export class Tools {
     return sign === '+'
       ? this.sanitizeFormattedNumber(hours) * 3.6e6 + this.sanitizeFormattedNumber(minutes) * 60000
       : (this.sanitizeFormattedNumber(hours) * 3.6e6 +
-      this.sanitizeFormattedNumber(minutes) * 60000) *
-      -1;
+          this.sanitizeFormattedNumber(minutes) * 60000) *
+          -1;
   }
 
   public static sanitizeFormattedNumber(str: string): number {

@@ -44,5 +44,5 @@ export {
   BASE_GREY,
   StyleType,
   ItemAttributes,
-  Legend,
+  Legend
 };

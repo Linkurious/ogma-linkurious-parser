@@ -1,12 +1,11 @@
-
 'use strict';
 
 import {BehaviorSubject, Observable} from 'rxjs';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 
+import {Tools} from '../../tools/tools';
 
 import {DummyNodeList, OgmaState} from './reactive';
-import {Tools} from "../../tools/tools";
 
 export class OgmaStore extends BehaviorSubject<OgmaState> {
   constructor(d: OgmaState) {

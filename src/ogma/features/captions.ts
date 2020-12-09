@@ -4,7 +4,7 @@ import * as Ogma from 'ogma';
 import {ItemFieldsCaptions} from '@linkurious/rest-client';
 
 import {Captions, LKOgma} from '../..';
-import {Tools} from "../../tools/tools";
+import {Tools} from '../../tools/tools';
 
 export interface CaptionState {
   node: ItemFieldsCaptions;
@@ -89,5 +89,4 @@ export class CaptionsViz {
       return this.edgesCaptionsRule.refresh();
     }
   }
-
 }

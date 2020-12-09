@@ -10,7 +10,7 @@ import {
 } from '@linkurious/rest-client';
 
 import {ItemAttributes} from '..';
-import {Tools} from "../tools/tools";
+import {Tools} from '../tools/tools';
 
 export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
   public type: SelectorType;
@@ -147,7 +147,7 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
    * @param comparator
    * @return {boolean}
    */
-  public static checkRange(value: number, comparator: { [key: string]: number }): boolean {
+  public static checkRange(value: number, comparator: {[key: string]: number}): boolean {
     const operators = Object.keys(comparator);
     return operators.every((op) => {
       switch (op) {
