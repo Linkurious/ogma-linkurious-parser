@@ -3,6 +3,7 @@ import {Color} from 'ogma';
 import {LkNodeData, OgmaNodeShape, IStyleImage, IStyleIcon} from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
+import {Tools} from '../tools/tools';
 
 import {StyleRule} from './styleRule';
 import {BASE_GREY, ItemAttributes} from './itemAttributes';

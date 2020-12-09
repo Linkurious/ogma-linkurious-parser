@@ -23,9 +23,9 @@ import {
   hasSelectionProperties
 } from './ogma/features/selectors';
 import {LKOgma, ANIMATION_DURATION} from './ogma';
+import {Filters} from './filters/filters'
 
 export {
-  OgmaState,
   Captions,
   EdgeAttributes,
   NodeAttributes,

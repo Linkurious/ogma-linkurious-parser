@@ -4,14 +4,15 @@ import {
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
+import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher} from 'ogma';
+
+import {Tools} from '../tools/tools';
 
 export {default as Ogma} from 'ogma';
 import {StylesViz} from './features/styles';
 import {CaptionsViz} from './features/captions';
-import {RxViz} from "./features/reactive";
-import {OgmaStore} from "./features/OgmaStore";
-import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher} from 'ogma';
-import {Tools} from "../tools/tools";
+import {RxViz} from './features/reactive';
+import {OgmaStore} from './features/OgmaStore';
 
 export const ANIMATION_DURATION = 750;
 
@@ -66,7 +67,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKStyles.setEdgesDefaultHalo();
     this.LKStyles.setBadgeRule();
     this.LKStyles.setFilterClass();
-
   }
 
   /**
@@ -118,7 +118,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Initialize graph.
    * add nodes and edges to the viz and init the selection.
    */
-  public async init(visualization: { nodes: Array<VizNode>; edges: Array<VizEdge> }): Promise<void> {
+  public async init(visualization: {nodes: Array<VizNode>; edges: Array<VizEdge>}): Promise<void> {
     this.clearGraph();
     let selectedEntityType: EntityType | undefined = undefined;
     let selectedElements: Array<string> = [];
@@ -200,9 +200,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   }
 
 }
-
-
-
 
 
 
