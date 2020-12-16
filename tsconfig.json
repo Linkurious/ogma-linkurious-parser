@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "module": "commonjs",
+    "module": "ES2015",
     "moduleResolution": "node",
     "target": "es5",
     "stripInternal": true,
@@ -12,7 +12,13 @@
     "rootDir": "./src",
     "sourceMap": true,
     "inlineSources": true,
-    "lib": ["es2016", "es2017", "dom"],
+    "lib": [
+      "ES5",
+      "ES6",
+      "ES2016",
+      "ES2017",
+      "ES2015",
+      "dom"
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noUnusedLocals": true,
