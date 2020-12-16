@@ -74,7 +74,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Initialize selection behavior
    */
   public initSelection(): void {
-    console.log('init selection ogma halper');
     this.events.onClick((e) => {
       if (e !== undefined && e.button === 'left') {
         if (e.target !== null) {

@@ -19,6 +19,7 @@
       "ES2017",
       "ES2015",
       "dom"
+    ],
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noUnusedLocals": true,

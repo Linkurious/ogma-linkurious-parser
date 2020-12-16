@@ -15,7 +15,7 @@
     "prepare": "tsc",
     "build": "tsc",
     "compile": "tsc -b",
-    "tsc": "tsc",
+    "tsc": "tsc -b",
     "build:rollup": "rollup -c",
     "test": "./node_modules/.bin/mocha -r ts-node/register/transpile-only tests/**/*.spec.ts",
     "test:unit": "nyc --reporter=text-summary --reporter=cobertura --report-dir=reports  mocha -r ts-node/register/transpile-only --reporter mocha-multi-reporters --reporter-options configFile=.test-reporters.json tests/**/*.spec.ts",
@@ -28,8 +28,8 @@
     "bump:major": "bump2version major && npm version --no-git-tag-version major"
   },
   "repository": {
-    "type": "",
-    "url": ""
+    "type": "git",
+    "url": "https://github.com/Linkurious/ogma-helper.git"
   },
   "license": "ISC",
   "homepage": "",
