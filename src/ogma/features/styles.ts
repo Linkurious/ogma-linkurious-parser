@@ -11,7 +11,14 @@ import {
   TextOptions
 } from '@linkurious/rest-client';
 
-import {BASE_GREY, EdgeAttributes, LKOgma, NodeAttributes, OgmaTools, StyleRule as LKStyleRule} from '../..';
+import {
+  BASE_GREY,
+  EdgeAttributes,
+  LKOgma,
+  NodeAttributes,
+  OgmaTools,
+  StyleRule as LKStyleRule
+} from '../..';
 import {Tools} from '../../tools/tools';
 
 export interface StylesConfig {
@@ -99,12 +106,12 @@ export class StylesViz {
   public setNodesDefaultStyles(
     nodeStyleConf:
       | {
-      nodeRadius?: number;
-      shape?: OgmaNodeShape;
-      text?: TextOptions & {
-        nodePosition?: 'right' | 'left' | 'top' | 'bottom' | 'center';
-      };
-    }
+          nodeRadius?: number;
+          shape?: OgmaNodeShape;
+          text?: TextOptions & {
+            nodePosition?: 'right' | 'left' | 'top' | 'bottom' | 'center';
+          };
+        }
       | undefined
   ): void {
     // setting selection and hover attributes
@@ -181,10 +188,10 @@ export class StylesViz {
   public setEdgesDefaultStyles(
     edgeStyleConf:
       | {
-      edgeWidth?: number;
-      shape?: OgmaEdgeShape;
-      text?: TextOptions;
-    }
+          edgeWidth?: number;
+          shape?: OgmaEdgeShape;
+          text?: TextOptions;
+        }
       | undefined
   ): void {
     // setting selection and hover attributes
