@@ -12,7 +12,6 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "prepare": "tsc -b",
     "build": "tsc -b",
     "compile": "tsc -b",
     "tsc": "tsc -b",
