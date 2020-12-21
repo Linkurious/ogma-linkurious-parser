@@ -8,6 +8,9 @@ import {StyleRule} from './styles/styleRule';
 import {StyleRules, StyleType, Legend} from './styles/styleRules';
 import {StylesViz, StylesConfig, FILTER_OPACITY} from './ogma/features/styles';
 import {CaptionsViz, CaptionState} from './ogma/features/captions';
+import {OgmaState} from './ogma/features/reactive';
+import {OgmaTools, HTML_COLORS} from './tools/ogmaTool';
+import {Filters} from './filters/filters';
 import {
   getSelectionSize,
   getSelectionState,
@@ -45,4 +48,8 @@ export {
   StyleType,
   ItemAttributes,
   Legend,
+  OgmaTools,
+  HTML_COLORS,
+  Filters,
+  OgmaState
 };

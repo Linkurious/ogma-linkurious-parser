@@ -1,6 +1,7 @@
 {
   "name": "ogma-helper",
-  "version": "1.0.0",
+  "version": "0.0.1",
+  "author": "Linkurious SAS",
   "description": "helper library to facilitate interaction with OGMA",
   "files": [
     "dist"
@@ -11,10 +12,11 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "prepare": "tsc",
-    "build": "tsc",
+    "prepare": "tsc -b",
+    "build": "tsc -b",
     "compile": "tsc -b",
-    "tsc": "tsc",
+    "tsc": "tsc -b",
+    "build:rollup": "rollup -c",
     "test": "./node_modules/.bin/mocha -r ts-node/register/transpile-only tests/**/*.spec.ts",
     "test:unit": "nyc --reporter=text-summary --reporter=cobertura --report-dir=reports  mocha -r ts-node/register/transpile-only --reporter mocha-multi-reporters --reporter-options configFile=.test-reporters.json tests/**/*.spec.ts",
     "dev": "./node_modules/.bin/tsc && node exemple/test_node.js",
@@ -26,25 +28,26 @@
     "bump:major": "bump2version major && npm version --no-git-tag-version major"
   },
   "repository": {
-    "type": "",
-    "url": ""
+    "type": "git",
+    "url": "https://github.com/Linkurious/ogma-helper.git"
   },
   "license": "ISC",
   "homepage": "",
   "dependencies": {
+    "lodash": "4.17.15",
+    "lodash-es": "4.17.15",
     "ogma": "github:Linkurious/ogma-release#3.2.2",
     "rxjs": "6.5.3",
-    "sha1": "1.1.1",
-    "lodash": "4.17.15",
-    "lodash-es": "4.17.15"
+    "sha1": "1.1.1"
   },
   "devDependencies": {
+    "@linkurious/rest-client": "2.10.2",
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@types/chai": "4.2.11",
     "@types/lodash": "4.14.147",
     "@types/lodash-es": "4.17.3",
-    "@types/sha1": "^1.1.2",
-    "@linkurious/rest-client": "2.10.2",
-    "@types/chai": "4.2.11",
     "@types/mocha": "5.2.7",
+    "@types/sha1": "^1.1.2",
     "@typescript-eslint/eslint-plugin": "2.25.0",
     "@typescript-eslint/parser": "2.25.0",
     "chai": "4.2.0",
@@ -58,6 +61,9 @@
     "nyc": "^15.1.0",
     "prettier": "2.0.2",
     "request": "2.88.2",
+    "rollup": "^2.35.1",
+    "rollup-plugin-typescript2": "^0.29.0",
+    "rollup-plugin-node-globals": "1.4.0",
     "should": "11.1.0",
     "ts-node": "6.2.0",
     "typescript": "3.7.5"

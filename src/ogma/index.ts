@@ -6,43 +6,40 @@ import {
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
+import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher} from 'ogma';
 
+import {Tools} from '../tools/tools';
+
+export {default as Ogma} from 'ogma';
 import {StylesViz} from './features/styles';
 import {CaptionsViz} from './features/captions';
-import {RxViz} from "./features/reactive";
-import {OgmaStore} from "./features/OgmaStore";
-import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher} from 'ogma';
-import {Tools} from "../tools/tools";
+import {RxViz} from './features/reactive';
+import {OgmaStore} from './features/OgmaStore';
 
 export const ANIMATION_DURATION = 750;
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
+  private _reactive: RxViz;
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
-
-  // TODO check the use of the watchers
-  public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData,
-    LkEdgeData> = this.schema.watchNodeNonObjectProperty({
-    path: 'categories',
-    unwindArrays: true,
-    filter: 'all'
-  });
-  public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData,
-    LkEdgeData> = this.schema.watchEdgeNonObjectProperty({
-    path: 'type',
-    filter: 'all'
-  });
-
-  // TODO check the need of RxViz
-  private _reactive: RxViz;
+  // Trigger an event with node category changes
+  public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
+  // Trigger an event with edge type changes
+  public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   public store: OgmaStore;
-
-  //TODO add back multiSelection logic
-  // private readonly _multiSelectionKey: string;
 
   constructor(_configuration: IOgmaConfig) {
     // set Ogma global configuration
     super(_configuration);
+    this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
+      path: 'categories',
+      unwindArrays: true,
+      filter: 'all'
+    });
+    this.edgeTypeWatcher = this.schema.watchEdgeNonObjectProperty({
+      path: 'type',
+      filter: 'all'
+    });
     Object.setPrototypeOf(this, new.target.prototype);
     // set ogma max zoom value  and selection with mouse option (false?)
     this.setOptions({
@@ -60,13 +57,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
 
     this._reactive = new RxViz(this);
     this.store = this._reactive.store;
-
-    // TODO: need to override  in LKE
+    // init selection behavior
     this.initSelection();
-
     // init ogma styles object
     this.initStyles(_configuration);
-
     // init visualization captions
     this.initCaptions(_configuration);
 
@@ -74,7 +68,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKStyles.setEdgesDefaultHalo();
     this.LKStyles.setBadgeRule();
     this.LKStyles.setFilterClass();
-
   }
 
   /**
@@ -125,7 +118,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Initialize graph.
    * add nodes and edges to the viz and init the selection.
    */
-  public async init(visualization: { nodes: Array<VizNode>; edges: Array<VizEdge> }): Promise<void> {
+  public async init(visualization: {nodes: Array<VizNode>; edges: Array<VizEdge>}): Promise<void> {
     this.clearGraph();
     let selectedEntityType: EntityType | undefined = undefined;
     let selectedElements: Array<string> = [];
@@ -196,7 +189,13 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       : this.getEdges().filter((i) => i.hasClass('filtered'));
   }
 
+  /**
+   * Do a full reset on ogma and streams of ogma
+   */
+  public shutDown() {
+    this.destroy();
+    if (this.store) {
+      this.store.clear();
+    }
+  }
 }
-
-
-

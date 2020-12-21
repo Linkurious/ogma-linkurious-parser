@@ -2,6 +2,7 @@
 
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 import {Edge, Node, ItemList} from 'ogma';
+
 import {OgmaState} from './reactive';
 
 export type SelectionState = 'selection' | 'multiSelection' | 'noSelection';

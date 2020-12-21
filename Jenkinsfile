@@ -5,5 +5,4 @@ nodeJob {
   projectName = "linkurious/ogma-helper-library"
 
   createGitTag = true
-
 }

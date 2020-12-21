@@ -1,15 +1,13 @@
-
-
 'use strict';
 
 import sha1 from 'sha1';
 import {Color} from 'ogma';
 
+import {Tools} from '../tools/tools';
 
 import {StyleRule} from './styleRule';
 import {NodeSizeExtrema} from './nodeAttributes';
-import {Tools} from "../tools/tools";
-import {EdgeWidthExtrema} from "./edgeAttributes";
+import {EdgeWidthExtrema} from './edgeAttributes';
 
 export const BASE_GREY = '#7f7f7f';
 export const PALETTE = [
