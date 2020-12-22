@@ -588,27 +588,27 @@ export class StylesViz {
 
   public initNodesSizes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
     const nodeSizeRules = this.getStyleRule(nodeRules, StyleType.SIZE);
-    this.refreshNodeIcons(nodeSizeRules);
+    this.refreshNodeSize(nodeSizeRules);
   }
 
   public initNodesShapes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
     const nodeShapesRules = this.getStyleRule(nodeRules, StyleType.SHAPE);
-    this.refreshNodeIcons(nodeShapesRules);
+    this.refreshNodeShape(nodeShapesRules);
   }
 
   public initEdgesWidth(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
     const edgesWidthRules = this.getStyleRule(edgeRules, StyleType.WIDTH);
-    this.refreshNodeIcons(edgesWidthRules);
+    this.refreshEdgeWidth(edgesWidthRules);
   }
 
   public initEdgesShape(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
     const edgesShapeRules = this.getStyleRule(edgeRules, StyleType.SHAPE);
-    this.refreshNodeIcons(edgesShapeRules);
+    this.refreshEdgeShape(edgesShapeRules);
   }
 
   public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
     const edgesColorRules = this.getStyleRule(edgeRules, StyleType.COLOR);
-    this.refreshNodeIcons(edgesColorRules);
+    this.refreshEdgeColors(edgesColorRules);
   }
 
   /**
