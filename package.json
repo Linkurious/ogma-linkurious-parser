@@ -41,7 +41,10 @@
   },
   "devDependencies": {
     "@linkurious/rest-client": "2.10.2",
+    "@rollup/plugin-buble": "^0.21.3",
     "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
     "@types/chai": "4.2.11",
     "@types/lodash": "4.14.147",
     "@types/lodash-es": "4.17.3",
@@ -61,8 +64,8 @@
     "prettier": "2.0.2",
     "request": "2.88.2",
     "rollup": "^2.35.1",
-    "rollup-plugin-typescript2": "^0.29.0",
     "rollup-plugin-node-globals": "1.4.0",
+    "rollup-plugin-typescript2": "^0.29.0",
     "should": "11.1.0",
     "ts-node": "6.2.0",
     "typescript": "3.7.5"

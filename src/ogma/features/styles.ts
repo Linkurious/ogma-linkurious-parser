@@ -4,6 +4,9 @@ import * as o from 'ogma';
 import {Edge, EdgeAttributesValue, Node, NodeAttributesValue, StyleClass, StyleRule} from 'ogma';
 import {
   GenericObject,
+  IEdgeStyle,
+  INodeStyle,
+  IStyleRule,
   LkEdgeData,
   LkNodeData,
   OgmaEdgeShape,
@@ -17,7 +20,9 @@ import {
   LKOgma,
   NodeAttributes,
   OgmaTools,
-  StyleRule as LKStyleRule
+  StyleRule as LKStyleRule,
+  StyleRules,
+  StyleType
 } from '../..';
 import {Tools} from '../../tools/tools';
 
@@ -106,12 +111,12 @@ export class StylesViz {
   public setNodesDefaultStyles(
     nodeStyleConf:
       | {
-          nodeRadius?: number;
-          shape?: OgmaNodeShape;
-          text?: TextOptions & {
-            nodePosition?: 'right' | 'left' | 'top' | 'bottom' | 'center';
-          };
-        }
+      nodeRadius?: number;
+      shape?: OgmaNodeShape;
+      text?: TextOptions & {
+        nodePosition?: 'right' | 'left' | 'top' | 'bottom' | 'center';
+      };
+    }
       | undefined
   ): void {
     // setting selection and hover attributes
@@ -188,10 +193,10 @@ export class StylesViz {
   public setEdgesDefaultStyles(
     edgeStyleConf:
       | {
-          edgeWidth?: number;
-          shape?: OgmaEdgeShape;
-          text?: TextOptions;
-        }
+      edgeWidth?: number;
+      shape?: OgmaEdgeShape;
+      text?: TextOptions;
+    }
       | undefined
   ): void {
     // setting selection and hover attributes
@@ -559,6 +564,21 @@ export class StylesViz {
       this._nodeColorAttribute.refresh({color: colorStyleRules});
       this._ogmaNodeColor.refresh();
     }
+  }
+
+  /**
+   * Return an array of StyleRules with only the style that need to be applied
+   */
+  public getStyleRule(
+    state: Array<IStyleRule<INodeStyle | IEdgeStyle>>,
+    styleType: StyleType
+  ): LKStyleRule[] {
+    return new StyleRules(state)[styleType];
+  }
+
+  public initNodeColors(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+    const nodeColorRules = this.getStyleRule(nodeRules, StyleType.COLOR);
+    this.refreshNodeColors(nodeColorRules);
   }
 
   /**

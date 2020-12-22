@@ -2,7 +2,7 @@ import {
   EntityType,
   IOgmaConfig,
   LkEdgeData,
-  LkNodeData,
+  LkNodeData, PopulatedVisualization,
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
@@ -118,7 +118,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Initialize graph.
    * add nodes and edges to the viz and init the selection.
    */
-  public async init(visualization: {nodes: Array<VizNode>; edges: Array<VizEdge>}): Promise<void> {
+  public async init(visualization: { nodes: Array<VizNode>; edges: Array<VizEdge> }): Promise<void> {
     this.clearGraph();
     let selectedEntityType: EntityType | undefined = undefined;
     let selectedElements: Array<string> = [];
@@ -151,6 +151,11 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     } else if (selectedEntityType === EntityType.EDGE) {
       this.getEdges(selectedElements).setSelected(true);
     }
+  }
+
+  public async initVisualization(visualization: PopulatedVisualization) {
+    this.init(visualization);
+    this.LKStyles.initNodeColors(visualization.design.styles.node)
   }
 
   /**
