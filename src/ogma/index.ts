@@ -119,7 +119,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Initialize graph.
    * add nodes and edges to the viz and init the selection.
    */
-  public async init(visualization: {nodes: Array<VizNode>; edges: Array<VizEdge>}): Promise<void> {
+  public async init(visualization: { nodes: Array<VizNode>; edges: Array<VizEdge> }): Promise<void> {
     this.clearGraph();
     let selectedEntityType: EntityType | undefined = undefined;
     let selectedElements: Array<string> = [];
@@ -163,6 +163,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKStyles.initEdgesWidth(visualization.design.styles.edge);
     this.LKStyles.initEdgesShape(visualization.design.styles.edge);
     this.LKStyles.initEdgesColor(visualization.design.styles.edge);
+    this.LKCaptions.initVizCaptions({
+      node: visualization.nodeFields.captions || {},
+      edge: visualization.edgeFields.captions || {}
+    })
   }
 
   /**
