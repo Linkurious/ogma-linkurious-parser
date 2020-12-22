@@ -157,6 +157,12 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public async initVisualization(visualization: PopulatedVisualization) {
     this.init(visualization);
     this.LKStyles.initNodeColors(visualization.design.styles.node);
+    this.LKStyles.initNodesIcons(visualization.design.styles.node);
+    this.LKStyles.initNodesSizes(visualization.design.styles.node);
+    this.LKStyles.initNodesShapes(visualization.design.styles.node);
+    this.LKStyles.initEdgesWidth(visualization.design.styles.edge);
+    this.LKStyles.initEdgesShape(visualization.design.styles.edge);
+    this.LKStyles.initEdgesColor(visualization.design.styles.edge);
   }
 
   /**
