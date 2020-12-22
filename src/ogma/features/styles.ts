@@ -86,19 +86,15 @@ export class StylesViz {
   private _edgeDefaultStylesRules!: StyleRule<LkNodeData, LkEdgeData>;
   private _edgeDefaultHaloRules!: StyleRule<LkNodeData, LkEdgeData>;
 
-  private _nodeColorAttribute!: NodeAttributes;
+  private _nodeAttributes: NodeAttributes = new NodeAttributes({});
+  private _edgeAttributes: EdgeAttributes = new EdgeAttributes({});
+
   private _ogmaNodeColor!: StyleRule;
-  private _nodeIconAttribute!: NodeAttributes;
   private _ogmaNodeIcon!: StyleRule;
-  private _nodeSizeAttribute!: NodeAttributes;
   private _ogmaNodeSize!: StyleRule;
-  private _nodeShapeAttribute!: NodeAttributes;
   private _ogmaNodeShape!: StyleRule;
-  private _edgeColorAttribute!: EdgeAttributes;
   private _ogmaEdgeColor!: StyleRule;
-  private _edgeWidthAttribute!: EdgeAttributes;
   private _ogmaEdgeWidth!: StyleRule;
-  private _edgeShapeAttribute!: EdgeAttributes;
   private _ogmaEdgeShape!: StyleRule;
 
   constructor(ogma: LKOgma) {
@@ -549,20 +545,22 @@ export class StylesViz {
    */
   public refreshNodeColors(colorStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaNodeColor)) {
-      this._nodeColorAttribute = new NodeAttributes({color: colorStyleRules});
+      this._nodeAttributes.refresh({color: colorStyleRules});
       this._ogmaNodeColor = this._ogma.styles.addRule({
         nodeAttributes: {
           color: (node: o.Node | undefined) => {
             if (node !== undefined) {
-              return this._nodeColorAttribute.color(node.getData());
+              return this._nodeAttributes.color(node.getData());
             }
           }
         },
         nodeDependencies: {self: {data: true}}
       });
     } else {
-      this._nodeColorAttribute.refresh({color: colorStyleRules});
+      this._nodeAttributes.refresh({color: colorStyleRules});
       this._ogmaNodeColor.refresh();
+      // TODO refresh node icons when moving the code from LKE
+      // this.refreshIconsColor();
     }
   }
 
@@ -618,24 +616,24 @@ export class StylesViz {
    */
   public refreshNodeIcons(iconStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaNodeIcon)) {
-      this._nodeIconAttribute = new NodeAttributes({icon: iconStyleRules});
+      this._nodeAttributes.refresh({icon: iconStyleRules});
       this._ogmaNodeIcon = this._ogma.styles.addRule({
         nodeAttributes: {
           icon: (node: o.Node | undefined) => {
             if (node !== undefined) {
-              return this._nodeIconAttribute.icon(node.getData()).icon;
+              return this._nodeAttributes.icon(node.getData()).icon;
             }
           },
           image: (node: o.Node | undefined) => {
             if (node !== undefined) {
-              return this._nodeIconAttribute.icon(node.getData()).image;
+              return this._nodeAttributes.icon(node.getData()).image;
             }
           }
         },
         nodeDependencies: {self: {data: true}}
       });
     } else {
-      this._nodeIconAttribute.refresh({icon: iconStyleRules});
+      this._nodeAttributes.refresh({icon: iconStyleRules});
       this._ogmaNodeIcon.refresh();
     }
   }
@@ -647,19 +645,19 @@ export class StylesViz {
    */
   public refreshNodeSize(sizeStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaNodeSize)) {
-      this._nodeSizeAttribute = new NodeAttributes({size: sizeStyleRules});
+      this._nodeAttributes.refresh({size: sizeStyleRules});
       this._ogmaNodeSize = this._ogma.styles.addRule({
         nodeAttributes: {
           radius: (node: o.Node | undefined) => {
             if (node !== undefined) {
-              return this._nodeSizeAttribute.size(node.getData());
+              return this._nodeAttributes.size(node.getData());
             }
           }
         },
         nodeDependencies: {self: {data: true}}
       });
     } else {
-      this._nodeSizeAttribute.refresh({size: sizeStyleRules});
+      this._nodeAttributes.refresh({size: sizeStyleRules});
       this._ogmaNodeSize.refresh();
     }
   }
@@ -671,19 +669,19 @@ export class StylesViz {
    */
   public refreshNodeShape(shapeStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaNodeShape)) {
-      this._nodeShapeAttribute = new NodeAttributes({shape: shapeStyleRules});
+      this._nodeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaNodeShape = this._ogma.styles.addRule({
         nodeAttributes: {
           shape: (node: o.Node | undefined) => {
             if (node !== undefined) {
-              return this._nodeShapeAttribute.shape(node.getData());
+              return this._nodeAttributes.shape(node.getData());
             }
           }
         },
         nodeDependencies: {self: {data: true}}
       });
     } else {
-      this._nodeShapeAttribute.refresh({shape: shapeStyleRules});
+      this._nodeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaNodeShape.refresh();
     }
   }
@@ -693,19 +691,19 @@ export class StylesViz {
    */
   public refreshEdgeColors(colorStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaEdgeColor)) {
-      this._edgeColorAttribute = new EdgeAttributes({color: colorStyleRules});
+      this._edgeAttributes.refresh({color: colorStyleRules});
       this._ogmaEdgeColor = this._ogma.styles.addRule({
         edgeAttributes: {
           color: (edge: o.Edge | undefined) => {
             if (edge !== undefined) {
-              return this._edgeColorAttribute.color(edge.getData());
+              return this._edgeAttributes.color(edge.getData());
             }
           }
         },
         edgeDependencies: {self: {data: true}}
       });
     } else {
-      this._edgeColorAttribute.refresh({color: colorStyleRules});
+      this._edgeAttributes.refresh({color: colorStyleRules});
       this._ogmaEdgeColor.refresh();
     }
   }
@@ -717,12 +715,12 @@ export class StylesViz {
    */
   public refreshEdgeWidth(widthStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaEdgeWidth)) {
-      this._edgeWidthAttribute = new EdgeAttributes({width: widthStyleRules});
+      this._edgeAttributes.refresh({width: widthStyleRules});
       this._ogmaEdgeWidth = this._ogma.styles.addRule({
         edgeAttributes: {
           width: (edge: o.Edge | undefined) => {
             if (edge !== undefined) {
-              return this._edgeWidthAttribute.width(edge.getData());
+              return this._edgeAttributes.width(edge.getData());
             }
           }
         },
@@ -731,7 +729,7 @@ export class StylesViz {
         }
       });
     } else {
-      this._edgeWidthAttribute.refresh({width: widthStyleRules});
+      this._edgeAttributes.refresh({width: widthStyleRules});
       this._ogmaEdgeWidth.refresh();
     }
   }
@@ -743,19 +741,19 @@ export class StylesViz {
    */
   public refreshEdgeShape(shapeStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaEdgeShape)) {
-      this._edgeShapeAttribute = new EdgeAttributes({shape: shapeStyleRules});
+      this._edgeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaEdgeShape = this._ogma.styles.addRule({
         edgeAttributes: {
           shape: (edge: o.Edge | undefined) => {
             if (edge !== undefined) {
-              return this._edgeShapeAttribute.shape(edge.getData());
+              return this._edgeAttributes.shape(edge.getData());
             }
           }
         },
         edgeDependencies: {self: {data: true}}
       });
     } else {
-      this._edgeShapeAttribute.refresh({shape: shapeStyleRules});
+      this._edgeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaEdgeShape.refresh();
     }
   }
