@@ -8,7 +8,8 @@ import {
   INodeStyle,
   SelectorType,
   IStyleIcon,
-  IStyleImage, IStyles
+  IStyleImage,
+  IStyles
 } from '@linkurious/rest-client';
 
 import {sortBy, Tools} from '../tools/tools';
@@ -26,7 +27,7 @@ export enum StyleType {
 }
 
 export interface Legend {
-  [key: string]: Array<{ label: string; value: string | IStyleIcon | IStyleImage | number }>;
+  [key: string]: Array<{label: string; value: string | IStyleIcon | IStyleImage | number}>;
 }
 
 export const SORTING_RULE = ['specificity', 'itemType', 'index'];
@@ -103,7 +104,7 @@ export class StyleRules {
    *
    * @return {any}
    */
-  public get nodeRules(): { [key: string]: Array<StyleRule> } {
+  public get nodeRules(): {[key: string]: Array<StyleRule>} {
     return {
       color: this.color,
       icon: this.icon,
@@ -118,7 +119,7 @@ export class StyleRules {
    *
    * @return {any}
    */
-  public get edgeRules(): { [key: string]: Array<StyleRule> } {
+  public get edgeRules(): {[key: string]: Array<StyleRule>} {
     return {
       color: this.color,
       shape: this.shape,
@@ -154,8 +155,8 @@ export class StyleRules {
     styleType: string,
     styles: Array<StyleRule>,
     itemsData: Array<LkNodeData | LkEdgeData>
-  ): Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }> {
-    const result: Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }> = [];
+  ): Array<{label: string; value: string | number | IStyleIcon | IStyleImage}> {
+    const result: Array<{label: string; value: string | number | IStyleIcon | IStyleImage}> = [];
     const data = itemsData.filter((i) => i);
     for (let i = 0; i < styles.length; i++) {
       const styleRule = new StyleRule(styles[i]);
@@ -169,7 +170,7 @@ export class StyleRules {
           // style is a custom icon
           const label = Tools.isDefined(styleRule.input)
             ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${
-              styleRule.input![1]
+                styleRule.input![1]
               } ${StyleRules.sanitizeValue(styleRule.type, styleRule.value)}`
             : `${StyleRules.getTypeLabel(styleRule.itemType)}`;
           const value = styleRule.style.image;
@@ -177,7 +178,7 @@ export class StyleRules {
         } else {
           const label = Tools.isDefined(styleRule.input)
             ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${
-              styleRule.input![1]
+                styleRule.input![1]
               } ${StyleRules.sanitizeValue(styleRule.type, styleRule.value)}`
             : `${StyleRules.getTypeLabel(styleRule.itemType)}`;
           const value = styleRule.style[styleType];
@@ -220,7 +221,7 @@ export class StyleRules {
   public static addLegendAutoColors(
     itemsData: Array<LkNodeData | LkEdgeData>,
     styleRule: StyleRule,
-    currentLegend: Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }>
+    currentLegend: Array<{label: string; value: string | number | IStyleIcon | IStyleImage}>
   ): void {
     const propertyKey: string = styleRule.style.color.input[1];
     itemsData.forEach((data) => {
@@ -254,8 +255,8 @@ export class StyleRules {
    * Check if a legend item already exists and overwrite it / push it
    */
   public static updateLegend(
-    legend: Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }>,
-    {label, value}: { [key: string]: string }
+    legend: Array<{label: string; value: string | number | IStyleIcon | IStyleImage}>,
+    {label, value}: {[key: string]: string}
   ): void {
     const indexOfLegendItem = legend.map((r) => r.label).indexOf(label);
     if (indexOfLegendItem < 0) {
