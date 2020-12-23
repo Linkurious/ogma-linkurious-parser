@@ -20,6 +20,12 @@ import {OgmaStore} from './features/OgmaStore';
 export {default as Ogma} from 'ogma';
 export const ANIMATION_DURATION = 750;
 
+declare global {
+  interface Document {
+    fonts: any;
+  }
+}
+
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   private _reactive: RxViz;
   public LKStyles!: StylesViz;
@@ -70,6 +76,20 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKStyles.setEdgesDefaultHalo();
     this.LKStyles.setBadgeRule();
     this.LKStyles.setFilterClass();
+    this.checkFonts();
+  }
+
+  /**
+   * Check if the font is correctly loaded, if not, send a telemetry event to server
+   */
+  private checkFonts() {
+    if (document.fonts && Array.from(document.fonts).length > 0) {
+      document.fonts.forEach((font: any) => {
+        font.loaded.catch((e: any) => {
+          console.log(e);
+        });
+      });
+    }
   }
 
   /**
