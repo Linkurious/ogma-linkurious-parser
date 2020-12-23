@@ -35,6 +35,24 @@ export class CaptionsViz {
   }
 
   /**
+   * Refresh visualization captions rules
+   */
+  public async initVizCaptions(schema: CaptionState): Promise<void> {
+    if (this._ogma.LKCaptions.nodesCaptionsRule) {
+      this._ogma.LKCaptions.refreshSchema(schema);
+      await this._ogma.LKCaptions.updateNodeCaptions();
+    } else {
+      this._ogma.LKCaptions.updateNodeCaptions(schema.node);
+    }
+    if (this._ogma.LKCaptions.edgesCaptionsRule) {
+      this._ogma.LKCaptions.refreshSchema(schema);
+      await this._ogma.LKCaptions.updateEdgeCaptions();
+    } else {
+      this._ogma.LKCaptions.updateEdgeCaptions(schema.edge);
+    }
+  }
+
+  /**
    * Create or update nodeCaptionRule
    */
   public updateNodeCaptions(schema?: ItemFieldsCaptions): Promise<void> | void {

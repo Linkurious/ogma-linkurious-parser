@@ -1,8 +1,10 @@
 import {version, author, description} from './package.json';
 import typescript from 'rollup-plugin-typescript2'
 import commonjs from '@rollup/plugin-commonjs';
-
-const nodeGlobals = require('rollup-plugin-node-globals');
+import nodeGlobals from 'rollup-plugin-node-globals';
+// import buble from '@rollup/plugin-buble';
+import {nodeResolve} from '@rollup/plugin-node-resolve';
+import json from '@rollup/plugin-json';
 
 const banner = `\
 /**
@@ -28,5 +30,7 @@ export default {
     commonjs(),
     nodeGlobals({exclude: ['./node_modules/**']}),
     typescript(),
+    nodeResolve({preferBuiltins: true}),
+    json()
   ],
 }

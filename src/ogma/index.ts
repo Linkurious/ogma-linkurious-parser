@@ -3,19 +3,21 @@ import {
   IOgmaConfig,
   LkEdgeData,
   LkNodeData,
+  PopulatedVisualization,
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
 import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher} from 'ogma';
 
+import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
 
-export {default as Ogma} from 'ogma';
 import {StylesViz} from './features/styles';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
 
+export {default as Ogma} from 'ogma';
 export const ANIMATION_DURATION = 750;
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
@@ -95,6 +97,9 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
             this.getSelectedEdges().setSelected(false);
             e.target.setSelected(true);
           }
+        } else {
+          this.getSelectedNodes().setSelected(false);
+          this.getSelectedEdges().setSelected(false);
         }
       }
     });
@@ -151,6 +156,22 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     } else if (selectedEntityType === EntityType.EDGE) {
       this.getEdges(selectedElements).setSelected(true);
     }
+  }
+
+  public async initVisualization(visualization: PopulatedVisualization) {
+    this.init(visualization);
+    const styles = StyleRules.sanitizeStylesIndex(visualization.design.styles);
+    this.LKStyles.initNodeColors(styles.node);
+    this.LKStyles.initNodesIcons(styles.node);
+    this.LKStyles.initNodesSizes(styles.node);
+    this.LKStyles.initNodesShapes(styles.node);
+    this.LKStyles.initEdgesWidth(styles.edge);
+    this.LKStyles.initEdgesShape(styles.edge);
+    this.LKStyles.initEdgesColor(styles.edge);
+    this.LKCaptions.initVizCaptions({
+      node: visualization.nodeFields.captions || {},
+      edge: visualization.edgeFields.captions || {}
+    });
   }
 
   /**

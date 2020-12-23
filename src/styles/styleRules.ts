@@ -8,7 +8,8 @@ import {
   INodeStyle,
   SelectorType,
   IStyleIcon,
-  IStyleImage
+  IStyleImage,
+  IStyles
 } from '@linkurious/rest-client';
 
 import {sortBy, Tools} from '../tools/tools';
@@ -307,5 +308,34 @@ export class StyleRules {
     const rule = Tools.clone(rawRule);
     rule.style = {[styleType]: rule.style[styleType]};
     return new StyleRule(rule);
+  }
+
+  /**
+   * Check for non unique index in styles rules and update them if exists
+   */
+  public static sanitizeStylesIndex(styles: IStyles): IStyles {
+    const seenIndex: Array<number> = [];
+    const sanitizedStyles: IStyles = Tools.clone(styles);
+    let maxIndex =
+      Math.max(...[...styles.node.map((s) => s.index), ...styles.edge.map((s) => s.index)]) + 1;
+    sanitizedStyles.node = sanitizedStyles.node.map((style) => {
+      if (seenIndex.includes(style.index)) {
+        style.index = maxIndex;
+        maxIndex++;
+      } else {
+        seenIndex.push(style.index);
+      }
+      return style;
+    });
+    sanitizedStyles.edge = sanitizedStyles.edge.map((style) => {
+      if (seenIndex.includes(style.index)) {
+        style.index = maxIndex;
+        maxIndex++;
+      } else {
+        seenIndex.push(style.index);
+      }
+      return style;
+    });
+    return sanitizedStyles;
   }
 }
