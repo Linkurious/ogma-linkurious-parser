@@ -97,6 +97,9 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
             this.getSelectedEdges().setSelected(false);
             e.target.setSelected(true);
           }
+        } else {
+          this.getSelectedNodes().setSelected(false);
+          this.getSelectedEdges().setSelected(false);
         }
       }
     });
