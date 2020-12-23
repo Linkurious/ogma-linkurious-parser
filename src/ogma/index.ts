@@ -17,7 +17,7 @@ import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
 
-export {default as Ogma} from 'ogma';
+// export {default as Ogma} from 'ogma';
 export const ANIMATION_DURATION = 750;
 
 declare global {
@@ -80,7 +80,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   }
 
   /**
-   * Check if the font is correctly loaded, if not, send a telemetry event to server
+   * Check if the font is correctly loaded
    */
   private checkFonts() {
     if (document.fonts && Array.from(document.fonts).length > 0) {
