@@ -13,6 +13,7 @@ import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
 
 import {StylesViz} from './features/styles';
+import {TransformationsViz} from './features/transformations';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
@@ -24,6 +25,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   private _reactive: RxViz;
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
+  public LKTransformation!: TransformationsViz;
   // Trigger an event with node category changes
   public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   // Trigger an event with edge type changes
@@ -59,12 +61,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
 
     this._reactive = new RxViz(this);
     this.store = this._reactive.store;
-    // init selection behavior
     this.initSelection();
-    // init ogma styles object
     this.initStyles(_configuration);
-    // init visualization captions
     this.initCaptions(_configuration);
+    this.initTransformations(_configuration);
 
     this.LKStyles.setNodesDefaultHalo();
     this.LKStyles.setEdgesDefaultHalo();
@@ -111,6 +111,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKStyles.setNodesDefaultStyles(nodeStyles);
     const edgeStyles = _configuration?.options?.styles?.edge;
     this.LKStyles.setEdgesDefaultStyles(edgeStyles);
+  }
+
+  private initTransformations(_configuration: IOgmaConfig) {
+    this.LKTransformation = new TransformationsViz(this);
   }
 
   private initCaptions(_configuration: IOgmaConfig): void {
@@ -219,4 +223,5 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this.store.clear();
     }
   }
+
 }
