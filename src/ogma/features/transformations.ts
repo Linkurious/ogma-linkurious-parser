@@ -67,7 +67,7 @@ export class TransformationsViz {
   }
 
   /**
-   * create an edge grouping transformation by edge type and setting the appropriate data
+   * create an edge grouping transformation by edge type
    */
   public async initTransformation(): Promise<void> {
     if (this.transformation === undefined) {
