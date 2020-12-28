@@ -176,6 +176,9 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       node: visualization.nodeFields.captions || {},
       edge: visualization.edgeFields.captions || {}
     });
+    this.LKTransformation.groupedEdges = visualization.edgeGrouping;
+    this.LKTransformation.initTransformation();
+    this.LKTransformation.initEdgeGroupingStyle();
   }
 
   /**

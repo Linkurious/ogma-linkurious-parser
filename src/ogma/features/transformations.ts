@@ -118,7 +118,7 @@ export class TransformationsViz {
     });
   }
 
-  public refreshEdgeGroupingCaptions(): void {
+  public refreshEdgeGroupingStyle(): void {
     if (this.edgeGroupingStyleRule !== undefined) {
       this.edgeGroupingStyleRule.refresh();
     }
