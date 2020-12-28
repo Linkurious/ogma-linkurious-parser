@@ -223,5 +223,4 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this.store.clear();
     }
   }
-
 }

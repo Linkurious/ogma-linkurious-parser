@@ -1,8 +1,9 @@
 'use strict';
 
-import {LKOgma} from "../index";
-import {GenericObject, IEdgeGroupStyle, LkEdgeData, LkNodeData} from "@linkurious/rest-client";
-import {Edge, EdgeExtremity, EdgeStyle, EdgeType, PixelSize, StyleRule, Transformation} from "ogma";
+import {GenericObject, IEdgeGroupStyle, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
+import {Edge, EdgeExtremity, EdgeStyle, EdgeType, PixelSize, StyleRule, Transformation} from 'ogma';
+
+import {LKOgma} from '../index';
 
 const DEFAULT_EDGE_GROUP_STYLE: {
   color: string;
@@ -23,7 +24,6 @@ const DEFAULT_EDGE_GROUP_STYLE: {
 };
 
 export class TransformationsViz {
-
   private _ogma: LKOgma;
   private _groupedEdges!: GenericObject<boolean>;
   private _edgeGroupStyle!: IEdgeGroupStyle;
@@ -35,11 +35,11 @@ export class TransformationsViz {
   }
 
   get groupedEdges() {
-    return this._groupedEdges
+    return this._groupedEdges;
   }
 
   set groupedEdges(groupedEdges: GenericObject<boolean>) {
-    this._groupedEdges = groupedEdges
+    this._groupedEdges = groupedEdges;
   }
 
   get transformation(): Transformation<LkNodeData, LkEdgeData> {
@@ -90,7 +90,6 @@ export class TransformationsViz {
     } else {
       this.transformation.refresh();
     }
-
   }
 
   /**
@@ -116,7 +115,7 @@ export class TransformationsViz {
         edge.getSubEdges() &&
         edge.getSubEdges()!.filter((e) => !e.hasClass('filtered')).size > 0,
       edgeDependencies: {self: {data: true}}
-    })
+    });
   }
 
   public refreshEdgeGroupingCaptions(): void {
@@ -124,5 +123,4 @@ export class TransformationsViz {
       this.edgeGroupingStyleRule.refresh();
     }
   }
-
 }
