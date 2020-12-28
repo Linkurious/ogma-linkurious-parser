@@ -93,9 +93,9 @@ export class TransformationsViz {
   }
 
   /**
-   * init edge grouping caption style
+   * init edge grouping style
    */
-  public async initEdgeGroupingCaption() {
+  public async initEdgeGroupingStyle() {
     this.edgeGroupingStyleRule = this._ogma.styles.addRule({
       edgeAttributes: {
         ...DEFAULT_EDGE_GROUP_STYLE,
