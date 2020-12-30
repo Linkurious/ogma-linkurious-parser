@@ -25,45 +25,13 @@ const DEFAULT_EDGE_GROUP_STYLE: {
 
 export class TransformationsViz {
   private _ogma: LKOgma;
-  private _groupedEdges!: GenericObject<boolean>;
-  private _edgeGroupStyle!: IEdgeGroupStyle;
-  private _transformation!: Transformation<LkNodeData, LkEdgeData>;
-  private _edgeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
+  public groupedEdges!: GenericObject<boolean>;
+  public edgeGroupStyle!: IEdgeGroupStyle;
+  public transformation!: Transformation<LkNodeData, LkEdgeData>;
+  public edgeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
-  }
-
-  get groupedEdges() {
-    return this._groupedEdges;
-  }
-
-  set groupedEdges(groupedEdges: GenericObject<boolean>) {
-    this._groupedEdges = groupedEdges;
-  }
-
-  get transformation(): Transformation<LkNodeData, LkEdgeData> {
-    return this._transformation;
-  }
-
-  set transformation(value: Transformation<LkNodeData, LkEdgeData>) {
-    this._transformation = value;
-  }
-
-  get edgeGroupStyle(): IEdgeGroupStyle {
-    return this._edgeGroupStyle;
-  }
-
-  set edgeGroupStyle(value: IEdgeGroupStyle) {
-    this._edgeGroupStyle = value;
-  }
-
-  get edgeGroupingStyleRule(): StyleRule<LkNodeData, LkEdgeData> {
-    return this._edgeGroupingStyleRule;
-  }
-
-  set edgeGroupingStyleRule(value: StyleRule<LkNodeData, LkEdgeData>) {
-    this._edgeGroupingStyleRule = value;
   }
 
   /**
