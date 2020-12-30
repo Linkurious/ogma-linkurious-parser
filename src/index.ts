@@ -7,6 +7,7 @@ import {NodeAttributes} from './styles/nodeAttributes';
 import {StyleRule} from './styles/styleRule';
 import {StyleRules, StyleType, Legend} from './styles/styleRules';
 import {StylesViz, StylesConfig, FILTER_OPACITY} from './ogma/features/styles';
+import {TransformationsViz} from './ogma/features/transformations';
 import {CaptionsViz, CaptionState} from './ogma/features/captions';
 import {OgmaState} from './ogma/features/reactive';
 import {OgmaTools, HTML_COLORS} from './tools/ogmaTool';
@@ -32,6 +33,7 @@ export {
   LKOgma,
   ANIMATION_DURATION,
   StylesViz,
+  TransformationsViz,
   StylesConfig,
   FILTER_OPACITY,
   CaptionsViz,

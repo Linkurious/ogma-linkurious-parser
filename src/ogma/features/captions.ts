@@ -93,7 +93,7 @@ export class CaptionsViz {
         edgeAttributes: {
           text: {
             content: (edge: Ogma.Edge | undefined) => {
-              if (edge === undefined) {
+              if (edge === undefined || edge.getData() === undefined) {
                 return ``;
               }
               const value = Captions.getText(edge.getData(), this._schema.edge);

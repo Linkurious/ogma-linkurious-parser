@@ -13,6 +13,7 @@ import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
 
 import {StylesViz} from './features/styles';
+import {TransformationsViz} from './features/transformations';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
@@ -24,6 +25,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   private _reactive: RxViz;
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
+  public LKTransformation: TransformationsViz;
   // Trigger an event with node category changes
   public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   // Trigger an event with edge type changes
@@ -59,12 +61,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
 
     this._reactive = new RxViz(this);
     this.store = this._reactive.store;
-    // init selection behavior
     this.initSelection();
-    // init ogma styles object
     this.initStyles(_configuration);
-    // init visualization captions
     this.initCaptions(_configuration);
+    this.LKTransformation = new TransformationsViz(this);
 
     this.LKStyles.setNodesDefaultHalo();
     this.LKStyles.setEdgesDefaultHalo();
@@ -172,6 +172,9 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       node: visualization.nodeFields.captions || {},
       edge: visualization.edgeFields.captions || {}
     });
+    this.LKTransformation.groupedEdges = visualization.edgeGrouping;
+    this.LKTransformation.initTransformation();
+    this.LKTransformation.initEdgeGroupingStyle();
   }
 
   /**
