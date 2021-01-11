@@ -1,5 +1,19 @@
 'use strict';
 
+import {
+  Edge,
+  EdgeList,
+  Node,
+  NodeList,
+  EdgeId,
+  NodeId,
+  RawEdge,
+  RawItem,
+  RawNode,
+  PropertyPath,
+  Item
+} from 'ogma';
+
 import {Captions} from './captions/captions';
 import {ItemAttributes, BASE_GREY} from './styles/itemAttributes';
 import {EdgeAttributes} from './styles/edgeAttributes';
@@ -25,6 +39,17 @@ import {
 import {LKOgma, ANIMATION_DURATION} from './ogma';
 
 export {
+  EdgeList,
+  Node,
+  NodeList,
+  EdgeId,
+  NodeId,
+  RawEdge,
+  RawItem,
+  RawNode,
+  PropertyPath,
+  Item,
+  Edge,
   Captions,
   EdgeAttributes,
   NodeAttributes,
