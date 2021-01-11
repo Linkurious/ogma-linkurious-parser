@@ -36,7 +36,7 @@
   "dependencies": {
     "lodash": "4.17.15",
     "lodash-es": "4.17.15",
-    "ogma": "github:Linkurious/ogma-release#3.2.2",
+    "ogma": "^3.2.4",
     "rxjs": "6.5.3",
     "sha1": "1.1.1"
   },
