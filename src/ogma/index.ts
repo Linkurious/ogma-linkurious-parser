@@ -106,11 +106,15 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   }
 
   private initStyles(_configuration: IOgmaConfig): void {
-    this.LKStyles = new StylesViz(this);
-    const nodeStyles = _configuration?.options?.styles?.node;
-    this.LKStyles.setNodesDefaultStyles(nodeStyles);
-    const edgeStyles = _configuration?.options?.styles?.edge;
-    this.LKStyles.setEdgesDefaultStyles(edgeStyles);
+    this.LKStyles = new StylesViz(
+      this,
+      {
+        node: _configuration?.options?.style?.node,
+        edge: _configuration?.options?.style?.edge
+      }
+    );
+    this.LKStyles.setNodesDefaultStyles();
+    this.LKStyles.setEdgesDefaultStyles();
   }
 
   private initCaptions(_configuration: IOgmaConfig): void {
