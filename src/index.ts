@@ -1,10 +1,24 @@
 'use strict';
 
+import {
+  Edge,
+  EdgeList,
+  Node,
+  NodeList,
+  EdgeId,
+  NodeId,
+  RawEdge,
+  RawItem,
+  RawNode,
+  PropertyPath,
+  Item
+} from 'ogma';
+
 import {Captions} from './captions/captions';
 import {ItemAttributes, BASE_GREY} from './styles/itemAttributes';
 import {EdgeAttributes} from './styles/edgeAttributes';
 import {NodeAttributes} from './styles/nodeAttributes';
-import {StyleRule} from './styles/styleRule';
+import {StyleRule, StyleRuleType} from './styles/styleRule';
 import {StyleRules, StyleType, Legend} from './styles/styleRules';
 import {StylesViz, StylesConfig, FILTER_OPACITY} from './ogma/features/styles';
 import {TransformationsViz} from './ogma/features/transformations';
@@ -25,6 +39,18 @@ import {
 import {LKOgma, ANIMATION_DURATION} from './ogma';
 
 export {
+  StyleRuleType,
+  EdgeList,
+  Node,
+  NodeList,
+  EdgeId,
+  NodeId,
+  RawEdge,
+  RawItem,
+  RawNode,
+  PropertyPath,
+  Item,
+  Edge,
   Captions,
   EdgeAttributes,
   NodeAttributes,
