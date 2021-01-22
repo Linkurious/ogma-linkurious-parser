@@ -108,25 +108,25 @@ export class StylesViz {
       edgeWidth?: number;
       shape?: OgmaEdgeShape;
       text?: TextOptions;
-    }
+    };
   };
 
   constructor(
-      ogma: LKOgma,
-      configuration: {
-        node: {
-          nodeRadius?: number;
-          shape?: OgmaNodeShape;
-          text?: TextOptions & {
-            nodePosition?: 'right' | 'left' | 'top' | 'bottom' | 'center';
-          };
+    ogma: LKOgma,
+    configuration: {
+      node: {
+        nodeRadius?: number;
+        shape?: OgmaNodeShape;
+        text?: TextOptions & {
+          nodePosition?: 'right' | 'left' | 'top' | 'bottom' | 'center';
         };
-        edge: {
-          edgeWidth?: number;
-          shape?: OgmaEdgeShape;
-          text?: TextOptions;
-        }
-      }
+      };
+      edge: {
+        edgeWidth?: number;
+        shape?: OgmaEdgeShape;
+        text?: TextOptions;
+      };
+    }
   ) {
     this._ogma = ogma;
     this._defaultConfiguration = configuration;
@@ -149,8 +149,8 @@ export class StylesViz {
               ? this._defaultConfiguration.node.text.minVisibleSize
               : 12,
           maxLineLength:
-              this._defaultConfiguration.node.text !== undefined &&
-              this._defaultConfiguration.node.text.maxLineLength !== undefined
+            this._defaultConfiguration.node.text !== undefined &&
+            this._defaultConfiguration.node.text.maxLineLength !== undefined
               ? this._defaultConfiguration.node.text.maxLineLength
               : 30,
           position:
@@ -466,10 +466,11 @@ export class StylesViz {
                     color: null
                   },
                   text: {
-                    font: this._defaultConfiguration.node.text !== undefined &&
-                          this._defaultConfiguration.node.text.font !== undefined
-                            ? this._defaultConfiguration.node.text.font
-                            : "'roboto', sans-serif",
+                    font:
+                      this._defaultConfiguration.node.text !== undefined &&
+                      this._defaultConfiguration.node.text.font !== undefined
+                        ? this._defaultConfiguration.node.text.font
+                        : "'roboto', sans-serif",
                     scale: 0.4,
                     color: textColor,
                     content: content
