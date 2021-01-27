@@ -11,7 +11,12 @@ import {
   RawItem,
   RawNode,
   PropertyPath,
-  Item
+  Item,
+  ItemId,
+  EdgeStyle,
+  PixelSize,
+  EdgeExtremity,
+  EdgeType
 } from 'ogma';
 
 import {Captions} from './captions/captions';
@@ -39,6 +44,11 @@ import {
 import {LKOgma, ANIMATION_DURATION} from './ogma';
 
 export {
+  EdgeType,
+  EdgeExtremity,
+  PixelSize,
+  EdgeStyle,
+  ItemId,
   StyleRuleType,
   EdgeList,
   Node,
