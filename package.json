@@ -36,7 +36,7 @@
   "dependencies": {
     "lodash": "4.17.15",
     "lodash-es": "4.17.15",
-    "ogma": "3.3.4",
+    "ogma": "3.3.5-develop.63",
     "rxjs": "6.5.3",
     "sha1": "1.1.1"
   },

@@ -1,7 +1,7 @@
 'use strict';
 
 import * as o from 'ogma';
-import {Edge, EdgeAttributesValue, Node, NodeAttributesValue, StyleClass, StyleRule} from 'ogma';
+import {Edge, EdgeAttributesValue, NodeAttributesValue, StyleClass, StyleRule} from 'ogma';
 import {
   GenericObject,
   IEdgeStyle,
@@ -82,8 +82,10 @@ export class StylesViz {
   private _ogma: LKOgma;
   private _exportClass!: StyleClass;
   private _nodeDefaultStylesRules!: StyleRule<LkNodeData, LkEdgeData>;
+  // @ts-ignore
   private _nodeDefaultHaloRules!: StyleRule<LkNodeData, LkEdgeData>;
   private _edgeDefaultStylesRules!: StyleRule<LkNodeData, LkEdgeData>;
+  // @ts-ignore
   private _edgeDefaultHaloRules!: StyleRule<LkNodeData, LkEdgeData>;
 
   private _nodeAttributes: NodeAttributes = new NodeAttributes({});
@@ -256,22 +258,14 @@ export class StylesViz {
   public setNodesDefaultHalo(): void {
     // setting default halo style
     this._nodeDefaultHaloRules = this._ogma.styles.addRule({
+      nodeSelector: (node) => node && !node.hasClass('filtered'),
       nodeAttributes: {
-        halo: (node: Node<LkNodeData> | undefined) => {
+        halo: (node) => {
           if (
             node !== undefined &&
-            !node.hasClass('filtered') &&
             (node.isSelected() ||
-              node
-                .getAdjacentNodes({})
-                .filter((n) => !n.hasClass('filtered'))
-                .isSelected()
-                .includes(true) ||
-              node
-                .getAdjacentEdges()
-                .filter((e) => !e.hasClass('filtered'))
-                .isSelected()
-                .includes(true))
+              node.getAdjacentNodes({}).isSelected().includes(true) ||
+              node.getAdjacentEdges().isSelected().includes(true))
           ) {
             return {
               ...NODE_HALO_CONFIGURATION,
@@ -284,6 +278,19 @@ export class StylesViz {
           }
           return null;
         }
+      },
+      // recalculate the rule *only* when itself or adjacent
+      // elements change their selection status
+      nodeDependencies: {
+        self: {
+          selection: true
+        },
+        adjacentNodes: {
+          selection: true
+        },
+        adjacentEdges: {
+          selection: true
+        }
       }
     });
   }
@@ -294,17 +301,13 @@ export class StylesViz {
   public setEdgesDefaultHalo(): void {
     // setting default halo styles
     this._edgeDefaultHaloRules = this._ogma.styles.addRule({
+      edgeSelector: (edge: Edge) =>
+        edge && edge.getSource() && edge.getTarget() && !edge.hasClass('filtered'),
       edgeAttributes: {
-        halo: (edge: Edge<LkEdgeData> | undefined) => {
+        halo: (edge) => {
           if (
-            edge !== undefined &&
-            !edge.hasClass('filtered') &&
-            (edge.isSelected() ||
-              edge
-                .getExtremities()
-                .filter((n) => !n.hasClass('filtered'))
-                .isSelected()
-                .includes(true))
+            edge &&
+            (edge.isSelected() || edge.getSource().isSelected() || edge.getTarget().isSelected())
           ) {
             return {
               ...EDGE_HALO_CONFIGURATION,
@@ -315,6 +318,16 @@ export class StylesViz {
             };
           }
           return null;
+        }
+      },
+      // this rule will only be invoked when the selection status
+      // of the edge or it's extremities is changed
+      edgeDependencies: {
+        self: {
+          selection: true
+        },
+        extremities: {
+          selection: true
         }
       }
     });
@@ -540,9 +553,7 @@ export class StylesViz {
    */
   public refreshRules(): void {
     this._nodeDefaultStylesRules.refresh();
-    this._nodeDefaultHaloRules.refresh();
     this._edgeDefaultStylesRules.refresh();
-    this._edgeDefaultHaloRules.refresh();
   }
 
   /**
