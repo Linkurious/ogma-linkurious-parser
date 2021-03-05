@@ -72,10 +72,10 @@ export class Tools {
   public static clone(o: any) {
     return typeof o === 'object'
       ? JSON.parse(
-          JSON.stringify(o, (k, v) => {
-            return v instanceof Set ? {} : v;
-          })
-        )
+        JSON.stringify(o, (k, v) => {
+          return v instanceof Set ? {} : v;
+        })
+      )
       : o;
   }
 
@@ -107,7 +107,7 @@ export class Tools {
    * @return {number}
    */
   public static getDegreeWithoutSelfConnection(node: Node<LkNodeData>): number {
-    return node.getAdjacentNodes({policy: 'exclude-sources', filter: 'all'}).size;
+    return node.getAdjacentNodes({policy: 'exclude-sources', filter: 'raw'}).size;
   }
 
   /**
@@ -230,8 +230,8 @@ export class Tools {
     return sign === '+'
       ? this.sanitizeFormattedNumber(hours) * 3.6e6 + this.sanitizeFormattedNumber(minutes) * 60000
       : (this.sanitizeFormattedNumber(hours) * 3.6e6 +
-          this.sanitizeFormattedNumber(minutes) * 60000) *
-          -1;
+      this.sanitizeFormattedNumber(minutes) * 60000) *
+      -1;
   }
 
   public static sanitizeFormattedNumber(str: string): number {
