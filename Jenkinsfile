@@ -2,7 +2,9 @@
 
 nodeJob {
   // General
-  projectName = "linkurious/ogma-helper-library"
+  projectName = "linkurious/ogma-helper"
 
   createGitTag = true
+  gitTagPrefix = 'v'
+  runBookeeping = true
 }
