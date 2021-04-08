@@ -103,6 +103,7 @@ export class CaptionsViz {
             }
           }
         },
+        edgeSelector: (edge) => !edge.isVirtual() && edge.isVisible(),
         edgeDependencies: {self: {data: true}}
       });
     } else {
