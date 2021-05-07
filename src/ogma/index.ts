@@ -7,7 +7,7 @@ import {
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
-import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher} from 'ogma';
+import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher, RawEdge, RawGraph, RawNode} from 'ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
@@ -149,8 +149,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       return edge;
     });
     await this.setGraph({
-      nodes: fixedNodes,
-      edges: fixedEdges
+      nodes: fixedNodes as Array<RawNode<LkNodeData>>,
+      edges: fixedEdges as Array<RawEdge<LkEdgeData>>
     });
     if (selectedEntityType === EntityType.NODE) {
       this.getNodes(selectedElements).setSelected(true);
@@ -176,6 +176,33 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKTransformation.groupedEdges = visualization.edgeGrouping;
     this.LKTransformation.initTransformation();
     this.LKTransformation.initEdgeGroupingStyle();
+  }
+
+  /**
+   * Adding nodes then adding edges to the graph
+   */
+  public async setGraph(
+    graph: RawGraph<LkNodeData, LkEdgeData>
+  ): Promise<{
+    nodes: NodeList<LkNodeData>;
+    edges: EdgeList<LkEdgeData>;
+  }> {
+    const addedNodes = await this.addNodes(graph.nodes);
+    const addedEdges = await this.addEdges(graph.edges);
+    return {
+      nodes: addedNodes,
+      edges: addedEdges
+    };
+  }
+
+  /**
+   * Adding edges to the graph after filtering disconnected ones
+   */
+  public async addEdges(edges: Array<RawEdge<LkEdgeData>>): Promise<EdgeList> {
+    const filteredEdges = edges.filter((edge) => {
+      return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
+    });
+    return super.addEdges(filteredEdges);
   }
 
   /**
