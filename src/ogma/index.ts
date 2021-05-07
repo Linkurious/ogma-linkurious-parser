@@ -7,7 +7,7 @@ import {
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
-import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher} from 'ogma';
+import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher, RawEdge} from 'ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
@@ -148,10 +148,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       }
       return edge;
     });
-    await this.setGraph({
-      nodes: fixedNodes,
-      edges: fixedEdges
-    });
+    await this.addNodes(fixedNodes);
+    await this.addEdges(fixedEdges);
     if (selectedEntityType === EntityType.NODE) {
       this.getNodes(selectedElements).setSelected(true);
     } else if (selectedEntityType === EntityType.EDGE) {
@@ -176,6 +174,13 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKTransformation.groupedEdges = visualization.edgeGrouping;
     this.LKTransformation.initTransformation();
     this.LKTransformation.initEdgeGroupingStyle();
+  }
+
+  public async addEdges(edges: Array<RawEdge<LkEdgeData>>): Promise<EdgeList> {
+    const filteredEdges = edges.filter((edge) => {
+      return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
+    });
+    return super.addEdges(filteredEdges);
   }
 
   /**
