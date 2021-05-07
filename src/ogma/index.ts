@@ -178,6 +178,9 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKTransformation.initEdgeGroupingStyle();
   }
 
+  /**
+   * Adding nodes then adding edges to the graph
+   */
   public async setGraph(
     graph: RawGraph<LkNodeData, LkEdgeData>
   ): Promise<{
@@ -192,6 +195,9 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     };
   }
 
+  /**
+   * Adding edges to the graph after filtering disconnected ones
+   */
   public async addEdges(edges: Array<RawEdge<LkEdgeData>>): Promise<EdgeList> {
     const filteredEdges = edges.filter((edge) => {
       return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
