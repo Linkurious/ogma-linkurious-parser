@@ -42,7 +42,7 @@
   "homepage": "",
   "dependencies": {
     "lodash": "4.17.21",
-    "ogma": "3.3.11",
+    "ogma": "3.3.12",
     "rxjs": "6.5.3",
     "sha1": "1.1.1"
   },
