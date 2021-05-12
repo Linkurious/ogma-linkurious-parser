@@ -1,26 +1,13 @@
 import {
   EntityType,
-  ForceLayoutMode,
-  HierarchicalLayoutMode,
   IOgmaConfig,
-  LayoutAlgorithm,
   LkEdgeData,
   LkNodeData,
   PopulatedVisualization,
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
-import Ogma, {
-  EdgeList,
-  ForceLayoutOptions,
-  HierarchicalLayoutOptions,
-  NodeList,
-  NonObjectPropertyWatcher,
-  RadialLayoutOptions,
-  RawEdge,
-  RawGraph,
-  RawNode
-} from 'ogma';
+import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher, RawEdge, RawGraph, RawNode} from 'ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
@@ -131,60 +118,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     const nodeMaxTextLength = _configuration?.options?.styles?.node?.text?.maxTextLength;
     const edgeMaxTextLength = _configuration?.options?.styles?.edge?.text?.maxTextLength;
     this.LKCaptions = new CaptionsViz(this, nodeMaxTextLength, edgeMaxTextLength);
-  }
-
-  /**
-   * Returns Ogma Layout parameters according to visualization layout settings
-   * */
-  public getLayoutParams(
-    algorithm: LayoutAlgorithm.FORCE,
-    mode: ForceLayoutMode,
-    rootNode: undefined
-  ): ForceLayoutOptions;
-  public getLayoutParams(
-    algorithm: LayoutAlgorithm.RADIAL,
-    mode: undefined,
-    rootNode: string
-  ): RadialLayoutOptions;
-  public getLayoutParams(
-    algorithm: LayoutAlgorithm.HIERARCHICAL,
-    mode: HierarchicalLayoutMode,
-    rootNode: string
-  ): HierarchicalLayoutOptions;
-  public getLayoutParams(
-    algorithm: LayoutAlgorithm,
-    mode?: ForceLayoutMode | HierarchicalLayoutMode,
-    rootNode?: string
-  ): ForceLayoutOptions | HierarchicalLayoutOptions | RadialLayoutOptions {
-    switch (algorithm) {
-      case LayoutAlgorithm.HIERARCHICAL:
-        return {
-          direction: mode as HierarchicalLayoutMode,
-          roots: [rootNode!],
-          duration: 0
-        };
-      case LayoutAlgorithm.RADIAL:
-        return {
-          centralNode: rootNode,
-          radiusDelta: 1,
-          nodeGap: 10,
-          repulsion: this.getNodes().size > 80 ? 1 : 6,
-          duration: 0
-        };
-      default:
-        let dynamicSteps = 300 - ((300 - 40) / 5000) * this.getNodes().size;
-        if (dynamicSteps < 40) {
-          dynamicSteps = 40;
-        }
-        return {
-          steps: mode === ForceLayoutMode.FAST ? dynamicSteps : 300,
-          alignSiblings: this.getNodes().size > 3,
-          duration: 0,
-          charge: 20,
-          gravity: 0.08,
-          theta: this.getNodes().size > 100 ? 0.8 : 0.34
-        };
-    }
   }
 
   /**
