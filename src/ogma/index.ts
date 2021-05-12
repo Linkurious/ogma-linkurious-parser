@@ -1,6 +1,7 @@
 import {
   EntityType,
   ForceLayoutMode,
+  HierarchicalLayoutMode,
   IOgmaConfig,
   LayoutAlgorithm,
   LkEdgeData,
@@ -135,36 +136,57 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Returns Ogma Layout parameters according to visualization layout settings
    * */
-  public getLayoutParamsByViz(
-    visualization: PopulatedVisualization
+  public getLayoutParams(
+    algorithm: LayoutAlgorithm.FORCE,
+    mode: ForceLayoutMode,
+    numberOfNodes: number,
+    rootNode: undefined
+  ): ForceLayoutOptions;
+  public getLayoutParams(
+    algorithm: LayoutAlgorithm.RADIAL,
+    mode: undefined,
+    numberOfNodes: number,
+    rootNode: string
+  ): RadialLayoutOptions;
+  public getLayoutParams(
+    algorithm: LayoutAlgorithm.HIERARCHICAL,
+    mode: HierarchicalLayoutMode,
+    numberOfNodes: undefined,
+    rootNode: string
+  ): HierarchicalLayoutOptions;
+  public getLayoutParams(
+    algorithm: LayoutAlgorithm,
+    mode?: ForceLayoutMode | HierarchicalLayoutMode,
+    numberOfNodes?: number,
+    rootNode?: string
   ): ForceLayoutOptions | HierarchicalLayoutOptions | RadialLayoutOptions {
-    switch (visualization.layout.algorithm) {
+    switch (algorithm) {
       case LayoutAlgorithm.HIERARCHICAL:
         return {
-          direction: visualization.layout.mode,
-          roots: [visualization.layout.rootNode as string],
+          direction: mode as HierarchicalLayoutMode,
+          roots: [rootNode!],
           duration: 0
         };
       case LayoutAlgorithm.RADIAL:
         return {
-          centralNode: visualization.layout.rootNode,
+          centralNode: rootNode,
           radiusDelta: 1,
           nodeGap: 10,
-          repulsion: visualization.nodes.length > 80 ? 1 : 6,
+          repulsion: numberOfNodes! > 80 ? 1 : 6,
           duration: 0
         };
       default:
-        let dynamicSteps = 300 - ((300 - 40) / 5000) * visualization.nodes.length;
+        let dynamicSteps = 300 - ((300 - 40) / 5000) * numberOfNodes!;
         if (dynamicSteps < 40) {
           dynamicSteps = 40;
         }
         return {
-          steps: visualization.layout.mode === ForceLayoutMode.FAST ? dynamicSteps : 300,
-          alignSiblings: visualization.nodes.length > 3,
+          steps: mode === ForceLayoutMode.FAST ? dynamicSteps : 300,
+          alignSiblings: numberOfNodes! > 3,
           duration: 0,
           charge: 20,
           gravity: 0.08,
-          theta: visualization.nodes.length > 100 ? 0.8 : 0.34
+          theta: numberOfNodes! > 100 ? 0.8 : 0.34
         };
     }
   }
