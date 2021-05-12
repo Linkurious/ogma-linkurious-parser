@@ -137,24 +137,24 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Returns Ogma Layout parameters according to visualization layout settings
    * */
   public getLayoutParams(
-      algorithm: LayoutAlgorithm.FORCE,
-      mode: ForceLayoutMode,
-      rootNode: undefined
+    algorithm: LayoutAlgorithm.FORCE,
+    mode: ForceLayoutMode,
+    rootNode: undefined
   ): ForceLayoutOptions;
   public getLayoutParams(
-      algorithm: LayoutAlgorithm.RADIAL,
-      mode: undefined,
-      rootNode: string
+    algorithm: LayoutAlgorithm.RADIAL,
+    mode: undefined,
+    rootNode: string
   ): RadialLayoutOptions;
   public getLayoutParams(
-      algorithm: LayoutAlgorithm.HIERARCHICAL,
-      mode: HierarchicalLayoutMode,
-      rootNode: string
+    algorithm: LayoutAlgorithm.HIERARCHICAL,
+    mode: HierarchicalLayoutMode,
+    rootNode: string
   ): HierarchicalLayoutOptions;
   public getLayoutParams(
-      algorithm: LayoutAlgorithm,
-      mode?: ForceLayoutMode | HierarchicalLayoutMode,
-      rootNode?: string
+    algorithm: LayoutAlgorithm,
+    mode?: ForceLayoutMode | HierarchicalLayoutMode,
+    rootNode?: string
   ): ForceLayoutOptions | HierarchicalLayoutOptions | RadialLayoutOptions {
     switch (algorithm) {
       case LayoutAlgorithm.HIERARCHICAL:
@@ -251,7 +251,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Adding nodes then adding edges to the graph
    */
   public async setGraph(
-      graph: RawGraph<LkNodeData, LkEdgeData>
+    graph: RawGraph<LkNodeData, LkEdgeData>
   ): Promise<{
     nodes: NodeList<LkNodeData>;
     edges: EdgeList<LkEdgeData>;
@@ -279,8 +279,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    */
   public getNonFilteredNodes(items?: Array<any>): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
-        ? this.getNodes(items).filter((i) => !i.hasClass('filtered'))
-        : this.getNodes().filter((i) => !i.hasClass('filtered'));
+      ? this.getNodes(items).filter((i) => !i.hasClass('filtered'))
+      : this.getNodes().filter((i) => !i.hasClass('filtered'));
   }
 
   /**
@@ -288,8 +288,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    */
   public getFilteredNodes(items?: Array<any>): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
-        ? this.getNodes(items).filter((i) => i.hasClass('filtered'))
-        : this.getNodes().filter((i) => i.hasClass('filtered'));
+      ? this.getNodes(items).filter((i) => i.hasClass('filtered'))
+      : this.getNodes().filter((i) => i.hasClass('filtered'));
   }
 
   /**
@@ -297,8 +297,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    */
   public getNonFilteredEdges(items?: Array<any>): EdgeList<LkEdgeData, LkNodeData> {
     return Tools.isDefined(items)
-        ? this.getEdges(items).filter((i) => !i.hasClass('filtered'))
-        : this.getEdges().filter((i) => !i.hasClass('filtered'));
+      ? this.getEdges(items).filter((i) => !i.hasClass('filtered'))
+      : this.getEdges().filter((i) => !i.hasClass('filtered'));
   }
 
   /**
@@ -306,8 +306,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    */
   public getFilteredEdges(items?: Array<any>): EdgeList<LkEdgeData, LkNodeData> {
     return Tools.isDefined(items)
-        ? this.getEdges(items).filter((i) => i.hasClass('filtered'))
-        : this.getEdges().filter((i) => i.hasClass('filtered'));
+      ? this.getEdges(items).filter((i) => i.hasClass('filtered'))
+      : this.getEdges().filter((i) => i.hasClass('filtered'));
   }
 
   /**
