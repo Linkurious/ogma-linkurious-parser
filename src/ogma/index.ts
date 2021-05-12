@@ -139,25 +139,21 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public getLayoutParams(
     algorithm: LayoutAlgorithm.FORCE,
     mode: ForceLayoutMode,
-    numberOfNodes: number,
     rootNode: undefined
   ): ForceLayoutOptions;
   public getLayoutParams(
     algorithm: LayoutAlgorithm.RADIAL,
     mode: undefined,
-    numberOfNodes: number,
     rootNode: string
   ): RadialLayoutOptions;
   public getLayoutParams(
     algorithm: LayoutAlgorithm.HIERARCHICAL,
     mode: HierarchicalLayoutMode,
-    numberOfNodes: undefined,
     rootNode: string
   ): HierarchicalLayoutOptions;
   public getLayoutParams(
     algorithm: LayoutAlgorithm,
     mode?: ForceLayoutMode | HierarchicalLayoutMode,
-    numberOfNodes?: number,
     rootNode?: string
   ): ForceLayoutOptions | HierarchicalLayoutOptions | RadialLayoutOptions {
     switch (algorithm) {
@@ -172,21 +168,21 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
           centralNode: rootNode,
           radiusDelta: 1,
           nodeGap: 10,
-          repulsion: numberOfNodes! > 80 ? 1 : 6,
+          repulsion: this.getNodes().size > 80 ? 1 : 6,
           duration: 0
         };
       default:
-        let dynamicSteps = 300 - ((300 - 40) / 5000) * numberOfNodes!;
+        let dynamicSteps = 300 - ((300 - 40) / 5000) * this.getNodes().size;
         if (dynamicSteps < 40) {
           dynamicSteps = 40;
         }
         return {
           steps: mode === ForceLayoutMode.FAST ? dynamicSteps : 300,
-          alignSiblings: numberOfNodes! > 3,
+          alignSiblings: this.getNodes().size > 3,
           duration: 0,
           charge: 20,
           gravity: 0.08,
-          theta: numberOfNodes! > 100 ? 0.8 : 0.34
+          theta: this.getNodes().size > 100 ? 0.8 : 0.34
         };
     }
   }
