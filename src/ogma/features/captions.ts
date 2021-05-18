@@ -104,6 +104,7 @@ export class CaptionsViz {
           }
         },
         edgeSelector: (edge) => !edge.isVirtual() && edge.isVisible(),
+        // ogma will trigger the rendering if data change or the shape change (to trigger the rendering when edges are grouped)
         edgeDependencies: {self: {data: true, attributes: ['shape.style']}}
       });
     } else {
