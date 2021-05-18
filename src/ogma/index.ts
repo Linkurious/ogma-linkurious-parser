@@ -3,7 +3,6 @@ import {
   ForceLayoutMode,
   HierarchicalLayoutMode,
   IOgmaConfig,
-  LayoutAlgorithm,
   LkEdgeData,
   LkNodeData,
   PopulatedVisualization,
@@ -136,55 +135,40 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Returns Ogma Layout parameters according to visualization layout settings
    * */
-  public getLayoutParams(
-    algorithm: LayoutAlgorithm.FORCE,
-    mode: ForceLayoutMode,
-    rootNode: undefined
-  ): ForceLayoutOptions;
-  public getLayoutParams(
-    algorithm: LayoutAlgorithm.RADIAL,
-    mode: undefined,
-    rootNode: string
-  ): RadialLayoutOptions;
-  public getLayoutParams(
-    algorithm: LayoutAlgorithm.HIERARCHICAL,
-    mode: HierarchicalLayoutMode,
-    rootNode: string
-  ): HierarchicalLayoutOptions;
-  public getLayoutParams(
-    algorithm: LayoutAlgorithm,
-    mode?: ForceLayoutMode | HierarchicalLayoutMode,
-    rootNode?: string
-  ): ForceLayoutOptions | HierarchicalLayoutOptions | RadialLayoutOptions {
-    switch (algorithm) {
-      case LayoutAlgorithm.HIERARCHICAL:
-        return {
-          direction: mode as HierarchicalLayoutMode,
-          roots: [rootNode!],
-          duration: 0
-        };
-      case LayoutAlgorithm.RADIAL:
-        return {
-          centralNode: rootNode,
-          radiusDelta: 1,
-          nodeGap: 10,
-          repulsion: this.getNodes().size > 80 ? 1 : 6,
-          duration: 0
-        };
-      default:
-        let dynamicSteps = 300 - ((300 - 40) / 5000) * this.getNodes().size;
-        if (dynamicSteps < 40) {
-          dynamicSteps = 40;
-        }
-        return {
-          steps: mode === ForceLayoutMode.FAST ? dynamicSteps : 300,
-          alignSiblings: this.getNodes().size > 3,
-          duration: 0,
-          charge: 20,
-          gravity: 0.08,
-          theta: this.getNodes().size > 100 ? 0.8 : 0.34
-        };
+  public getForceLayoutParams(mode: ForceLayoutMode, duration = 0): ForceLayoutOptions {
+    let dynamicSteps = 300 - ((300 - 40) / 5000) * this.getNodes().size;
+    if (dynamicSteps < 40) {
+      dynamicSteps = 40;
     }
+    return {
+      steps: mode === ForceLayoutMode.FAST ? dynamicSteps : 300,
+      alignSiblings: this.getNodes().size > 3,
+      duration: duration,
+      charge: 20,
+      gravity: 0.08,
+      theta: this.getNodes().size > 100 ? 0.8 : 0.34
+    };
+  }
+  public getRadialLayoutParams(rootNode: string, duration = 0): RadialLayoutOptions {
+    return {
+      centralNode: rootNode,
+      radiusDelta: 1,
+      nodeGap: 10,
+      repulsion: this.getNodes().size > 80 ? 1 : 6,
+      duration: duration
+    };
+  }
+
+  public getHierarchicalLayoutParams(
+    mode: HierarchicalLayoutMode,
+    rootNode: string,
+    duration = 0
+  ): HierarchicalLayoutOptions {
+    return {
+      direction: mode,
+      roots: [rootNode],
+      duration: duration
+    };
   }
 
   /**
