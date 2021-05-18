@@ -104,7 +104,7 @@ export class CaptionsViz {
           }
         },
         edgeSelector: (edge) => !edge.isVirtual() && edge.isVisible(),
-        edgeDependencies: {self: {data: true}}
+        edgeDependencies: {self: {data: true, attributes: ['shape.style']}}
       });
     } else {
       return this.edgesCaptionsRule.refresh();
