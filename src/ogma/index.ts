@@ -140,8 +140,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     const fixedEdges = visualization.edges.map((edge) => {
       if (edge.attributes !== undefined) {
         if (edge.attributes.selected) {
-          selectedEntityType = EntityType.EDGE;
-          selectedElements = [];
+          if (selectedEntityType === undefined || selectedEntityType === EntityType.NODE) {
+            selectedEntityType = EntityType.EDGE;
+            selectedElements = [];
+          }
           selectedElements.push(edge.id);
         }
         delete edge.attributes.selected;
