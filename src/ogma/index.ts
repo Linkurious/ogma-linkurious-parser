@@ -17,6 +17,7 @@ import {TransformationsViz} from './features/transformations';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
+import {AddItemOptions} from "../../../ogma/src/modules/core/graph";
 
 export {default as Ogma} from 'ogma';
 export const ANIMATION_DURATION = 750;
@@ -200,7 +201,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding edges to the graph after filtering disconnected ones
    */
-  public async addEdges(edges: Array<RawEdge<LkEdgeData>>, options): Promise<EdgeList> {
+  public async addEdges(edges: Array<RawEdge<LkEdgeData>>, options?: AddItemOptions): Promise<EdgeList> {
     const filteredEdges = edges.filter((edge) => {
       return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
     });
