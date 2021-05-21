@@ -1,5 +1,7 @@
 import {
   EntityType,
+  ForceLayoutMode,
+  HierarchicalLayoutMode,
   IOgmaConfig,
   LkEdgeData,
   LkNodeData,
@@ -7,7 +9,17 @@ import {
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
-import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher, RawEdge, RawGraph, RawNode} from 'ogma';
+import Ogma, {
+  EdgeList,
+  ForceLayoutOptions,
+  HierarchicalLayoutOptions,
+  NodeList,
+  NonObjectPropertyWatcher,
+  RadialLayoutOptions,
+  RawEdge,
+  RawGraph,
+  RawNode
+} from 'ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
@@ -118,6 +130,45 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     const nodeMaxTextLength = _configuration?.options?.styles?.node?.text?.maxTextLength;
     const edgeMaxTextLength = _configuration?.options?.styles?.edge?.text?.maxTextLength;
     this.LKCaptions = new CaptionsViz(this, nodeMaxTextLength, edgeMaxTextLength);
+  }
+
+  /**
+   * Returns Ogma Layout parameters according to visualization layout settings
+   * */
+  public getForceLayoutParams(mode: ForceLayoutMode, duration = 0): ForceLayoutOptions {
+    let dynamicSteps = 300 - ((300 - 40) / 5000) * this.getNodes().size;
+    if (dynamicSteps < 40) {
+      dynamicSteps = 40;
+    }
+    return {
+      steps: mode === ForceLayoutMode.FAST ? dynamicSteps : 300,
+      alignSiblings: this.getNodes().size > 3,
+      duration: duration,
+      charge: 20,
+      gravity: 0.08,
+      theta: this.getNodes().size > 100 ? 0.8 : 0.34
+    };
+  }
+  public getRadialLayoutParams(rootNode: string, duration = 0): RadialLayoutOptions {
+    return {
+      centralNode: rootNode,
+      radiusDelta: 1,
+      nodeGap: 10,
+      repulsion: this.getNodes().size > 80 ? 1 : 6,
+      duration: duration
+    };
+  }
+
+  public getHierarchicalLayoutParams(
+    mode: HierarchicalLayoutMode,
+    rootNode: string,
+    duration = 0
+  ): HierarchicalLayoutOptions {
+    return {
+      direction: mode,
+      roots: [rootNode],
+      duration: duration
+    };
   }
 
   /**
