@@ -21,6 +21,11 @@ import {OgmaStore} from './features/OgmaStore';
 export {default as Ogma} from 'ogma';
 export const ANIMATION_DURATION = 750;
 
+interface GraphOptions {
+  virtual?: boolean;
+  batchSize?: number;
+}
+
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   private _reactive: RxViz;
   public LKStyles!: StylesViz;
@@ -189,7 +194,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    */
   public async setGraph(
     graph: RawGraph<LkNodeData, LkEdgeData>,
-    options
+    options: GraphOptions
   ): Promise<{
     nodes: NodeList<LkNodeData>;
     edges: EdgeList<LkEdgeData>;
@@ -205,7 +210,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding edges to the graph after filtering disconnected ones
    */
-  public async addEdges(edges: Array<RawEdge<LkEdgeData>>, options): Promise<EdgeList> {
+  public async addEdges(
+    edges: Array<RawEdge<LkEdgeData>>,
+    options: GraphOptions
+  ): Promise<EdgeList> {
     const filteredEdges = edges.filter((edge) => {
       return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
     });
