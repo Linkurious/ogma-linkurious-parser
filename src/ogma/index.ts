@@ -183,15 +183,20 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
 
   /**
    * Adding nodes then adding edges to the graph
+   *
+   * /!\ Warining, this is changeing the behaviour of Ogma's setGraph
+   * Ogma uses this API (for now) only un addNodeClustering, so it's safe
+   * as long as you dont implement it.
    */
   public async setGraph(
-    graph: RawGraph<LkNodeData, LkEdgeData>
+    graph: RawGraph<LkNodeData, LkEdgeData>,
+    options
   ): Promise<{
     nodes: NodeList<LkNodeData>;
     edges: EdgeList<LkEdgeData>;
   }> {
-    const addedNodes = await this.addNodes(graph.nodes);
-    const addedEdges = await this.addEdges(graph.edges);
+    const addedNodes = await this.addNodes(graph.nodes, options);
+    const addedEdges = await this.addEdges(graph.edges, options);
     return {
       nodes: addedNodes,
       edges: addedEdges
