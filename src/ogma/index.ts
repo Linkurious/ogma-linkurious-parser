@@ -17,10 +17,14 @@ import {TransformationsViz} from './features/transformations';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
-import {AddItemOptions} from "../../../ogma/src/modules/core/graph";
 
 export {default as Ogma} from 'ogma';
 export const ANIMATION_DURATION = 750;
+
+interface AddItemOptions {
+  batchSize?: number;
+  virtual?: boolean;
+}
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   private _reactive: RxViz;
@@ -151,7 +155,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       }
       return edge;
     });
-    await this.setGraph({
+    await this.setGraphLKE({
       nodes: fixedNodes as Array<RawNode<LkNodeData>>,
       edges: fixedEdges as Array<RawEdge<LkEdgeData>>
     });
@@ -183,20 +187,15 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
 
   /**
    * Adding nodes then adding edges to the graph
-   *
-   * /!\ Warining, this is changeing the behaviour of Ogma's setGraph
-   * Ogma uses this API (for now) only un addNodeClustering, so it's safe
-   * as long as you dont implement it.
    */
-  public async setGraph(
-    graph: RawGraph<LkNodeData, LkEdgeData>,
-    options
+  public async setGraphLKE(
+    graph: RawGraph<LkNodeData, LkEdgeData>
   ): Promise<{
     nodes: NodeList<LkNodeData>;
     edges: EdgeList<LkEdgeData>;
   }> {
-    const addedNodes = await this.addNodes(graph.nodes, options);
-    const addedEdges = await this.addEdges(graph.edges, options);
+    const addedNodes = await this.addNodes(graph.nodes);
+    const addedEdges = await this.addEdges(graph.edges);
     return {
       nodes: addedNodes,
       edges: addedEdges
@@ -206,7 +205,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding edges to the graph after filtering disconnected ones
    */
-  public async addEdges(edges: Array<RawEdge<LkEdgeData>>, options?: AddItemOptions): Promise<EdgeList> {
+  public async addEdges(
+    edges: Array<RawEdge<LkEdgeData>>,
+    options?: AddItemOptions
+  ): Promise<EdgeList> {
     const filteredEdges = edges.filter((edge) => {
       return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
     });
