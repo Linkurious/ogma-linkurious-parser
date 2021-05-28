@@ -29,7 +29,8 @@
     "lint:ci": "eslint -f checkstyle -o reports/checkstyle.xml --ext .ts .",
     "latest:develop": "npm install --save-exact @linkurious/rest-client@lk-develop",
     "latest:develop-next": "npm install --save-exact @linkurious/rest-client@lk-develop-next",
-    "latest:master": "npm install --save-exact  @linkurious/rest-client@latest",
+    "latest:master": "npm install --save-exact  @linkurious/rest-client@lk-master",
+    "latest:master-stable": "npm install --save-exact @linkurious/rest-client@lk-master-stable",
     "bump:patch": "bump2version patch && npm version --no-git-tag-version patch",
     "bump:minor": "bump2version minor && npm version --no-git-tag-version minor",
     "bump:major": "bump2version major && npm version --no-git-tag-version major"
