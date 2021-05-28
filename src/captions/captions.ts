@@ -7,7 +7,8 @@ import {
   LkNodeData,
   LkProperty
 } from '@linkurious/rest-client';
-import {CAPTION_HEURISTIC, Tools} from "../tools/tools";
+
+import {CAPTION_HEURISTIC, Tools} from '../tools/tools';
 
 export class Captions {
   /**
@@ -52,7 +53,7 @@ export class Captions {
         return Tools.formatDate(
           new Date(
             new Date(propertyValue.value).getTime() +
-            Tools.timezoneToMilliseconds(propertyValue.timezone)
+              Tools.timezoneToMilliseconds(propertyValue.timezone)
           ).toISOString()
         );
       }
@@ -72,7 +73,7 @@ export class Captions {
    */
   public static generateNodeCaption(
     itemData: LkNodeData,
-    schema: { [key: string]: ICaptionConfig }
+    schema: {[key: string]: ICaptionConfig}
   ): string {
     const categories = itemData.categories;
     const caption: Array<string | null> = [];
@@ -101,7 +102,7 @@ export class Captions {
    */
   public static generateEdgeCaption(
     itemData: LkEdgeData,
-    schema: { [key: string]: ICaptionConfig }
+    schema: {[key: string]: ICaptionConfig}
   ): string {
     const type = itemData.type;
     const caption: Array<string | null> = [];

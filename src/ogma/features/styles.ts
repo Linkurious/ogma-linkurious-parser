@@ -1,8 +1,12 @@
 'use strict';
 
 import * as o from 'ogma';
+import {Edge, EdgeAttributesValue, NodeAttributesValue, StyleClass, StyleRule} from 'ogma';
 import {
   GenericObject,
+  IEdgeStyle,
+  INodeStyle,
+  IStyleRule,
   LkEdgeData,
   LkNodeData,
   OgmaEdgeShape,
@@ -10,20 +14,29 @@ import {
   TextOptions
 } from '@linkurious/rest-client';
 
-import {BASE_GREY, EdgeAttributes, LKOgma, NodeAttributes, StyleRule} from '../..';
-import {Tools} from "../../tools/tools";
+import {
+  BASE_GREY,
+  EdgeAttributes,
+  LKOgma,
+  NodeAttributes,
+  OgmaTools,
+  StyleRule as LKStyleRule,
+  StyleRules,
+  StyleType
+} from '../..';
+import {Tools} from '../../tools/tools';
 
 export interface StylesConfig {
-  nodeColorStyleRules: Array<StyleRule>;
-  nodeIconStyleRules: Array<StyleRule>;
-  nodeSizeStyleRules: Array<StyleRule>;
-  nodeShapeStyleRules?: Array<StyleRule>;
-  edgeColorStyleRules: Array<StyleRule>;
-  edgeWidthStyleRules: Array<StyleRule>;
-  edgeShapeStyleRules?: Array<StyleRule>;
+  nodeColorStyleRules: Array<LKStyleRule>;
+  nodeIconStyleRules: Array<LKStyleRule>;
+  nodeSizeStyleRules: Array<LKStyleRule>;
+  nodeShapeStyleRules?: Array<LKStyleRule>;
+  edgeColorStyleRules: Array<LKStyleRule>;
+  edgeWidthStyleRules: Array<LKStyleRule>;
+  edgeShapeStyleRules?: Array<LKStyleRule>;
 }
 
-const HOVERED_SELECTED_NODE_STYLE: o.NodeAttributesValue<LkNodeData, LkEdgeData> = {
+const HOVERED_SELECTED_NODE_STYLE: NodeAttributesValue<LkNodeData, LkEdgeData> = {
   text: {
     style: 'bold',
     backgroundColor: '#fff',
@@ -33,7 +46,7 @@ const HOVERED_SELECTED_NODE_STYLE: o.NodeAttributesValue<LkNodeData, LkEdgeData>
   outline: false
 };
 
-const HOVERED_SELECTED_EDGE_STYLE: o.EdgeAttributesValue<LkEdgeData, LkNodeData> = {
+const HOVERED_SELECTED_EDGE_STYLE: EdgeAttributesValue<LkEdgeData, LkNodeData> = {
   text: {
     style: 'bold',
     backgroundColor: '#fff',
@@ -44,68 +57,87 @@ const HOVERED_SELECTED_EDGE_STYLE: o.EdgeAttributesValue<LkEdgeData, LkNodeData>
 
 const NODE_HALO_CONFIGURATION = {
   color: '#FFF',
-  size: 7,
+  width: 7,
   scalingMethod: 'scaled',
   strokeWidth: 0,
   hideNonAdjacentEdges: false
 } as {
   color: '#FFF';
-  size: 7;
+  width: 7;
   strokeWidth: 0;
 };
 
 const EDGE_HALO_CONFIGURATION = {
   color: '#FFF',
   scalingMethod: 'scaled',
-  size: 4
+  width: 4
 } as {
   color: '#FFF';
-  size: 4;
+  width: 4;
 };
 
 export const FILTER_OPACITY = 0.2;
 
 export class StylesViz {
   private _ogma: LKOgma;
-  private _exportClass!: o.StyleClass;
-  private _nodeDefaultStylesRules!: o.StyleRule;
-  private _nodeDefaultHaloRules!: o.StyleRule;
-  private _edgeDefaultStylesRules!: o.StyleRule;
-  private _edgeDefaultHaloRules!: o.StyleRule;
+  private _exportClass!: StyleClass;
+  private _nodeDefaultStylesRules!: StyleRule<LkNodeData, LkEdgeData>;
+  // @ts-ignore
+  private _nodeDefaultHaloRules!: StyleRule<LkNodeData, LkEdgeData>;
+  private _edgeDefaultStylesRules!: StyleRule<LkNodeData, LkEdgeData>;
+  // @ts-ignore
+  private _edgeDefaultHaloRules!: StyleRule<LkNodeData, LkEdgeData>;
 
-  private _nodeColorAttribute!: NodeAttributes;
-  private _ogmaNodeColor!: o.StyleRule;
-  private _nodeIconAttribute!: NodeAttributes;
-  private _ogmaNodeIcon!: o.StyleRule;
-  private _nodeSizeAttribute!: NodeAttributes;
-  private _ogmaNodeSize!: o.StyleRule;
-  private _nodeShapeAttribute!: NodeAttributes;
-  private _ogmaNodeShape!: o.StyleRule;
-  private _edgeColorAttribute!: EdgeAttributes;
-  private _ogmaEdgeColor!: o.StyleRule;
-  private _edgeWidthAttribute!: EdgeAttributes;
-  private _ogmaEdgeWidth!: o.StyleRule;
-  private _edgeShapeAttribute!: EdgeAttributes;
-  private _ogmaEdgeShape!: o.StyleRule;
+  private _nodeAttributes: NodeAttributes = new NodeAttributes({});
+  private _edgeAttributes: EdgeAttributes = new EdgeAttributes({});
 
-  constructor(ogma: LKOgma) {
-    this._ogma = ogma;
-  }
-
-  /**
-   * Set nodes default styles based on the configuration
-   */
-  public setNodesDefaultStyles(
-    nodeStyleConf:
-      | {
+  private _ogmaNodeColor!: StyleRule;
+  private _ogmaNodeIcon!: StyleRule;
+  private _ogmaNodeSize!: StyleRule;
+  private _ogmaNodeShape!: StyleRule;
+  private _ogmaEdgeColor!: StyleRule;
+  private _ogmaEdgeWidth!: StyleRule;
+  private _ogmaEdgeShape!: StyleRule;
+  private _defaultConfiguration: {
+    node: {
       nodeRadius?: number;
       shape?: OgmaNodeShape;
       text?: TextOptions & {
         nodePosition?: 'right' | 'left' | 'top' | 'bottom' | 'center';
       };
+    };
+    edge: {
+      edgeWidth?: number;
+      shape?: OgmaEdgeShape;
+      text?: TextOptions;
+    };
+  };
+
+  constructor(
+    ogma: LKOgma,
+    configuration: {
+      node: {
+        nodeRadius?: number;
+        shape?: OgmaNodeShape;
+        text?: TextOptions & {
+          nodePosition?: 'right' | 'left' | 'top' | 'bottom' | 'center';
+        };
+      };
+      edge: {
+        edgeWidth?: number;
+        shape?: OgmaEdgeShape;
+        text?: TextOptions;
+      };
     }
-      | undefined
-  ): void {
+  ) {
+    this._ogma = ogma;
+    this._defaultConfiguration = configuration;
+  }
+
+  /**
+   * Set nodes default styles based on the configuration
+   */
+  public setNodesDefaultStyles(): void {
     // setting selection and hover attributes
     this._ogma.styles.setHoveredNodeAttributes(HOVERED_SELECTED_NODE_STYLE);
     this._ogma.styles.setSelectedNodeAttributes(HOVERED_SELECTED_NODE_STYLE);
@@ -114,57 +146,50 @@ export class StylesViz {
       nodeAttributes: {
         text: {
           minVisibleSize:
-            nodeStyleConf !== undefined &&
-            nodeStyleConf.text !== undefined &&
-            nodeStyleConf.text.minVisibleSize
-              ? nodeStyleConf.text.minVisibleSize
+            this._defaultConfiguration.node.text !== undefined &&
+            this._defaultConfiguration.node.text.minVisibleSize
+              ? this._defaultConfiguration.node.text.minVisibleSize
               : 12,
           maxLineLength:
-            nodeStyleConf !== undefined &&
-            nodeStyleConf.text !== undefined &&
-            nodeStyleConf.text.maxLineLength !== undefined
-              ? nodeStyleConf.text.maxLineLength
+            this._defaultConfiguration.node.text !== undefined &&
+            this._defaultConfiguration.node.text.maxLineLength !== undefined
+              ? this._defaultConfiguration.node.text.maxLineLength
               : 30,
           position:
-            nodeStyleConf !== undefined &&
-            nodeStyleConf.text !== undefined &&
-            nodeStyleConf.text.nodePosition !== undefined
-              ? nodeStyleConf.text.nodePosition
+            this._defaultConfiguration.node.text !== undefined &&
+            this._defaultConfiguration.node.text.nodePosition !== undefined
+              ? this._defaultConfiguration.node.text.nodePosition
               : 'bottom',
           backgroundColor:
-            nodeStyleConf !== undefined &&
-            nodeStyleConf.text !== undefined &&
-            nodeStyleConf.text.backgroundColor !== undefined
-              ? nodeStyleConf.text.backgroundColor
+            this._defaultConfiguration.node.text !== undefined &&
+            this._defaultConfiguration.node.text.backgroundColor !== undefined
+              ? this._defaultConfiguration.node.text.backgroundColor
               : 'null',
           font:
-            nodeStyleConf !== undefined &&
-            nodeStyleConf.text !== undefined &&
-            nodeStyleConf.text.font !== undefined
-              ? nodeStyleConf.text.font
-              : 'roboto',
+            this._defaultConfiguration.node.text !== undefined &&
+            this._defaultConfiguration.node.text.font !== undefined
+              ? this._defaultConfiguration.node.text.font
+              : "'roboto', sans-serif",
           color:
-            nodeStyleConf !== undefined &&
-            nodeStyleConf.text !== undefined &&
-            nodeStyleConf.text.color !== undefined
-              ? nodeStyleConf.text.color
+            this._defaultConfiguration.node.text !== undefined &&
+            this._defaultConfiguration.node.text.color !== undefined
+              ? this._defaultConfiguration.node.text.color
               : 'black',
           size:
-            nodeStyleConf !== undefined &&
-            nodeStyleConf.text !== undefined &&
-            nodeStyleConf.text.size !== undefined
-              ? nodeStyleConf.text.size
+            this._defaultConfiguration.node.text !== undefined &&
+            this._defaultConfiguration.node.text.size !== undefined
+              ? this._defaultConfiguration.node.text.size
               : 14,
           margin: 5
         },
-        radius: this.defaultNodeRadius(nodeStyleConf),
+        radius: this.defaultNodeRadius(this._defaultConfiguration.node),
         icon: {
           minVisibleSize: 15
         },
         color: '#7f7f7f',
         shape:
-          nodeStyleConf !== undefined && nodeStyleConf.shape !== undefined
-            ? nodeStyleConf.shape
+          this._defaultConfiguration.node.shape !== undefined
+            ? this._defaultConfiguration.node.shape
             : ('circle' as OgmaNodeShape),
         innerStroke: {
           width: 3
@@ -177,15 +202,7 @@ export class StylesViz {
   /**
    * Set edges default styles based on the configuration
    */
-  public setEdgesDefaultStyles(
-    edgeStyleConf:
-      | {
-      edgeWidth?: number;
-      shape?: OgmaEdgeShape;
-      text?: TextOptions;
-    }
-      | undefined
-  ): void {
+  public setEdgesDefaultStyles(): void {
     // setting selection and hover attributes
     this._ogma.styles.setHoveredEdgeAttributes(HOVERED_SELECTED_EDGE_STYLE);
     this._ogma.styles.setSelectedEdgeAttributes(HOVERED_SELECTED_EDGE_STYLE);
@@ -194,46 +211,41 @@ export class StylesViz {
       edgeAttributes: {
         text: {
           minVisibleSize:
-            edgeStyleConf !== undefined &&
-            edgeStyleConf.text !== undefined &&
-            edgeStyleConf.text.minVisibleSize
-              ? edgeStyleConf.text.minVisibleSize
+            this._defaultConfiguration.edge.text !== undefined &&
+            this._defaultConfiguration.edge.text.minVisibleSize
+              ? this._defaultConfiguration.edge.text.minVisibleSize
               : 3,
           maxLineLength:
-            edgeStyleConf !== undefined &&
-            edgeStyleConf.text !== undefined &&
-            edgeStyleConf.text.maxLineLength !== undefined
-              ? edgeStyleConf.text.maxLineLength
+            this._defaultConfiguration.edge.text !== undefined &&
+            this._defaultConfiguration.edge.text.maxLineLength !== undefined
+              ? this._defaultConfiguration.edge.text.maxLineLength
               : 30,
           backgroundColor:
-            edgeStyleConf !== undefined &&
-            edgeStyleConf.text !== undefined &&
-            edgeStyleConf.text.backgroundColor !== undefined
-              ? edgeStyleConf.text.backgroundColor
+            this._defaultConfiguration.edge.text !== undefined &&
+            this._defaultConfiguration.edge.text.backgroundColor !== undefined
+              ? this._defaultConfiguration.edge.text.backgroundColor
               : null,
           font:
-            edgeStyleConf !== undefined &&
-            edgeStyleConf.text !== undefined &&
-            edgeStyleConf.text.font !== undefined
-              ? edgeStyleConf.text.font
-              : 'roboto',
+            this._defaultConfiguration.edge.text !== undefined &&
+            this._defaultConfiguration.edge.text.font !== undefined
+              ? this._defaultConfiguration.edge.text.font
+              : "'roboto', sans-serif",
           color:
-            edgeStyleConf !== undefined &&
-            edgeStyleConf.text !== undefined &&
-            edgeStyleConf.text.color !== undefined
-              ? edgeStyleConf.text.color
+            this._defaultConfiguration.edge !== undefined &&
+            this._defaultConfiguration.edge.text !== undefined &&
+            this._defaultConfiguration.edge.text.color !== undefined
+              ? this._defaultConfiguration.edge.text.color
               : 'black',
           size:
-            edgeStyleConf !== undefined &&
-            edgeStyleConf.text !== undefined &&
-            edgeStyleConf.text.size !== undefined
-              ? edgeStyleConf.text.size
+            this._defaultConfiguration.edge.text !== undefined &&
+            this._defaultConfiguration.edge.text.size !== undefined
+              ? this._defaultConfiguration.edge.text.size
               : 14
         },
-        width: this.defaultEdgeWidth(edgeStyleConf),
+        width: this.defaultEdgeWidth(this._defaultConfiguration.edge),
         shape:
-          edgeStyleConf !== undefined && edgeStyleConf.shape !== undefined
-            ? edgeStyleConf.shape
+          this._defaultConfiguration.edge.shape !== undefined
+            ? this._defaultConfiguration.edge.shape
             : 'arrow',
         color: '#7f7f7f'
       }
@@ -246,33 +258,38 @@ export class StylesViz {
   public setNodesDefaultHalo(): void {
     // setting default halo style
     this._nodeDefaultHaloRules = this._ogma.styles.addRule({
+      nodeSelector: (node) => node && !node.hasClass('filtered'),
       nodeAttributes: {
-        halo: (node: o.Node | undefined) => {
+        halo: (node) => {
           if (
             node !== undefined &&
-            !node.hasClass('filtered') &&
             (node.isSelected() ||
-              node
-                .getAdjacentNodes({})
-                .filter((n) => !n.hasClass('filtered'))
-                .isSelected()
-                .includes(true) ||
-              node
-                .getAdjacentEdges()
-                .filter((e) => !e.hasClass('filtered'))
-                .isSelected()
-                .includes(true))
+              node.getAdjacentNodes({}).isSelected().includes(true) ||
+              node.getAdjacentEdges().isSelected().includes(true))
           ) {
             return {
               ...NODE_HALO_CONFIGURATION,
               scalingMethod: this._ogma.geo.enabled() ? 'fixed' : 'scaled'
             } as {
               color: '#FFF';
-              size: 7;
+              width: 7;
               strokeWidth: 0;
             };
           }
           return null;
+        }
+      },
+      // recalculate the rule *only* when itself or adjacent
+      // elements change their selection status
+      nodeDependencies: {
+        self: {
+          selection: true
+        },
+        adjacentNodes: {
+          selection: true
+        },
+        adjacentEdges: {
+          selection: true
         }
       }
     });
@@ -284,27 +301,33 @@ export class StylesViz {
   public setEdgesDefaultHalo(): void {
     // setting default halo styles
     this._edgeDefaultHaloRules = this._ogma.styles.addRule({
+      edgeSelector: (edge: Edge) =>
+        edge && edge.getSource() && edge.getTarget() && !edge.hasClass('filtered'),
       edgeAttributes: {
-        halo: (edge: o.Edge | undefined) => {
+        halo: (edge) => {
           if (
-            edge !== undefined &&
-            !edge.hasClass('filtered') &&
-            (edge.isSelected() ||
-              edge
-                .getExtremities()
-                .filter((n) => !n.hasClass('filtered'))
-                .isSelected()
-                .includes(true))
+            edge &&
+            (edge.isSelected() || edge.getSource().isSelected() || edge.getTarget().isSelected())
           ) {
             return {
               ...EDGE_HALO_CONFIGURATION,
               scalingMethod: this._ogma.geo.enabled() ? 'fixed' : 'scaled'
             } as {
               color: '#FFF';
-              size: 4;
+              width: 4;
             };
           }
           return null;
+        }
+      },
+      // this rule will only be invoked when the selection status
+      // of the edge or it's extremities is changed
+      edgeDependencies: {
+        self: {
+          selection: true
+        },
+        extremities: {
+          selection: true
         }
       }
     });
@@ -442,7 +465,7 @@ export class StylesViz {
                 const nodeColor = Array.isArray(node.getAttribute('color'))
                   ? node.getAttribute('color')![0]
                   : node.getAttribute('color');
-                const textColor = Tools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
+                const textColor = OgmaTools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
                 const isSupernode = node.getData(['statistics', 'supernode']);
                 let content = null;
                 if (+badgeContent !== 0) {
@@ -456,7 +479,11 @@ export class StylesViz {
                     color: null
                   },
                   text: {
-                    font: 'roboto',
+                    font:
+                      this._defaultConfiguration.node.text !== undefined &&
+                      this._defaultConfiguration.node.text.font !== undefined
+                        ? this._defaultConfiguration.node.text.font
+                        : "'roboto', sans-serif",
                     scale: 0.4,
                     color: textColor,
                     content: content
@@ -477,7 +504,7 @@ export class StylesViz {
               const nodeColor = Array.isArray(node.getAttribute('color'))
                 ? node.getAttribute('color')![0]
                 : node.getAttribute('color');
-              const textColor = Tools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
+              const textColor = OgmaTools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
               return {
                 color: 'inherit',
                 minVisibleSize: 20,
@@ -526,31 +553,76 @@ export class StylesViz {
    */
   public refreshRules(): void {
     this._nodeDefaultStylesRules.refresh();
-    this._nodeDefaultHaloRules.refresh();
     this._edgeDefaultStylesRules.refresh();
-    this._edgeDefaultHaloRules.refresh();
   }
 
   /**
    * Create / refresh an ogma rule for node colors
    */
-  public refreshNodeColors(colorStyleRules: Array<StyleRule>): void {
+  public refreshNodeColors(colorStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaNodeColor)) {
-      this._nodeColorAttribute = new NodeAttributes({color: colorStyleRules});
+      this._nodeAttributes.refresh({color: colorStyleRules});
       this._ogmaNodeColor = this._ogma.styles.addRule({
         nodeAttributes: {
           color: (node: o.Node | undefined) => {
             if (node !== undefined) {
-              return this._nodeColorAttribute.color(node.getData());
+              return this._nodeAttributes.color(node.getData());
             }
           }
         },
         nodeDependencies: {self: {data: true}}
       });
     } else {
-      this._nodeColorAttribute.refresh({color: colorStyleRules});
+      this._nodeAttributes.refresh({color: colorStyleRules});
       this._ogmaNodeColor.refresh();
+      // TODO refresh node icons when moving the code from LKE
+      // this.refreshIconsColor();
     }
+  }
+
+  /**
+   * Return an array of StyleRules with only the style that need to be applied
+   */
+  public getStyleRule(
+    state: Array<IStyleRule<INodeStyle | IEdgeStyle>>,
+    styleType: StyleType
+  ): LKStyleRule[] {
+    return new StyleRules(state)[styleType];
+  }
+
+  public initNodeColors(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+    const nodeColorRules = this.getStyleRule(nodeRules, StyleType.COLOR);
+    this.refreshNodeColors(nodeColorRules);
+  }
+
+  public initNodesIcons(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+    const nodeIconsRules = this.getStyleRule(nodeRules, StyleType.ICON);
+    this.refreshNodeIcons(nodeIconsRules);
+  }
+
+  public initNodesSizes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+    const nodeSizeRules = this.getStyleRule(nodeRules, StyleType.SIZE);
+    this.refreshNodeSize(nodeSizeRules);
+  }
+
+  public initNodesShapes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+    const nodeShapesRules = this.getStyleRule(nodeRules, StyleType.SHAPE);
+    this.refreshNodeShape(nodeShapesRules);
+  }
+
+  public initEdgesWidth(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+    const edgesWidthRules = this.getStyleRule(edgeRules, StyleType.WIDTH);
+    this.refreshEdgeWidth(edgesWidthRules);
+  }
+
+  public initEdgesShape(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+    const edgesShapeRules = this.getStyleRule(edgeRules, StyleType.SHAPE);
+    this.refreshEdgeShape(edgesShapeRules);
+  }
+
+  public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+    const edgesColorRules = this.getStyleRule(edgeRules, StyleType.COLOR);
+    this.refreshEdgeColors(edgesColorRules);
   }
 
   /**
@@ -558,26 +630,26 @@ export class StylesViz {
    *
    * @param {Array<any>} iconStyleRules
    */
-  public refreshNodeIcons(iconStyleRules: Array<StyleRule>): void {
+  public refreshNodeIcons(iconStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaNodeIcon)) {
-      this._nodeIconAttribute = new NodeAttributes({icon: iconStyleRules});
+      this._nodeAttributes.refresh({icon: iconStyleRules});
       this._ogmaNodeIcon = this._ogma.styles.addRule({
         nodeAttributes: {
           icon: (node: o.Node | undefined) => {
             if (node !== undefined) {
-              return this._nodeIconAttribute.icon(node.getData()).icon;
+              return this._nodeAttributes.icon(node.getData()).icon;
             }
           },
           image: (node: o.Node | undefined) => {
             if (node !== undefined) {
-              return this._nodeIconAttribute.icon(node.getData()).image;
+              return this._nodeAttributes.icon(node.getData()).image;
             }
           }
         },
         nodeDependencies: {self: {data: true}}
       });
     } else {
-      this._nodeIconAttribute.refresh({icon: iconStyleRules});
+      this._nodeAttributes.refresh({icon: iconStyleRules});
       this._ogmaNodeIcon.refresh();
     }
   }
@@ -587,21 +659,21 @@ export class StylesViz {
    *
    * @param {Array<any>} sizeStyleRules
    */
-  public refreshNodeSize(sizeStyleRules: Array<StyleRule>): void {
+  public refreshNodeSize(sizeStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaNodeSize)) {
-      this._nodeSizeAttribute = new NodeAttributes({size: sizeStyleRules});
+      this._nodeAttributes.refresh({size: sizeStyleRules});
       this._ogmaNodeSize = this._ogma.styles.addRule({
         nodeAttributes: {
           radius: (node: o.Node | undefined) => {
             if (node !== undefined) {
-              return this._nodeSizeAttribute.size(node.getData());
+              return this._nodeAttributes.size(node.getData());
             }
           }
         },
         nodeDependencies: {self: {data: true}}
       });
     } else {
-      this._nodeSizeAttribute.refresh({size: sizeStyleRules});
+      this._nodeAttributes.refresh({size: sizeStyleRules});
       this._ogmaNodeSize.refresh();
     }
   }
@@ -611,21 +683,21 @@ export class StylesViz {
    *
    * @param {Array<any>} shapeStyleRules
    */
-  public refreshNodeShape(shapeStyleRules: Array<StyleRule>): void {
+  public refreshNodeShape(shapeStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaNodeShape)) {
-      this._nodeShapeAttribute = new NodeAttributes({shape: shapeStyleRules});
+      this._nodeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaNodeShape = this._ogma.styles.addRule({
         nodeAttributes: {
           shape: (node: o.Node | undefined) => {
             if (node !== undefined) {
-              return this._nodeShapeAttribute.shape(node.getData());
+              return this._nodeAttributes.shape(node.getData());
             }
           }
         },
         nodeDependencies: {self: {data: true}}
       });
     } else {
-      this._nodeShapeAttribute.refresh({shape: shapeStyleRules});
+      this._nodeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaNodeShape.refresh();
     }
   }
@@ -633,21 +705,21 @@ export class StylesViz {
   /**
    * Create / refresh an ogma rule for edge colors
    */
-  public refreshEdgeColors(colorStyleRules: Array<StyleRule>): void {
+  public refreshEdgeColors(colorStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaEdgeColor)) {
-      this._edgeColorAttribute = new EdgeAttributes({color: colorStyleRules});
+      this._edgeAttributes.refresh({color: colorStyleRules});
       this._ogmaEdgeColor = this._ogma.styles.addRule({
         edgeAttributes: {
           color: (edge: o.Edge | undefined) => {
             if (edge !== undefined) {
-              return this._edgeColorAttribute.color(edge.getData());
+              return this._edgeAttributes.color(edge.getData());
             }
           }
         },
         edgeDependencies: {self: {data: true}}
       });
     } else {
-      this._edgeColorAttribute.refresh({color: colorStyleRules});
+      this._edgeAttributes.refresh({color: colorStyleRules});
       this._ogmaEdgeColor.refresh();
     }
   }
@@ -655,16 +727,16 @@ export class StylesViz {
   /**
    * Create / refresh an ogma rule for edge width
    *
-   * @param {Array<StyleRule>} widthStyleRules
+   * @param {Array<LKStyleRule>} widthStyleRules
    */
-  public refreshEdgeWidth(widthStyleRules: Array<StyleRule>): void {
+  public refreshEdgeWidth(widthStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaEdgeWidth)) {
-      this._edgeWidthAttribute = new EdgeAttributes({width: widthStyleRules});
+      this._edgeAttributes.refresh({width: widthStyleRules});
       this._ogmaEdgeWidth = this._ogma.styles.addRule({
         edgeAttributes: {
           width: (edge: o.Edge | undefined) => {
             if (edge !== undefined) {
-              return this._edgeWidthAttribute.width(edge.getData());
+              return this._edgeAttributes.width(edge.getData());
             }
           }
         },
@@ -673,7 +745,7 @@ export class StylesViz {
         }
       });
     } else {
-      this._edgeWidthAttribute.refresh({width: widthStyleRules});
+      this._edgeAttributes.refresh({width: widthStyleRules});
       this._ogmaEdgeWidth.refresh();
     }
   }
@@ -681,23 +753,23 @@ export class StylesViz {
   /**
    * Create / refresh an ogma rule for edge width
    *
-   * @param {Array<StyleRule>} shapeStyleRules
+   * @param {Array<LKStyleRule>} shapeStyleRules
    */
-  public refreshEdgeShape(shapeStyleRules: Array<StyleRule>): void {
+  public refreshEdgeShape(shapeStyleRules: Array<LKStyleRule>): void {
     if (!Tools.isDefined(this._ogmaEdgeShape)) {
-      this._edgeShapeAttribute = new EdgeAttributes({shape: shapeStyleRules});
+      this._edgeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaEdgeShape = this._ogma.styles.addRule({
         edgeAttributes: {
           shape: (edge: o.Edge | undefined) => {
             if (edge !== undefined) {
-              return this._edgeShapeAttribute.shape(edge.getData());
+              return this._edgeAttributes.shape(edge.getData());
             }
           }
         },
         edgeDependencies: {self: {data: true}}
       });
     } else {
-      this._edgeShapeAttribute.refresh({shape: shapeStyleRules});
+      this._edgeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaEdgeShape.refresh();
     }
   }

@@ -8,12 +8,14 @@ import {
   INodeStyle,
   SelectorType,
   IStyleIcon,
-  IStyleImage
+  IStyleImage,
+  IStyles
 } from '@linkurious/rest-client';
+
+import {sortBy, Tools} from '../tools/tools';
 
 import {StyleRule} from './styleRule';
 import {ItemAttributes} from './itemAttributes';
-import {sortBy, Tools} from "../tools/tools";
 
 export enum StyleType {
   COLOR = 'color',
@@ -25,7 +27,7 @@ export enum StyleType {
 }
 
 export interface Legend {
-  [key: string]: Array<{ label: string; value: string | IStyleIcon | IStyleImage | number }>;
+  [key: string]: Array<{label: string; value: string | IStyleIcon | IStyleImage | number}>;
 }
 
 export const SORTING_RULE = ['specificity', 'itemType', 'index'];
@@ -102,7 +104,7 @@ export class StyleRules {
    *
    * @return {any}
    */
-  public get nodeRules(): { [key: string]: Array<StyleRule> } {
+  public get nodeRules(): {[key: string]: Array<StyleRule>} {
     return {
       color: this.color,
       icon: this.icon,
@@ -117,7 +119,7 @@ export class StyleRules {
    *
    * @return {any}
    */
-  public get edgeRules(): { [key: string]: Array<StyleRule> } {
+  public get edgeRules(): {[key: string]: Array<StyleRule>} {
     return {
       color: this.color,
       shape: this.shape,
@@ -153,8 +155,8 @@ export class StyleRules {
     styleType: string,
     styles: Array<StyleRule>,
     itemsData: Array<LkNodeData | LkEdgeData>
-  ): Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }> {
-    const result: Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }> = [];
+  ): Array<{label: string; value: string | number | IStyleIcon | IStyleImage}> {
+    const result: Array<{label: string; value: string | number | IStyleIcon | IStyleImage}> = [];
     const data = itemsData.filter((i) => i);
     for (let i = 0; i < styles.length; i++) {
       const styleRule = new StyleRule(styles[i]);
@@ -168,7 +170,7 @@ export class StyleRules {
           // style is a custom icon
           const label = Tools.isDefined(styleRule.input)
             ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${
-              styleRule.input![1]
+                styleRule.input![1]
               } ${StyleRules.sanitizeValue(styleRule.type, styleRule.value)}`
             : `${StyleRules.getTypeLabel(styleRule.itemType)}`;
           const value = styleRule.style.image;
@@ -176,7 +178,7 @@ export class StyleRules {
         } else {
           const label = Tools.isDefined(styleRule.input)
             ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${
-              styleRule.input![1]
+                styleRule.input![1]
               } ${StyleRules.sanitizeValue(styleRule.type, styleRule.value)}`
             : `${StyleRules.getTypeLabel(styleRule.itemType)}`;
           const value = styleRule.style[styleType];
@@ -219,7 +221,7 @@ export class StyleRules {
   public static addLegendAutoColors(
     itemsData: Array<LkNodeData | LkEdgeData>,
     styleRule: StyleRule,
-    currentLegend: Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }>
+    currentLegend: Array<{label: string; value: string | number | IStyleIcon | IStyleImage}>
   ): void {
     const propertyKey: string = styleRule.style.color.input[1];
     itemsData.forEach((data) => {
@@ -253,8 +255,8 @@ export class StyleRules {
    * Check if a legend item already exists and overwrite it / push it
    */
   public static updateLegend(
-    legend: Array<{ label: string; value: string | number | IStyleIcon | IStyleImage }>,
-    {label, value}: { [key: string]: string }
+    legend: Array<{label: string; value: string | number | IStyleIcon | IStyleImage}>,
+    {label, value}: {[key: string]: string}
   ): void {
     const indexOfLegendItem = legend.map((r) => r.label).indexOf(label);
     if (indexOfLegendItem < 0) {
@@ -306,5 +308,34 @@ export class StyleRules {
     const rule = Tools.clone(rawRule);
     rule.style = {[styleType]: rule.style[styleType]};
     return new StyleRule(rule);
+  }
+
+  /**
+   * Check for non unique index in styles rules and update them if exists
+   */
+  public static sanitizeStylesIndex(styles: IStyles): IStyles {
+    const seenIndex: Array<number> = [];
+    const sanitizedStyles: IStyles = Tools.clone(styles);
+    let maxIndex =
+      Math.max(...[...styles.node.map((s) => s.index), ...styles.edge.map((s) => s.index)]) + 1;
+    sanitizedStyles.node = sanitizedStyles.node.map((style) => {
+      if (seenIndex.includes(style.index)) {
+        style.index = maxIndex;
+        maxIndex++;
+      } else {
+        seenIndex.push(style.index);
+      }
+      return style;
+    });
+    sanitizedStyles.edge = sanitizedStyles.edge.map((style) => {
+      if (seenIndex.includes(style.index)) {
+        style.index = maxIndex;
+        maxIndex++;
+      } else {
+        seenIndex.push(style.index);
+      }
+      return style;
+    });
+    return sanitizedStyles;
   }
 }

@@ -8,9 +8,9 @@ import {LkEdgeData, LkNodeData, OgmaEdgeShape, SelectorType} from "@linkurious/r
 
 describe('EdgeAttributes', () => {
   let edge: Edge<LkEdgeData, LkNodeData>;
-
+  let ogma: Ogma;
   beforeEach(() => {
-    let ogma = new Ogma();
+    ogma = new Ogma();
     ogma.addNodes([
       {id: 0, data: {categories: ['CITY'], properties: {name: 'Paris'}}},
       {id: 1, data: {categories: ['COMPANY, INVESTOR'], properties: {name: 'Linkurious', country: 'FR'}}}
@@ -23,6 +23,10 @@ describe('EdgeAttributes', () => {
     });
     edge = ogma.getEdge(0) as Edge<LkEdgeData, LkNodeData>;
   });
+
+  afterEach(() => {
+    ogma.destroy()
+  })
 
   describe('EdgeAttributes.color', () => {
     it('should return an auto color for an edge', () => {

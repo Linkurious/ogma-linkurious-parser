@@ -1,12 +1,11 @@
-
 'use strict';
 import {Color} from 'ogma';
 import {LkEdgeData, OgmaEdgeShape} from '@linkurious/rest-client';
 
+import {Tools} from '../tools/tools';
 
 import {StyleRule} from './styleRule';
 import {BASE_GREY, ItemAttributes} from './itemAttributes';
-import {Tools} from "../tools/tools";
 
 export enum EdgeWidthExtrema {
   MIN = 50,

@@ -1,10 +1,11 @@
 'use strict';
 
 import * as Ogma from 'ogma';
+import {Node, Edge} from 'ogma';
 import {ItemFieldsCaptions} from '@linkurious/rest-client';
 
 import {Captions, LKOgma} from '../..';
-import {Tools} from "../../tools/tools";
+import {Tools} from '../../tools/tools';
 
 export interface CaptionState {
   node: ItemFieldsCaptions;
@@ -16,6 +17,7 @@ export class CaptionsViz {
   public edgesCaptionsRule!: Ogma.StyleRule;
   private _ogma: LKOgma;
   private _schema: CaptionState = {node: {}, edge: {}};
+  private _exportCaptionClass!: Ogma.StyleClass;
 
   constructor(
     ogma: LKOgma,
@@ -30,6 +32,24 @@ export class CaptionsViz {
    */
   public refreshSchema(schema: CaptionState): void {
     this._schema = schema;
+  }
+
+  /**
+   * Refresh visualization captions rules
+   */
+  public async initVizCaptions(schema: CaptionState): Promise<void> {
+    if (this._ogma.LKCaptions.nodesCaptionsRule) {
+      this._ogma.LKCaptions.refreshSchema(schema);
+      await this._ogma.LKCaptions.updateNodeCaptions();
+    } else {
+      this._ogma.LKCaptions.updateNodeCaptions(schema.node);
+    }
+    if (this._ogma.LKCaptions.edgesCaptionsRule) {
+      this._ogma.LKCaptions.refreshSchema(schema);
+      await this._ogma.LKCaptions.updateEdgeCaptions();
+    } else {
+      this._ogma.LKCaptions.updateEdgeCaptions(schema.edge);
+    }
   }
 
   /**
@@ -73,7 +93,7 @@ export class CaptionsViz {
         edgeAttributes: {
           text: {
             content: (edge: Ogma.Edge | undefined) => {
-              if (edge === undefined) {
+              if (edge === undefined || edge.getData() === undefined) {
                 return ``;
               }
               const value = Captions.getText(edge.getData(), this._schema.edge);
@@ -83,11 +103,45 @@ export class CaptionsViz {
             }
           }
         },
-        edgeDependencies: {self: {data: true}}
+        edgeSelector: (edge) => !edge.isVirtual() && edge.isVisible(),
+        // ogma will trigger the rendering if data change or the shape change (to trigger the rendering when edges are grouped)
+        edgeDependencies: {self: {data: true, attributes: ['shape.style']}}
       });
     } else {
       return this.edgesCaptionsRule.refresh();
     }
   }
 
+  /**
+   * Set the class for exported nodes and edges
+   */
+  public setExportCaptionClass(textWrappingLength?: boolean): void {
+    if (!this._exportCaptionClass) {
+      this._exportCaptionClass = this._ogma.styles.createClass({
+        name: 'exportedCaption',
+        nodeAttributes: {
+          text: {
+            content: (node: Node | undefined) => {
+              if (node === undefined) {
+                return ``;
+              }
+              return Captions.getText(node.getData(), this._schema.node);
+            }
+          }
+        },
+        nodeDependencies: {self: {data: true}},
+        edgeAttributes: {
+          text: {
+            content: (edge: Edge | undefined) => {
+              if (edge === undefined) {
+                return ``;
+              }
+              return Captions.getText(edge.getData(), this._schema.edge);
+            }
+          }
+        },
+        edgeDependencies: {self: {data: true}}
+      });
+    }
+  }
 }

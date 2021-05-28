@@ -16,9 +16,9 @@ let node_1_category: Node<LkNodeData, LkEdgeData>,
   node_2_category: Node<LkNodeData, LkEdgeData>;
 
 describe('NodeAttributes', function () {
-
+  let ogma: Ogma
   beforeEach(() => {
-    let ogma = new Ogma();
+    ogma = new Ogma();
     ogma.addNodes([
       {id: 2, data: {categories: ['CITY'], properties: {name: 'Paris'}}},
       {id: 1, data: {categories: ['CITY', 'TRANSACTION'], properties: {name: 'Lyon'}}}
@@ -26,7 +26,9 @@ describe('NodeAttributes', function () {
     node_1_category = ogma.getNode(2) as Node<LkNodeData, LkEdgeData>;
     node_2_category = ogma.getNode(1) as Node<LkNodeData, LkEdgeData>;
   });
-
+  afterEach(() => {
+    ogma.destroy()
+  })
   describe('NodeAttributes.color', () => {
     it('should return an autocolor for 1 category', () => {
       expect(
