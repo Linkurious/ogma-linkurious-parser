@@ -16,7 +16,7 @@
     "npm": "6.14.12"
   },
   "scripts": {
-    "prepare": "tsc",
+    "prepare": "tsc -b",
     "build": "tsc -b",
     "compile": "tsc -b",
     "tsc": "tsc -b",
