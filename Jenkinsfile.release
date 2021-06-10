@@ -1,10 +1,6 @@
 @Library('linkurious-shared')_
 
-nodeJob {
+lkeSubReleaseJob {
   // General
   projectName = "linkurious/ogma-helper"
-
-  createGitTag = true
-  gitTagPrefix = 'v'
-  runBookeeping = true
 }

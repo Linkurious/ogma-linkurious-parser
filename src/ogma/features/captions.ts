@@ -93,7 +93,7 @@ export class CaptionsViz {
         edgeAttributes: {
           text: {
             content: (edge: Ogma.Edge | undefined) => {
-              if (edge === undefined) {
+              if (edge === undefined || edge.getData() === undefined) {
                 return ``;
               }
               const value = Captions.getText(edge.getData(), this._schema.edge);
@@ -103,7 +103,9 @@ export class CaptionsViz {
             }
           }
         },
-        edgeDependencies: {self: {data: true}}
+        edgeSelector: (edge) => !edge.isVirtual() && edge.isVisible(),
+        // ogma will trigger the rendering if data change or the shape change (to trigger the rendering when edges are grouped)
+        edgeDependencies: {self: {data: true, attributes: ['shape.style']}}
       });
     } else {
       return this.edgesCaptionsRule.refresh();

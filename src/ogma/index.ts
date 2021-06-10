@@ -1,5 +1,7 @@
 import {
   EntityType,
+  ForceLayoutMode,
+  HierarchicalLayoutMode,
   IOgmaConfig,
   LkEdgeData,
   LkNodeData,
@@ -7,12 +9,23 @@ import {
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
-import Ogma, {EdgeList, NodeList, NonObjectPropertyWatcher} from 'ogma';
+import Ogma, {
+  EdgeList,
+  ForceLayoutOptions,
+  HierarchicalLayoutOptions,
+  NodeList,
+  NonObjectPropertyWatcher,
+  RadialLayoutOptions,
+  RawEdge,
+  RawGraph,
+  RawNode
+} from 'ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
 
 import {StylesViz} from './features/styles';
+import {TransformationsViz} from './features/transformations';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
@@ -24,6 +37,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   private _reactive: RxViz;
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
+  public LKTransformation: TransformationsViz;
   // Trigger an event with node category changes
   public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   // Trigger an event with edge type changes
@@ -59,12 +73,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
 
     this._reactive = new RxViz(this);
     this.store = this._reactive.store;
-    // init selection behavior
     this.initSelection();
-    // init ogma styles object
     this.initStyles(_configuration);
-    // init visualization captions
     this.initCaptions(_configuration);
+    this.LKTransformation = new TransformationsViz(this);
 
     this.LKStyles.setNodesDefaultHalo();
     this.LKStyles.setEdgesDefaultHalo();
@@ -106,17 +118,57 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   }
 
   private initStyles(_configuration: IOgmaConfig): void {
-    this.LKStyles = new StylesViz(this);
-    const nodeStyles = _configuration?.options?.styles?.node;
-    this.LKStyles.setNodesDefaultStyles(nodeStyles);
-    const edgeStyles = _configuration?.options?.styles?.edge;
-    this.LKStyles.setEdgesDefaultStyles(edgeStyles);
+    this.LKStyles = new StylesViz(this, {
+      node: _configuration?.options?.styles?.node || {},
+      edge: _configuration?.options?.styles?.edge || {}
+    });
+    this.LKStyles.setNodesDefaultStyles();
+    this.LKStyles.setEdgesDefaultStyles();
   }
 
   private initCaptions(_configuration: IOgmaConfig): void {
     const nodeMaxTextLength = _configuration?.options?.styles?.node?.text?.maxTextLength;
     const edgeMaxTextLength = _configuration?.options?.styles?.edge?.text?.maxTextLength;
     this.LKCaptions = new CaptionsViz(this, nodeMaxTextLength, edgeMaxTextLength);
+  }
+
+  /**
+   * Returns Ogma Layout parameters according to visualization layout settings
+   * */
+  public getForceLayoutParams(mode: ForceLayoutMode, duration = 0): ForceLayoutOptions {
+    let dynamicSteps = 300 - ((300 - 40) / 5000) * this.getNodes().size;
+    if (dynamicSteps < 40) {
+      dynamicSteps = 40;
+    }
+    return {
+      steps: mode === ForceLayoutMode.FAST ? dynamicSteps : 300,
+      alignSiblings: this.getNodes().size > 3,
+      duration: duration,
+      charge: 20,
+      gravity: 0.08,
+      theta: this.getNodes().size > 100 ? 0.8 : 0.34
+    };
+  }
+  public getRadialLayoutParams(rootNode: string, duration = 0): RadialLayoutOptions {
+    return {
+      centralNode: rootNode,
+      radiusDelta: 1,
+      nodeGap: 10,
+      repulsion: this.getNodes().size > 80 ? 1 : 6,
+      duration: duration
+    };
+  }
+
+  public getHierarchicalLayoutParams(
+    mode: HierarchicalLayoutMode,
+    rootNode: string,
+    duration = 0
+  ): HierarchicalLayoutOptions {
+    return {
+      direction: mode,
+      roots: [rootNode],
+      duration: duration
+    };
   }
 
   /**
@@ -139,8 +191,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     const fixedEdges = visualization.edges.map((edge) => {
       if (edge.attributes !== undefined) {
         if (edge.attributes.selected) {
-          selectedEntityType = EntityType.EDGE;
-          selectedElements = [];
+          if (selectedEntityType === undefined || selectedEntityType === EntityType.NODE) {
+            selectedEntityType = EntityType.EDGE;
+            selectedElements = [];
+          }
           selectedElements.push(edge.id);
         }
         delete edge.attributes.selected;
@@ -148,8 +202,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       return edge;
     });
     await this.setGraph({
-      nodes: fixedNodes,
-      edges: fixedEdges
+      nodes: fixedNodes as Array<RawNode<LkNodeData>>,
+      edges: fixedEdges as Array<RawEdge<LkEdgeData>>
     });
     if (selectedEntityType === EntityType.NODE) {
       this.getNodes(selectedElements).setSelected(true);
@@ -172,6 +226,36 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       node: visualization.nodeFields.captions || {},
       edge: visualization.edgeFields.captions || {}
     });
+    this.LKTransformation.groupedEdges = visualization.edgeGrouping;
+    this.LKTransformation.initTransformation();
+    this.LKTransformation.initEdgeGroupingStyle();
+  }
+
+  /**
+   * Adding nodes then adding edges to the graph
+   */
+  public async setGraph(
+    graph: RawGraph<LkNodeData, LkEdgeData>
+  ): Promise<{
+    nodes: NodeList<LkNodeData>;
+    edges: EdgeList<LkEdgeData>;
+  }> {
+    const addedNodes = await this.addNodes(graph.nodes);
+    const addedEdges = await this.addEdges(graph.edges);
+    return {
+      nodes: addedNodes,
+      edges: addedEdges
+    };
+  }
+
+  /**
+   * Adding edges to the graph after filtering disconnected ones
+   */
+  public async addEdges(edges: Array<RawEdge<LkEdgeData>>): Promise<EdgeList> {
+    const filteredEdges = edges.filter((edge) => {
+      return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
+    });
+    return super.addEdges(filteredEdges);
   }
 
   /**
