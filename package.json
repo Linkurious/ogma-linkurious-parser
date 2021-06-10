@@ -1,6 +1,6 @@
 {
   "name": "ogma-helper",
-  "version": "2.10.10",
+  "version": "2.10.11",
   "author": "Linkurious SAS",
   "description": "helper library to facilitate interaction with OGMA",
   "files": [
