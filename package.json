@@ -1,5 +1,5 @@
 {
-  "name": "ogma-helper",
+  "name": "@linkurious/ogma-helper",
   "version": "3.0.1",
   "author": "Linkurious SAS",
   "description": "helper library to facilitate interaction with OGMA",
