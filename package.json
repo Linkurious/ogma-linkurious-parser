@@ -1,6 +1,6 @@
 {
   "name": "@linkurious/ogma-helper",
-  "version": "2.10.12",
+  "version": "3.0.1",
   "author": "Linkurious SAS",
   "description": "helper library to facilitate interaction with OGMA",
   "files": [
@@ -12,8 +12,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {
-    "node": "10.23.0",
-    "npm": "6.14.8"
+    "node": "14.16.1",
+    "npm": "6.14.12"
   },
   "scripts": {
     "prepare": "tsc -b",
@@ -48,7 +48,7 @@
     "sha1": "1.1.1"
   },
   "devDependencies": {
-    "@linkurious/rest-client": "2.10.11",
+    "@linkurious/rest-client": "3.0.0",
     "@rollup/plugin-buble": "0.21.3",
     "@rollup/plugin-commonjs": "17.0.0",
     "@rollup/plugin-json": "4.1.0",

@@ -33,6 +33,11 @@ import {OgmaStore} from './features/OgmaStore';
 export {default as Ogma} from 'ogma';
 export const ANIMATION_DURATION = 750;
 
+interface AddItemOptions {
+  batchSize?: number;
+  virtual?: boolean;
+}
+
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   private _reactive: RxViz;
   public LKStyles!: StylesViz;
@@ -201,7 +206,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       }
       return edge;
     });
-    await this.setGraph({
+    await this.setGraphLKE({
       nodes: fixedNodes as Array<RawNode<LkNodeData>>,
       edges: fixedEdges as Array<RawEdge<LkEdgeData>>
     });
@@ -234,7 +239,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding nodes then adding edges to the graph
    */
-  public async setGraph(
+  public async setGraphLKE(
     graph: RawGraph<LkNodeData, LkEdgeData>
   ): Promise<{
     nodes: NodeList<LkNodeData>;
@@ -251,11 +256,14 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding edges to the graph after filtering disconnected ones
    */
-  public async addEdges(edges: Array<RawEdge<LkEdgeData>>): Promise<EdgeList> {
+  public async addEdges(
+    edges: Array<RawEdge<LkEdgeData>>,
+    options?: AddItemOptions
+  ): Promise<EdgeList> {
     const filteredEdges = edges.filter((edge) => {
       return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
     });
-    return super.addEdges(filteredEdges);
+    return super.addEdges(filteredEdges, options);
   }
 
   /**
