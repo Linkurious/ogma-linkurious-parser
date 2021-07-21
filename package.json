@@ -1,6 +1,6 @@
 {
   "name": "@linkurious/ogma-helper",
-  "version": "2.10.11",
+  "version": "2.10.12",
   "author": "Linkurious SAS",
   "description": "helper library to facilitate interaction with OGMA",
   "files": [
@@ -48,7 +48,7 @@
     "sha1": "1.1.1"
   },
   "devDependencies": {
-    "@linkurious/rest-client": "2.10.11",
+    "@linkurious/rest-client": "2.10.12",
     "@rollup/plugin-buble": "0.21.3",
     "@rollup/plugin-commonjs": "17.0.0",
     "@rollup/plugin-json": "4.1.0",
