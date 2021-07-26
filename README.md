@@ -1,11 +1,11 @@
-# Ogma-Linkurious Helper 
+# Ogma-Linkurious parser 
 TODO Discuss name with David
 
 ## Description
-Ogma-Linkurious Helper is an official library maintained by the Linkurious team that allows you to generate Linkurious Enterprise similar looking visualizations by importing the data from Linkurious Enterprise and directly interacting with it via Ogma. 
+Ogma-Linkurious Parser is an official library maintained by the Linkurious team that allows you to quickly parse and load a Linkurious visualization in Ogma with one line of code and apply different Linkurious Enterprise styles, filters, captions and more.  
 
 Left: Ogma visualization without any style applied
-Right: Linkurious Enterprise visualization using Ogma-Linkurious Helper
+Right: Linkurious Enterprise visualization using Ogma-Linkurious parser
 TODO add 2 screenshots same viz without styles and captions and one with everything
 
 ### Prerequisites
@@ -15,7 +15,7 @@ TODO add 2 screenshots same viz without styles and captions and one with everyth
 
 # Installation
 
-````npm install @linkurious/ogma-helper````
+````npm install @linkurious/ogma-parser````
 
 # Usage
 
@@ -46,7 +46,7 @@ TODO clean up example
 > If you are writing a Linkurious plugin, the Linkurious Rest-Client library will be already initialized.
 -->
 
- - Import and initialize the Ogma-Linkurious helper in your project and call the `initVisualization` method in order to apply Linkurious styles and captions to your Ogma visualization 
+ - Import and initialize the Ogma-Linkurious parser in your project and call the `initVisualization` method in order to apply Linkurious styles and captions to your Ogma visualization 
    
 TODO hello world of import/initialize
 
@@ -55,4 +55,4 @@ TODO hello world of import/initialize
 > To learn more about Ogma check our [official documentation](https://doc.linkurio.us/ogma/latest/).
   
 ## Licensing
-The Ogma-Linkurious helper is licensed under the Apache License, Version 2.0. See [LICENSE](/LICENSE) for the full license text.
+The Ogma-Linkurious parser is licensed under the Apache License, Version 2.0. See [LICENSE](/LICENSE) for the full license text.
