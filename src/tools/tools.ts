@@ -63,7 +63,8 @@ export class Tools {
    * Return a value from a nested object depending on a keyPath
    */
   public static getIn(ref: any, path: Array<string | number>): any {
-    return path.reduce((p, c) => (p && p[c] !== undefined ? p[c] : undefined), Tools.clone(ref));
+    const result = path.reduce((p, c) => (p && p[c] !== undefined ? p[c] : undefined), ref);
+    return Tools.clone(result);
   }
 
   /**
@@ -111,9 +112,9 @@ export class Tools {
   }
 
   /**
-   * Return a shortened version of a number
+   * Return a formatted version of a number
    */
-  public static shortenNumber(number: number): string {
+  public static formatNumber(number: number): string {
     let div = 1;
     let suffix = '';
     const sign = number < 0 ? '-' : '';
@@ -142,10 +143,7 @@ export class Tools {
    * @return {boolean}
    */
   public static isStringFilled(value: string): boolean {
-    if (typeof value === 'string') {
-      return value.trim() !== '';
-    }
-    return true;
+    return value.trim() !== '';
   }
 
   public static getValueFromLkProperty(property: LkProperty): null | string | number | boolean {

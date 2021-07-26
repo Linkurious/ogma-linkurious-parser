@@ -460,7 +460,7 @@ export class StylesViz {
           topRight: (node) => {
             if (node !== undefined) {
               const degree = Tools.getHiddenNeighbors(node.toList());
-              const badgeContent = Tools.shortenNumber(degree);
+              const badgeContent = Tools.formatNumber(degree);
               if (degree > 0) {
                 const nodeColor = Array.isArray(node.getAttribute('color'))
                   ? node.getAttribute('color')![0]
