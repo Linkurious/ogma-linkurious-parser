@@ -29,7 +29,7 @@ export class Tools {
    * @param {any} value
    * @return {boolean}
    */
-  public static isDefined(value: unknown): boolean {
+  public static isDefined<T>(value: T): value is NonNullable<T> {
     return value !== undefined && value !== null;
   }
 

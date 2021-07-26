@@ -85,7 +85,6 @@ describe('StyleRule', () => {
       expect(
         new StyleRule({
           type: SelectorType.IS,
-          itemType: null,
           input: undefined,
           style: {color: 'red'},
           index: 0
@@ -160,7 +159,6 @@ describe('StyleRule', () => {
       expect(
         new StyleRule({
           type: SelectorType.IS,
-          itemType: null,
           input: ['properties', 'name'],
           value: 'Paris',
           style: {color: 'red'},
@@ -242,7 +240,7 @@ describe('StyleRule', () => {
           input: ['properties', 'name'],
           style: {color: 'red'},
           index: 0
-        }).canApplyTo({categories: ['CITY'], properties: {name: null}, geo: {}, readAt: 0})
+        }).canApplyTo({categories: ['CITY'], properties: {}, geo: {}, readAt: 0})
       ).to.be.true;
 
       expect(
@@ -274,16 +272,6 @@ describe('StyleRule', () => {
           itemType: 'CITY',
           input: ['properties', 'name'],
           value: 'Paris',
-          style: {color: 'red'},
-          index: 0
-        }).canApplyTo({categories: ['COMPANY'], properties: {name: 'Paris'}, geo: {}, readAt: 0})
-      ).to.be.false;
-
-      expect(
-        new StyleRule({
-          type: SelectorType.ANY,
-          itemType: null,
-          input: undefined,
           style: {color: 'red'},
           index: 0
         }).canApplyTo({categories: ['COMPANY'], properties: {name: 'Paris'}, geo: {}, readAt: 0})
@@ -356,14 +344,14 @@ describe('StyleRule', () => {
 
       expect(
         StyleRule.checkNoValue(
-          {categories: ['CITY'], properties: {name: null}, geo: {}, readAt: 0},
+          {categories: ['CITY'], properties: {}, geo: {}, readAt: 0},
           ['properties', 'name']
         )
       ).to.be.true;
 
       expect(
         StyleRule.checkNoValue(
-          {categories: ['CITY'], properties: {name: undefined}, geo: {}, readAt: 0},
+          {categories: ['CITY'], properties: {}, geo: {}, readAt: 0},
           ['properties', 'name']
         )
       ).to.be.true;
@@ -490,6 +478,7 @@ describe('StyleRule', () => {
 
   describe('StyleRule.checkIs', () => {
     it('should return true', () => {
+        // We don't check for null LKE properties
       expect(
         StyleRule.checkIs(
           {categories: ['CITY'], properties: {name: 0}, geo: {}, readAt: 0},
@@ -508,15 +497,7 @@ describe('StyleRule', () => {
 
       expect(
         StyleRule.checkIs(
-          {categories: ['CITY'], properties: {name: null}, geo: {}, readAt: 0},
-          ['properties', 'name'],
-          null
-        )
-      ).to.be.true;
-
-      expect(
-        StyleRule.checkIs(
-          {categories: ['CITY'], properties: {name: undefined}, geo: {}, readAt: 0},
+          {categories: ['CITY'], properties: {}, geo: {}, readAt: 0},
           ['properties', 'name'],
           undefined
         )
@@ -562,13 +543,11 @@ describe('StyleRule', () => {
     it('should return true', () => {
       expect(StyleRule.checkItemType(['CITY'], undefined)).to.be.true;
       expect(StyleRule.checkItemType(['CITY', 'CATEGORY'], 'CITY')).to.be.true;
-      expect(StyleRule.checkItemType(null, undefined)).to.be.true;
-      expect(StyleRule.checkItemType(undefined, undefined)).to.be.true;
+      expect(StyleRule.checkItemType([], undefined)).to.be.true;
     });
 
     it('should return false', () => {
       expect(StyleRule.checkItemType(['COMPANY'], 'CITY')).to.be.false;
-      expect(StyleRule.checkItemType(['COMPANY'], null)).to.be.false;
     });
   });
 
