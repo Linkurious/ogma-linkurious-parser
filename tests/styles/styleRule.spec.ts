@@ -1,7 +1,6 @@
 'use strict';
 
 import {expect} from 'chai';
-
 import 'mocha';
 import {OgmaNodeShape, SelectorType, INodeStyle} from '@linkurious/rest-client';
 
@@ -343,17 +342,17 @@ describe('StyleRule', () => {
       ).to.be.true;
 
       expect(
-        StyleRule.checkNoValue(
-          {categories: ['CITY'], properties: {}, geo: {}, readAt: 0},
-          ['properties', 'name']
-        )
+        StyleRule.checkNoValue({categories: ['CITY'], properties: {}, geo: {}, readAt: 0}, [
+          'properties',
+          'name'
+        ])
       ).to.be.true;
 
       expect(
-        StyleRule.checkNoValue(
-          {categories: ['CITY'], properties: {}, geo: {}, readAt: 0},
-          ['properties', 'name']
-        )
+        StyleRule.checkNoValue({categories: ['CITY'], properties: {}, geo: {}, readAt: 0}, [
+          'properties',
+          'name'
+        ])
       ).to.be.true;
 
       expect(
@@ -478,7 +477,7 @@ describe('StyleRule', () => {
 
   describe('StyleRule.checkIs', () => {
     it('should return true', () => {
-        // We don't check for null LKE properties
+      // We don't check for null LKE properties
       expect(
         StyleRule.checkIs(
           {categories: ['CITY'], properties: {name: 0}, geo: {}, readAt: 0},

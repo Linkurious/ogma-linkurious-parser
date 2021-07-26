@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/camelcase */
 'use strict';
 
 import {expect} from 'chai';
-
 import 'mocha';
 import Ogma, {Edge} from 'ogma';
 import {LkEdgeData, LkNodeData, OgmaEdgeShape, SelectorType} from '@linkurious/rest-client';

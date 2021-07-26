@@ -65,7 +65,11 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
   /**
    * Return true if this style match values
    */
-  public matchValues(itemType: string | undefined, input: Array<string> | undefined, value: any): boolean {
+  public matchValues(
+    itemType: string | undefined,
+    input: Array<string> | undefined,
+    value: any
+  ): boolean {
     if (Tools.isDefined(input)) {
       return (
         ((itemType === this.itemType || !Tools.isDefined(this.itemType)) &&
@@ -212,10 +216,7 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
    * Check that value of itemType match for the node
    */
   public static checkItemType(types: Array<string>, itemType: string | undefined): boolean {
-    return (
-      StyleRule.matchCategory(types, itemType) ||
-      StyleRule.matchAny(itemType)
-    );
+    return StyleRule.matchCategory(types, itemType) || StyleRule.matchAny(itemType);
   }
 
   /**
@@ -225,7 +226,10 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
    * @param {string} itemType
    * @return {boolean}
    */
-  public static matchCategory(types: Array<string> | string, itemType: string | undefined): boolean {
+  public static matchCategory(
+    types: Array<string> | string,
+    itemType: string | undefined
+  ): boolean {
     return (
       Tools.isDefined(itemType) &&
       (Array.isArray(types) ? types.includes(itemType) : Tools.isEqual(types, itemType))

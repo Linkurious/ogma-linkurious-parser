@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/camelcase */
 'use strict';
 
 import {expect} from 'chai';
-
 import 'mocha';
-import {OgmaNodeShape, SelectorType, StyleColor} from '@linkurious/rest-client';
+import {
+  OgmaNodeShape,
+  SelectorType,
+  IStyleColor,
+  IStyleIcon,
+  IStyleImage
+} from '@linkurious/rest-client';
 
 import {StyleRules, StyleType} from '../../src';
 
@@ -30,7 +36,7 @@ describe('StyleRules', () => {
             color: {
               type: 'auto',
               input: ['categories']
-            } as StyleColor
+            } as IStyleColor
           }
         },
         {
@@ -129,7 +135,7 @@ describe('StyleRules', () => {
             color: {
               type: 'auto',
               input: ['categories']
-            } as StyleColor
+            } as IStyleColor
           }
         },
         {
@@ -727,7 +733,7 @@ describe('StyleRules', () => {
 
   describe('updateLegend()', () => {
     it('should add an item to legend', () => {
-      const legend = [];
+      const legend: Array<{label: string; value: string | number | IStyleIcon | IStyleImage}> = [];
       StyleRules.updateLegend(legend, {label: 'top', value: 'test'});
       expect(legend).to.eql([{label: 'top', value: 'test'}]);
       StyleRules.updateLegend(legend, {label: 'tip', value: 'gnarf'});
