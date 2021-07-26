@@ -49,7 +49,7 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
    *
    * @return {number}
    */
-  get specificity(): number {
+  get specificity(): 1 | 2 | 3 | 4 {
     if (this.itemType !== undefined && this.input !== undefined) {
       return 4;
     }
@@ -166,23 +166,16 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
    * @param comparator
    * @return {boolean}
    */
-  public static checkRange(value: number, comparator: {[key: string]: number}): boolean {
-    const operators = Object.keys(comparator);
-    return operators.every((op) => {
-      switch (op) {
-        case '<=':
-          return value <= comparator[op];
-
-        case '<':
-          return value < comparator[op];
-
-        case '>':
-          return value > comparator[op];
-
-        case '>=':
-          return value >= comparator[op];
-      }
-    });
+  public static checkRange(
+    value: number,
+    comparator: {[key in '<=' | '<' | '>' | '>=']?: number}
+  ): boolean {
+    return (
+      (comparator['<='] === undefined || value <= comparator['<=']) &&
+      (comparator['<'] === undefined || value < comparator['<']) &&
+      (comparator['>'] === undefined || value > comparator['>']) &&
+      (comparator['>='] === undefined || value >= comparator['>='])
+    );
   }
 
   /**

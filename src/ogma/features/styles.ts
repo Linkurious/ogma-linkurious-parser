@@ -76,6 +76,10 @@ const EDGE_HALO_CONFIGURATION = {
   width: 4;
 };
 
+const DEFAULT_OGMA_FONT = "'roboto', sans-serif";
+const DARK_FONT_COLOR = '#000';
+const CLEAR_FONT_COLOR = '#FFF';
+
 export const FILTER_OPACITY = 0.2;
 
 export class StylesViz {
@@ -465,7 +469,9 @@ export class StylesViz {
                 const nodeColor = Array.isArray(node.getAttribute('color'))
                   ? node.getAttribute('color')![0]
                   : node.getAttribute('color');
-                const textColor = OgmaTools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
+                const textColor = OgmaTools.isBright(nodeColor as o.Color)
+                  ? DARK_FONT_COLOR
+                  : CLEAR_FONT_COLOR;
                 const isSupernode = node.getData(['statistics', 'supernode']);
                 let content = null;
                 if (+badgeContent !== 0) {
@@ -483,7 +489,7 @@ export class StylesViz {
                       this._defaultConfiguration.node.text !== undefined &&
                       this._defaultConfiguration.node.text.font !== undefined
                         ? this._defaultConfiguration.node.text.font
-                        : "'roboto', sans-serif",
+                        : DEFAULT_OGMA_FONT,
                     scale: 0.4,
                     color: textColor,
                     content: content
@@ -504,7 +510,9 @@ export class StylesViz {
               const nodeColor = Array.isArray(node.getAttribute('color'))
                 ? node.getAttribute('color')![0]
                 : node.getAttribute('color');
-              const textColor = OgmaTools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
+              const textColor = OgmaTools.isBright(nodeColor as o.Color)
+                ? DARK_FONT_COLOR
+                : CLEAR_FONT_COLOR;
               return {
                 color: 'inherit',
                 minVisibleSize: 20,
