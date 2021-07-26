@@ -1,5 +1,4 @@
-# Ogma-Linkurious parser 
-TODO Discuss name with David
+# Ogma-Linkurious Parser 
 
 ## Description
 Ogma-Linkurious Parser is an official library maintained by the Linkurious team that allows you to quickly parse and load a Linkurious visualization in Ogma with one line of code and apply different Linkurious Enterprise styles, filters, captions and more.  
