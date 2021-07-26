@@ -3,20 +3,23 @@
 import {expect} from 'chai';
 import 'mocha';
 import Ogma, {Node} from 'ogma';
-import {NodeAttributes, StyleRule, StyleRules} from '../../src';
-import {LkEdgeData, LkNodeData, SelectorType} from "@linkurious/rest-client";
+import {LkEdgeData, LkNodeData, SelectorType} from '@linkurious/rest-client';
 
-const widgetNode_1_category = {id: 2, data: {categories: ['CITY'], properties: {name: 'Paris'}, readAt: 0, geo: {}}};
+import {NodeAttributes, StyleRule, StyleRules} from '../../src';
+
+const widgetNode_1_category = {
+  id: 2,
+  data: {categories: ['CITY'], properties: {name: 'Paris'}, readAt: 0, geo: {}}
+};
 const widgetNode_2_category = {
   id: 1,
   data: {categories: ['CITY', 'TRANSACTION'], properties: {name: 'Lyon'}, readAt: 0, geo: {}}
 };
 
-let node_1_category: Node<LkNodeData, LkEdgeData>,
-  node_2_category: Node<LkNodeData, LkEdgeData>;
+let node_1_category: Node<LkNodeData, LkEdgeData>, node_2_category: Node<LkNodeData, LkEdgeData>;
 
 describe('NodeAttributes', function () {
-  let ogma: Ogma
+  let ogma: Ogma;
   beforeEach(() => {
     ogma = new Ogma();
     ogma.addNodes([
@@ -27,35 +30,35 @@ describe('NodeAttributes', function () {
     node_2_category = ogma.getNode(1) as Node<LkNodeData, LkEdgeData>;
   });
   afterEach(() => {
-    ogma.destroy()
-  })
+    ogma.destroy();
+  });
   describe('NodeAttributes.color', () => {
     it('should return an autocolor for 1 category', () => {
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.ANY,
               itemType: undefined,
               input: undefined,
               style: {color: {type: 'auto', input: ['categories']}}
-            }]
-          )
+            }
+          ])
         ).color(widgetNode_1_category.data)
       ).to.equal('#2ca02c');
 
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.ANY,
               itemType: undefined,
               input: undefined,
               style: {color: {type: 'auto', input: ['categories']}}
-            }]
-          )
+            }
+          ])
         ).color(node_1_category.getData())
       ).to.equal('#2ca02c');
     });
@@ -63,313 +66,339 @@ describe('NodeAttributes', function () {
     it('should return 2 autocolor for 2 category', () => {
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.ANY,
               itemType: undefined,
               input: undefined,
               style: {color: {type: 'auto', input: ['categories']}}
-            }]
-          )
+            }
+          ])
         ).color(widgetNode_2_category.data)
       ).to.eql(['#2ca02c', '#17becf']);
 
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.ANY,
               itemType: undefined,
               input: undefined,
               style: {color: {type: 'auto', input: ['categories']}}
-            }]
-          )
+            }
+          ])
         ).color(node_2_category.getData())
       ).to.eql(['#2ca02c', '#17becf']);
     });
 
     it('should return an autocolor for a property', () => {
-
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.ANY,
               itemType: undefined,
               input: undefined,
               style: {color: {type: 'auto', input: ['properties', 'name']}}
-            }]
-          )
+            }
+          ])
         ).color(widgetNode_1_category.data)
       ).to.equal('#bcbd22');
 
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.ANY,
               itemType: undefined,
               input: undefined,
               style: {color: {type: 'auto', input: ['properties', 'name']}}
-            }]
-          )
+            }
+          ])
         ).color(node_1_category.getData())
       ).to.equal('#bcbd22');
     });
 
     it('should return a color', () => {
-      expect(new NodeAttributes(new StyleRules([
-        {
-          index: 0,
-          type: SelectorType.ANY,
-          itemType: 'CITY',
-          input: undefined,
-          style: {color: 'red'}
-        }
-      ])).color(widgetNode_1_category.data)).to.equal('red');
+      expect(
+        new NodeAttributes(
+          new StyleRules([
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'CITY',
+              input: undefined,
+              style: {color: 'red'}
+            }
+          ])
+        ).color(widgetNode_1_category.data)
+      ).to.equal('red');
 
-      expect(new NodeAttributes(new StyleRules([
-        {
-          index: 0,
-          type: SelectorType.ANY,
-          itemType: 'CITY',
-          input: undefined,
-          style: {color: 'red'}
-        }
-      ])).color(node_1_category.getData())).to.equal('red');
+      expect(
+        new NodeAttributes(
+          new StyleRules([
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'CITY',
+              input: undefined,
+              style: {color: 'red'}
+            }
+          ])
+        ).color(node_1_category.getData())
+      ).to.equal('red');
     });
 
     it('should return a color for a property', () => {
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.IS,
               itemType: 'CITY',
               input: ['properties', 'name'],
               value: 'Paris',
               style: {color: 'green'}
-            }]
-          )
+            }
+          ])
         ).color(widgetNode_1_category.data)
       ).to.equal('green');
 
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.IS,
               itemType: 'CITY',
               input: ['properties', 'name'],
               value: 'Paris',
               style: {color: 'green'}
-            }]
-          )
+            }
+          ])
         ).color(node_1_category.getData())
       ).to.equal('green');
     });
 
     it('should return grey for a property', () => {
-
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.IS,
               itemType: 'CITY',
               input: ['properties', 'name'],
               value: 'Paris',
               style: {color: 'green'}
-            }]
-          )
+            }
+          ])
         ).color(widgetNode_2_category.data)
       ).to.equal('#7f7f7f');
 
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.IS,
               itemType: 'CITY',
               input: ['properties', 'name'],
               value: 'Paris',
               style: {color: 'green'}
-            }]
-          )
+            }
+          ])
         ).color(node_2_category.getData())
       ).to.equal('#7f7f7f');
     });
 
     it('should return 2 colors', () => {
-      expect(new NodeAttributes(new StyleRules([
-        {
-          index: 0,
-          type: SelectorType.ANY,
-          itemType: 'CITY',
-          input: undefined,
-          style: {color: 'red'}
-        },
-        {
-          index: 0,
-          type: SelectorType.ANY,
-          itemType: 'TRANSACTION',
-          input: undefined,
-          style: {color: 'green'}
-        }
-      ])).color(widgetNode_2_category.data)).to.eql(['red', 'green']);
+      expect(
+        new NodeAttributes(
+          new StyleRules([
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'CITY',
+              input: undefined,
+              style: {color: 'red'}
+            },
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'TRANSACTION',
+              input: undefined,
+              style: {color: 'green'}
+            }
+          ])
+        ).color(widgetNode_2_category.data)
+      ).to.eql(['red', 'green']);
 
-      expect(new NodeAttributes(new StyleRules([
-        {
-          index: 0,
-          type: SelectorType.ANY,
-          itemType: 'CITY',
-          input: undefined,
-          style: {color: 'red'}
-        },
-        {
-          index: 0,
-          type: SelectorType.ANY,
-          itemType: 'TRANSACTION',
-          input: undefined,
-          style: {color: 'green'}
-        }
-      ])).color(node_2_category.getData())).to.eql(['red', 'green']);
+      expect(
+        new NodeAttributes(
+          new StyleRules([
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'CITY',
+              input: undefined,
+              style: {color: 'red'}
+            },
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'TRANSACTION',
+              input: undefined,
+              style: {color: 'green'}
+            }
+          ])
+        ).color(node_2_category.getData())
+      ).to.eql(['red', 'green']);
     });
 
     it('should return the right color', () => {
       expect(
-        new NodeAttributes(new StyleRules([
-          {
-            index: 0,
-            type: SelectorType.ANY,
-            itemType: undefined,
-            input: undefined,
-            style: {
-              // @ts-ignore
-              color: {
-                type: 'auto',
-                input: ['categories']
+        new NodeAttributes(
+          new StyleRules([
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: undefined,
+              input: undefined,
+              style: {
+                // @ts-ignore
+                color: {
+                  type: 'auto',
+                  input: ['categories']
+                }
               }
+            },
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'CITY',
+              input: undefined,
+              style: {color: 'green'}
+            },
+            {
+              index: 0,
+              type: SelectorType.IS,
+              itemType: undefined,
+              input: ['properties', 'name'],
+              value: 'Dijon',
+              style: {color: 'red'}
             }
-          },
-          {
-            index: 0,
-            type: SelectorType.ANY,
-            itemType: 'CITY',
-            input: undefined,
-            style: {color: 'green'}
-          },
-          {
-            index: 0,
-            type: SelectorType.IS,
-            itemType: undefined,
-            input: ['properties', 'name'],
-            value: 'Dijon',
-            style: {color: 'red'}
-          }
-        ])).color(widgetNode_1_category.data)).to.equal('green');
+          ])
+        ).color(widgetNode_1_category.data)
+      ).to.equal('green');
 
       expect(
-        new NodeAttributes(new StyleRules([
-          {
-            index: 0,
-            type: SelectorType.ANY,
-            itemType: undefined,
-            input: undefined,
-            style: {
-              color: {
-                type: 'auto',
-                input: ['categories']
+        new NodeAttributes(
+          new StyleRules([
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: undefined,
+              input: undefined,
+              style: {
+                color: {
+                  type: 'auto',
+                  input: ['categories']
+                }
               }
+            },
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'CITY',
+              input: undefined,
+              style: {color: 'green'}
+            },
+            {
+              index: 0,
+              type: SelectorType.IS,
+              itemType: undefined,
+              input: ['properties', 'name'],
+              value: 'Dijon',
+              style: {color: 'red'}
             }
-          },
-          {
-            index: 0,
-            type: SelectorType.ANY,
-            itemType: 'CITY',
-            input: undefined,
-            style: {color: 'green'}
-          },
-          {
-            index: 0,
-            type: SelectorType.IS,
-            itemType: undefined,
-            input: ['properties', 'name'],
-            value: 'Dijon',
-            style: {color: 'red'}
-          }
-        ])).color(widgetNode_2_category.data)).to.eql(['green', '#17becf']);
+          ])
+        ).color(widgetNode_2_category.data)
+      ).to.eql(['green', '#17becf']);
       expect(
-        new NodeAttributes(new StyleRules([
-          {
-            index: 0,
-            type: SelectorType.ANY,
-            itemType: undefined,
-            input: undefined,
-            style: {
-              // @ts-ignore
-              color: {
-                type: 'auto',
-                input: ['categories']
+        new NodeAttributes(
+          new StyleRules([
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: undefined,
+              input: undefined,
+              style: {
+                // @ts-ignore
+                color: {
+                  type: 'auto',
+                  input: ['categories']
+                }
               }
+            },
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'CITY',
+              input: undefined,
+              style: {color: 'green'}
+            },
+            {
+              index: 0,
+              type: SelectorType.IS,
+              itemType: undefined,
+              input: ['properties', 'name'],
+              value: 'Dijon',
+              style: {color: 'red'}
             }
-          },
-          {
-            index: 0,
-            type: SelectorType.ANY,
-            itemType: 'CITY',
-            input: undefined,
-            style: {color: 'green'}
-          },
-          {
-            index: 0,
-            type: SelectorType.IS,
-            itemType: undefined,
-            input: ['properties', 'name'],
-            value: 'Dijon',
-            style: {color: 'red'}
-          }
-        ])).color(node_1_category.getData())).to.equal('green');
+          ])
+        ).color(node_1_category.getData())
+      ).to.equal('green');
 
       expect(
-        new NodeAttributes(new StyleRules([
-          {
-            index: 0,
-            type: SelectorType.ANY,
-            itemType: undefined,
-            input: undefined,
-            style: {
-              // @ts-ignore
-              color: {
-                type: 'auto',
-                input: ['categories']
+        new NodeAttributes(
+          new StyleRules([
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: undefined,
+              input: undefined,
+              style: {
+                // @ts-ignore
+                color: {
+                  type: 'auto',
+                  input: ['categories']
+                }
               }
+            },
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'CITY',
+              input: undefined,
+              style: {color: 'green'}
+            },
+            {
+              index: 0,
+              type: SelectorType.IS,
+              itemType: undefined,
+              input: ['properties', 'name'],
+              value: 'Dijon',
+              style: {color: 'red'}
             }
-          },
-          {
-            index: 0,
-            type: SelectorType.ANY,
-            itemType: 'CITY',
-            input: undefined,
-            style: {color: 'green'}
-          },
-          {
-            index: 0,
-            type: SelectorType.IS,
-            itemType: undefined,
-            input: ['properties', 'name'],
-            value: 'Dijon',
-            style: {color: 'red'}
-          }
-        ])).color(node_2_category.getData())).to.eql(['green', '#17becf']);
+          ])
+        ).color(node_2_category.getData())
+      ).to.eql(['green', '#17becf']);
     });
   });
 
@@ -377,21 +406,21 @@ describe('NodeAttributes', function () {
     it('should return an icon for 1 category', () => {
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.ANY,
               itemType: undefined,
               input: undefined,
               style: {icon: {content: 'L', font: 'arial'}}
-            }]
-          )
+            }
+          ])
         ).icon(node_1_category.getData())
       ).to.eql({
         icon: {
           content: 'L',
           font: 'arial',
-          scale: .5,
+          scale: 0.5,
           color: '#FFFFFF'
         }
       });
@@ -400,15 +429,15 @@ describe('NodeAttributes', function () {
     it('should return an image for 1 category', () => {
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [{
+          new StyleRules([
+            {
               index: 0,
               type: SelectorType.ANY,
               itemType: undefined,
               input: undefined,
               style: {image: {url: 'http://mario.jpg', scale: 1, fit: false, tile: false}}
-            }]
-          )
+            }
+          ])
         ).icon(node_1_category.getData())
       ).to.eql({
         image: {
@@ -424,25 +453,23 @@ describe('NodeAttributes', function () {
     it('should return an image for 1 property', () => {
       expect(
         new NodeAttributes(
-          new StyleRules(
-            [
-              {
-                index: 0,
-                type: SelectorType.ANY,
-                itemType: 'CITY',
-                input: undefined,
-                style: {icon: {content: 'L', font: 'arial'}}
-              },
-              {
-                index: 1,
-                type: SelectorType.IS,
-                itemType: 'CITY',
-                input: ['properties', 'name'],
-                value: 'Paris',
-                style: {image: {url: 'http://mario.jpg', scale: 1, fit: false, tile: false}}
-              }
-            ]
-          )
+          new StyleRules([
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: 'CITY',
+              input: undefined,
+              style: {icon: {content: 'L', font: 'arial'}}
+            },
+            {
+              index: 1,
+              type: SelectorType.IS,
+              itemType: 'CITY',
+              input: ['properties', 'name'],
+              value: 'Paris',
+              style: {image: {url: 'http://mario.jpg', scale: 1, fit: false, tile: false}}
+            }
+          ])
         ).icon(node_1_category.getData())
       ).to.eql({
         image: {
@@ -4818,57 +4845,88 @@ describe('NodeAttributes', function () {
   describe('NodeAttributes.getAutomaticRangeSize', function () {
     it('should return the right size', () => {
       expect(
-        NodeAttributes.getAutomaticRangeSize(1995, new StyleRule(
-          {
-            index: 0, type: SelectorType.NO_VALUE, itemType: undefined, input: undefined, value: undefined, style: {
+        NodeAttributes.getAutomaticRangeSize(
+          1995,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
               size: {
-                "type": "autoRange",
-                "input": ["properties", "age"], min: 10, max: 1995
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: 10,
+                max: 1995
               }
             }
-          },
-        ))
+          })
+        )
       ).to.equal('500%');
 
       expect(
-        NodeAttributes.getAutomaticRangeSize(554, new StyleRule(
-          {
-            index: 0, type: SelectorType.NO_VALUE, itemType: undefined, input: undefined, value: undefined, style: {
+        NodeAttributes.getAutomaticRangeSize(
+          554,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
               size: {
-                "type": "autoRange",
-                "input": ["properties", "age"], min: 10, max: 1995
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: 10,
+                max: 1995
               }
             }
-          },
-        ))
+          })
+        )
       ).to.equal('173%');
 
       expect(
-        NodeAttributes.getAutomaticRangeSize(454, new StyleRule(
-          {
-            index: 0, type: SelectorType.NO_VALUE, itemType: undefined, input: undefined, value: undefined, style: {
+        NodeAttributes.getAutomaticRangeSize(
+          454,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
               size: {
-                "type": "autoRange",
-                "input": ["properties", "age"], min: 10, max: 1995
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: 10,
+                max: 1995
               }
             }
-          },
-        ))
+          })
+        )
       ).to.equal('150%');
 
       expect(
-        NodeAttributes.getAutomaticRangeSize(200, new StyleRule(
-          {
-            index: 0, type: SelectorType.NO_VALUE, itemType: undefined, input: undefined, value: undefined, style: {
+        NodeAttributes.getAutomaticRangeSize(
+          200,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
               size: {
-                "type": "autoRange",
-                "input": ["properties", "age"], min: 10, max: 1995
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: 10,
+                max: 1995
               }
             }
-          },
-        ))
+          })
+        )
       ).to.equal('93%');
     });
-
   });
 });
