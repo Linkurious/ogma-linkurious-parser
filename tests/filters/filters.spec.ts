@@ -1,13 +1,14 @@
 'use strict';
 
 import {expect} from 'chai';
-
 import 'mocha';
-import Ogma from 'ogma';
+import Ogma, {RawEdge, RawNode} from 'ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {Filters} from '../../src';
 import {Tools} from '../../src/tools/tools';
+
+// TODO remove bang operator
 
 describe('Filters', () => {
   const filterEmpty = {edge: [], node: []};
@@ -17,7 +18,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['CITY'],
-      properties: {name: 'Paris', invested_amount: 105519047},
+      properties: {name: 'Paris', investedAmount: 105519047},
       geo: {},
       statistics: {
         supernode: false
@@ -31,7 +32,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['CITY'],
-      properties: {invested_amount: 105519047},
+      properties: {investedAmount: 105519047},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -43,7 +44,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['CITY'],
-      properties: {name: 'Barcelona', invested_amount: 155519047},
+      properties: {name: 'Barcelona', investedAmount: 155519047},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -55,7 +56,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['CITY'],
-      properties: {name: 1233584, invested_amount: 155519047},
+      properties: {name: 1233584, investedAmount: 155519047},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -67,7 +68,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['CITY'],
-      properties: {name: 'Barcelona', invested_amount: 'aaa'},
+      properties: {name: 'Barcelona', investedAmount: 'aaa'},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -79,7 +80,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['COMPANY'],
-      properties: {name: 'EDP', invested_amount: 105519047},
+      properties: {name: 'EDP', investedAmount: 105519047},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -91,7 +92,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['COMPANY'],
-      properties: {name: 123566, invested_amount: 105519047},
+      properties: {name: 123566, investedAmount: 105519047},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -103,7 +104,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_CITY',
-      properties: {moved_in: 2000},
+      properties: {movedIn: 2000},
       readAt: 0
     },
     source: '1',
@@ -115,7 +116,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_CITY',
-      properties: {city: 'Paris', moved_in: 2000},
+      properties: {city: 'Paris', movedIn: 2000},
       readAt: 0
     },
     source: '1',
@@ -127,7 +128,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_CITY',
-      properties: {city: 'Barcelona', moved_in: 2005},
+      properties: {city: 'Barcelona', movedIn: 2005},
       readAt: 0
     },
     source: '2',
@@ -139,7 +140,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_CITY',
-      properties: {city: 12345667, moved_in: 2005},
+      properties: {city: 12345667, movedIn: 2005},
       readAt: 0
     },
     source: '2',
@@ -151,9 +152,9 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_CITY',
-      properties: {city: 'Barcelona', moved_in: undefined},
+      properties: {city: 'Barcelona'},
       readAt: 0
-    },
+    } as LkEdgeData,
     source: '2',
     target: '3'
   };
@@ -163,7 +164,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_INVESTOR',
-      properties: {investor: 'EDP', moved_in: 2000},
+      properties: {investor: 'EDP', movedIn: 2000},
       readAt: 0
     },
     source: '1',
@@ -175,7 +176,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_INVESTOR',
-      properties: {investor: 123456, moved_in: 2000},
+      properties: {investor: 123456, movedIn: 2000},
       readAt: 0
     },
     source: '1',
@@ -226,7 +227,7 @@ describe('Filters', () => {
         readAt: 0
       }
     }
-  ];
+  ] as RawNode<LkNodeData>[];
 
   const ogmaFilteredEdge = {
     id: 120463,
@@ -239,9 +240,9 @@ describe('Filters', () => {
     },
     source: 76529,
     target: 19
-  };
+  } as RawEdge<LkEdgeData>;
 
-  const ogma = new Ogma();
+  const ogma = new Ogma<LkNodeData, LkEdgeData>();
   ogma.addNodes(ogmaFilteredNodes);
   ogma.addEdge(ogmaFilteredEdge);
 
@@ -297,14 +298,12 @@ describe('Filters', () => {
     });
 
     it('should return true when a node from ogma match with one filter', () => {
-      const node = ogma.getNode(19).getData() as LkNodeData;
+      const node = ogma.getNode(19)!.getData();
       expect(Filters.isFiltered(filterFilledAny.node, node)).to.eq(true);
     });
 
     it('should return true when a edge from ogma match with one filter', () => {
-      expect(
-        Filters.isFiltered(filterFilledAny.edge, ogma.getEdge(120463).getData() as LkEdgeData)
-      ).to.eq(true);
+      expect(Filters.isFiltered(filterFilledAny.edge, ogma.getEdge(120463)!.getData())).to.eq(true);
     });
   });
 
@@ -421,7 +420,7 @@ describe('Filters', () => {
       {
         type: 'range',
         itemType: 'CITY',
-        input: ['properties', 'invested_amount'],
+        input: ['properties', 'investedAmount'],
         value: {'<': 115519047.61904761, '>': 2425700000}
       }
     ];
@@ -429,7 +428,7 @@ describe('Filters', () => {
       {
         type: 'range',
         itemType: 'HAS_CITY',
-        input: ['properties', 'moved_in'],
+        input: ['properties', 'movedIn'],
         value: {'<': 2001, '>': 2010}
       }
     ];
@@ -451,8 +450,8 @@ describe('Filters', () => {
     });
 
     it('should return false if the edge property does not match the range', () => {
-      // rules: filter/hide edges when "moved_in" < 2001 OR "moved_in" > 2010
-      // here, edge."moved_in" is 2005 => the edge should *not* be hidden/filtered.
+      // rules: filter/hide edges when "movedIn" < 2001 OR "movedIn" > 2010
+      // here, edge."movedIn" is 2005 => the edge should *not* be hidden/filtered.
       expect(Filters.isFiltered(filterRules.edge, edgeHasCityBarcelona.data)).to.eq(false);
     });
 
@@ -465,8 +464,8 @@ describe('Filters', () => {
     });
 
     it('should return true if the edge type matches and the property matches the range', () => {
-      // rules: filter/hide edges when "moved_in" < 2001 OR "moved_in" > 2010
-      // here, edge."moved_in" is 2000 => the edge should be hidden/filtered.
+      // rules: filter/hide edges when "movedIn" < 2001 OR "movedIn" > 2010
+      // here, edge."movedIn" is 2000 => the edge should be hidden/filtered.
       expect(Filters.isFiltered(filterRules.edge, edgeHasCityParis.data)).to.eq(true);
     });
   });
@@ -482,19 +481,13 @@ describe('Filters', () => {
 
     it('should return false when a node from ogma dont match with any filter', () => {
       expect(
-        Filters.isFiltered(
-          filterEmpty.node,
-          ogma.getNode(ogmaFilteredNodes[1].id).getData() as LkNodeData
-        )
+        Filters.isFiltered(filterEmpty.node, ogma.getNode(ogmaFilteredNodes[1].id!)!.getData())
       ).to.eq(false);
     });
 
     it('should return false when a edge from ogma dont match with any filter', () => {
       expect(
-        Filters.isFiltered(
-          filterEmpty.edge,
-          ogma.getEdge(ogmaFilteredEdge.id).getData() as LkEdgeData
-        )
+        Filters.isFiltered(filterEmpty.edge, ogma.getEdge(ogmaFilteredEdge.id!)!.getData())
       ).to.eq(false);
     });
   });

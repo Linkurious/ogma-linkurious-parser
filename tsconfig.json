@@ -9,7 +9,7 @@
     "experimentalDecorators": true,
     "noEmitOnError": false,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "sourceMap": true,
     "inlineSources": true,
     "lib": [
@@ -31,7 +31,12 @@
   "typeRoots": [
     "node_modules/@types"
   ],
+  "include": [
+    "src/**/*",
+    "tests/**/*"
+  ],
   "exclude": [
+    "node_modules",
     "dist/**/*"
   ]
 }
