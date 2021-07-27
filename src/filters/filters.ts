@@ -54,8 +54,10 @@ export class Filters {
     const filterKey = JSON.stringify(filterRules, null, '');
 
     // This cast is needed to tell the TypeScript compiler to trust us that "isNode" and "T" are dependent.
-    const filterCache = (isNode ? Filters.nodeCache : Filters.edgeCache) as Map<string,
-      FilterFunction<T>>;
+    const filterCache = (isNode ? Filters.nodeCache : Filters.edgeCache) as Map<
+      string,
+      FilterFunction<T>
+    >;
 
     let filterFunc = filterCache.get(filterKey);
     if (!filterFunc) {
