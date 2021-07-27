@@ -206,7 +206,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       }
       return edge;
     });
-    await this.setGraphLKE({
+    await this.addGraphAfterValidation({
       nodes: fixedNodes as Array<RawNode<LkNodeData>>,
       edges: fixedEdges as Array<RawEdge<LkEdgeData>>
     });
@@ -239,7 +239,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding nodes then adding edges to the graph
    */
-  public async setGraphLKE(
+  public async addGraphAfterValidation(
     graph: RawGraph<LkNodeData, LkEdgeData>
   ): Promise<{
     nodes: NodeList<LkNodeData>;

@@ -79,7 +79,7 @@ const EDGE_HALO_CONFIGURATION = {
 const DEFAULT_OGMA_FONT = "'roboto', sans-serif";
 const DARK_FONT_COLOR = '#000';
 const CLEAR_FONT_COLOR = '#FFF';
-
+const ITEM_DEFAULT_COLOR = '#7f7f7f';
 export const FILTER_OPACITY = 0.2;
 
 export class StylesViz {
@@ -190,7 +190,7 @@ export class StylesViz {
         icon: {
           minVisibleSize: 15
         },
-        color: '#7f7f7f',
+        color: ITEM_DEFAULT_COLOR,
         shape:
           this._defaultConfiguration.node.shape !== undefined
             ? this._defaultConfiguration.node.shape
@@ -251,7 +251,7 @@ export class StylesViz {
           this._defaultConfiguration.edge.shape !== undefined
             ? this._defaultConfiguration.edge.shape
             : 'arrow',
-        color: '#7f7f7f'
+        color: ITEM_DEFAULT_COLOR
       }
     });
   }
@@ -274,10 +274,6 @@ export class StylesViz {
             return {
               ...NODE_HALO_CONFIGURATION,
               scalingMethod: this._ogma.geo.enabled() ? 'fixed' : 'scaled'
-            } as {
-              color: '#FFF';
-              width: 7;
-              strokeWidth: 0;
             };
           }
           return null;
@@ -316,9 +312,6 @@ export class StylesViz {
             return {
               ...EDGE_HALO_CONFIGURATION,
               scalingMethod: this._ogma.geo.enabled() ? 'fixed' : 'scaled'
-            } as {
-              color: '#FFF';
-              width: 4;
             };
           }
           return null;
