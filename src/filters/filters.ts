@@ -41,9 +41,9 @@ export class Filters {
     }
 
     if ('categories' in itemData) {
-      return this.getFilterFunction(filterRules, true)(itemData);
+      return Filters.getFilterFunction(filterRules, true)(itemData);
     } else {
-      return this.getFilterFunction(filterRules, false)(itemData);
+      return Filters.getFilterFunction(filterRules, false)(itemData);
     }
   }
 
@@ -54,15 +54,15 @@ export class Filters {
     const filterKey = JSON.stringify(filterRules, null, '');
 
     // This cast is needed to tell the TypeScript compiler to trust us that "isNode" and "T" are dependent.
-    const filterCache = (isNode ? this.nodeCache : this.edgeCache) as Map<
+    const filterCache = (isNode ? Filters.nodeCache : Filters.edgeCache) as Map<
       string,
       FilterFunction<T>
     >;
 
     let filterFunc = filterCache.get(filterKey);
     if (!filterFunc) {
-      filterFunc = this.createFilterFunction(filterRules, isNode);
-      if (filterCache.size > this.FILTER_CACHE_SIZE) {
+      filterFunc = Filters.createFilterFunction(filterRules, isNode);
+      if (filterCache.size > Filters.FILTER_CACHE_SIZE) {
         filterCache.clear();
       }
       filterCache.set(filterKey, filterFunc);
@@ -75,7 +75,7 @@ export class Filters {
     isNode: boolean
   ): FilterFunction<T> {
     const filterFunctions = filterRules.map((filter: ItemSelector) =>
-      this.filterToFilterFunction(filter, isNode)
+      Filters.filterToFilterFunction(filter, isNode)
     );
 
     /**
@@ -98,15 +98,15 @@ export class Filters {
   ): FilterFunction<T> {
     switch (filter.type) {
       case SelectorType.ANY:
-        return this.createAnyFilterFunction(filter, isNode);
+        return Filters.createAnyFilterFunction(filter, isNode);
       case SelectorType.IS:
-        return this.createIsFilterFunction(filter, isNode);
+        return Filters.createIsFilterFunction(filter, isNode);
       case SelectorType.NO_VALUE:
-        return this.createNoValueFilterFunction(filter, isNode);
+        return Filters.createNoValueFilterFunction(filter, isNode);
       case SelectorType.RANGE:
-        return this.createRangeFilterFunction(filter, isNode);
+        return Filters.createRangeFilterFunction(filter, isNode);
       case SelectorType.NAN:
-        return this.createNaNFilterFunction(filter, isNode);
+        return Filters.createNaNFilterFunction(filter, isNode);
     }
   }
 
@@ -166,12 +166,12 @@ export class Filters {
     if (isNode) {
       return (itemData: T) =>
         (itemData as LkNodeData).categories.includes(filter.itemType) &&
-        this.isNotANumber(Tools.getPropertyValue(Tools.getIn(itemData, filter.input), true));
+        Filters.isNotANumber(Tools.getPropertyValue(Tools.getIn(itemData, filter.input), true));
     } else {
       // isEdge
       return (itemData: T) =>
         (itemData as LkEdgeData).type === filter.itemType &&
-        this.isNotANumber(Tools.getPropertyValue(Tools.getIn(itemData, filter.input), true));
+        Filters.isNotANumber(Tools.getPropertyValue(Tools.getIn(itemData, filter.input), true));
     }
   }
 
@@ -186,7 +186,7 @@ export class Filters {
     if (isNode) {
       return (itemData: T) =>
         (itemData as LkNodeData).categories.includes(filter.itemType) &&
-        this.valueShouldBeHidden(
+        Filters.valueShouldBeHidden(
           Tools.getPropertyValue(Tools.getIn(itemData, filter.input), true),
           filter.value
         );
@@ -194,7 +194,7 @@ export class Filters {
       // isEdge
       return (itemData: T) =>
         (itemData as LkEdgeData).type === filter.itemType &&
-        this.valueShouldBeHidden(
+        Filters.valueShouldBeHidden(
           Tools.getPropertyValue(Tools.getIn(itemData, filter.input), true),
           filter.value
         );
