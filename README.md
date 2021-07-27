@@ -19,26 +19,25 @@ TODO add 2 screenshots same viz without styles and captions and one with everyth
 # Usage
 
 - Retrieve your visualization data via an API call. You can do that via any of the following options:
-  - A CURL request
-
-TODO add curl example
-
-  - Any HTTP client of your choice
-
-TODO add postman example
-        
+  - A CURL request: ````curl 'http://localhost:3000/api/e7900d9b/visualizations/3'````
+    
+  - Any HTTP client of your choice: ````GET http://localhost:3000/api/e7900d9b/visualizations/3````   
+    
+    where the values `e7900d9b` and `3` stand for the data source key and the visualisation id respectively.
+    
   - The Linkurious Rest-Client library
-
-TODO clean up example
 ```
-    const rc = new RestClient({baseUrl: data.baseUrl});
-    if (data.username !== undefined && data.password !== undefined) {
+    // Initialize the rest client
+    const rc = new RestClient({baseUrl: baseUrl});
+    if (username !== undefined && password !== undefined) {
       await rc.auth.login({
-        usernameOrEmail: data.username,
-        password: data.password
+        usernameOrEmail: username,
+        password: password
       });
     }
-    rc.visualization.getVisualization('{')
+    
+    // Retrieve the visualization by id
+    const viz = await rc.visualization.getVisualization({sourceKey:'e7900d9b', id: 3})
 ```
 <!--
 # TODO uncomment when plugins are officially documented
