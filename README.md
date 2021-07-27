@@ -19,12 +19,12 @@ TODO add 2 screenshots same viz without styles and captions and one with everyth
 # Usage
 
 - Retrieve your visualization data via an API call. You can do that via any of the following options:
-  - A CURL request: ````curl 'http://localhost:3000/api/e7900d9b/visualizations/3'````
+  - A CURL request: ````curl 'http://your-domain.com/api/{sourceKey}/visualizations/{visualizationId}'````
     
-  - Any HTTP client of your choice: ````GET http://localhost:3000/api/e7900d9b/visualizations/3````   
-    
-    where the values `e7900d9b` and `3` stand for the data source key and the visualisation id respectively.
-    
+  - Any HTTP client of your choice: ````GET http://your-domain.com/api/{sourceKey}/visualizations/{visualizationId}````
+
+Replace your-domain.com, {sourceKey} and {visualizationId} with the actual host and port of your server, your data source key and your visualization id respectively.
+
   - The Linkurious Rest-Client library
 ```
     // Initialize the rest client
@@ -46,7 +46,42 @@ TODO add 2 screenshots same viz without styles and captions and one with everyth
 
  - Import and initialize the Ogma-Linkurious parser in your project and call the `initVisualization` method in order to apply Linkurious styles and captions to your Ogma visualization 
    
-TODO hello world of import/initialize
+```
+import {LKOgma} from '@linkurious/ogma-helper';
+import {RestClient} from "@linkurious/rest-client";
+
+let ogma;
+
+// Initialize the rest client
+const rc = new RestClient({baseUrl: baseUrl});
+
+// Get linkurious configuration response
+const linkuriousConfigurationResponse = await rc.config.getConfiguration();
+
+// Get the visualisation configuration response
+const visualizationResponse = await rc
+    .visualization.getVisualization({
+        sourceKey: 'e7900d9b',
+        id: 3
+    });
+
+if (linkuriousConfigurationResponse.isSuccess() && visualizationResponse.isSuccess()) {
+    const ogmaConfiguration = linkuriousConfigurationResponse.body.ogma;
+
+    const visualizationConfiguration = visualizationResponse.body;
+
+     // Initialize ogma object
+     ogma = new LKOgma({
+        ...ogmaConfiguration, options: {...ogmaConfiguration.options, backgroundColor: "rgba(240, 240, 240)"}
+    });
+
+    ogma.setContainer('graph-container');
+
+    // Initialize the visualization content & styles
+    ogma.initVisualization(visualizationConfiguration);
+}
+
+```
 
 - Use any other Ogma feature you would like to apply to the visualization
   
