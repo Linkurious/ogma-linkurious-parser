@@ -63,8 +63,7 @@ export class Tools {
    * Return a value from a nested object depending on a keyPath
    */
   public static getIn(ref: any, path: Array<string | number>): any {
-    const result = path.reduce((p, c) => (p && p[c] !== undefined ? p[c] : undefined), ref);
-    return Tools.clone(result);
+    return path.reduce((p, c) => (p && p[c] !== undefined ? p[c] : undefined), ref);
   }
 
   /**
@@ -73,10 +72,10 @@ export class Tools {
   public static clone(o: any) {
     return typeof o === 'object'
       ? JSON.parse(
-        JSON.stringify(o, (k, v) => {
-          return v instanceof Set ? {} : v;
-        })
-      )
+          JSON.stringify(o, (k, v) => {
+            return v instanceof Set ? {} : v;
+          })
+        )
       : o;
   }
 
@@ -228,8 +227,8 @@ export class Tools {
     return sign === '+'
       ? this.sanitizeFormattedNumber(hours) * 3.6e6 + this.sanitizeFormattedNumber(minutes) * 60000
       : (this.sanitizeFormattedNumber(hours) * 3.6e6 +
-      this.sanitizeFormattedNumber(minutes) * 60000) *
-      -1;
+          this.sanitizeFormattedNumber(minutes) * 60000) *
+          -1;
   }
 
   public static sanitizeFormattedNumber(str: string): number {
