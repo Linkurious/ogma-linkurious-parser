@@ -17,7 +17,7 @@
   },
   "scripts": {
     "prepare": "tsc -b",
-    "build": "tsc -b src",
+    "build": "tsc -b",
     "compile": "tsc -b",
     "tsc": "tsc -b",
     "build:rollup": "rollup -c",
