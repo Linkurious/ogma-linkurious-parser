@@ -26,5 +26,8 @@
     "allowUnreachableCode": false,
     "forceConsistentCasingInFileNames": true,
     "strict": true
-  }
+  },
+  "include": [
+    "**/*.spec.ts"
+  ]
 }
