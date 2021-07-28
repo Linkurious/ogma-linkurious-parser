@@ -1,42 +1,12 @@
 {
-  "compilerOptions": {
-    "declaration": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "target": "es5",
-    "stripInternal": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "noEmitOnError": false,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "sourceMap": true,
-    "inlineSources": true,
-    "lib": [
-      "ES5",
-      "ES6",
-      "ES2016",
-      "ES2017",
-      "ES2015",
-      "dom"
-    ],
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "noUnusedLocals": true,
-    "noFallthroughCasesInSwitch": true,
-    "allowUnreachableCode": false,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true
-  },
-  "typeRoots": [
-    "node_modules/@types"
-  ],
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist/**/*",
-    "tests/**/*.spec.ts"
+  "include": [],
+  // DO NOT DELETE: mandatory to keep even if empty
+  "references": [
+    {
+      "path": "src"
+    },
+    {
+      "path": "tests"
+    }
   ]
 }
