@@ -7,4 +7,6 @@ nodeJob {
   createGitTag = true
   gitTagPrefix = 'v'
   runBookeeping = true
+
+  runNpmPublish = true
 }
