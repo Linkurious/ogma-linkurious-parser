@@ -29,7 +29,7 @@ A full working example using the [Linkurious REST Client](https://github.com/Lin
 
 ```js
 const {RestClient} = require('@linkurious/rest-client');
-const {LKOgma} = require('@linkurious/ogma-helper');
+const {LKOgma} = require('@linkurious/ogma-linkurious-parser');
 
 async function main() {
   // Initialize the rest client
