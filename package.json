@@ -1,14 +1,15 @@
 {
-  "name": "@linkurious/ogma-helper",
+  "name": "@linkurious/ogma-linkurious-parser",
   "version": "2.10.13",
   "author": "Linkurious SAS",
-  "description": "helper library to facilitate interaction with OGMA",
+  "description": "Parse and load a Linkurious visualization in Ogma with one line of code ",
   "files": [
     "dist"
   ],
   "publishConfig": {
-    "registry": "https://nexus3.vpc.prod.scw-par1.linkurious.net/repository/npm-linkurious/"
+    "registry": "https://nexus3.linkurious.net/repository/npm/"
   },
+  "private": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {
@@ -37,9 +38,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Linkurious/ogma-helper.git"
+    "url": "https://github.com/Linkurious/ogma-linkurious-parser.git"
   },
-  "license": "ISC",
+  "license": "Apache-2.0",
   "homepage": "",
   "dependencies": {
     "lodash": "4.17.21",
