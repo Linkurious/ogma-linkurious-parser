@@ -7,9 +7,8 @@
     "dist"
   ],
   "publishConfig": {
-    "registry": "https://nexus3.linkurious.net/repository/npm/"
+    "access": "public"
   },
-  "private": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {
