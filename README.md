@@ -10,7 +10,7 @@ Ogma-Linkurious Parser is an official library maintained by the Linkurious team 
 
 # Installation
 
-````npm install @linkurious/ogma-parser````
+````npm install @linkurious/ogma-linkurious-parser````
 
 # Usage
 
