@@ -7,7 +7,7 @@
     "dist"
   ],
   "publishConfig": {
-    "registry": "https://nexus3.linkurious.net/repository/npm/"
+    "access": "public"
   },
   "private": false,
   "main": "./dist/index.js",
@@ -27,10 +27,11 @@
     "clean": "rm -rf node_modules; rm -rf package-lock.json; rm -rf dist",
     "lint": "eslint --fix --ext .ts .",
     "lint:ci": "eslint -f checkstyle -o reports/checkstyle.xml --ext .ts .",
+    "latest:develop-stable": "npm install --save-exact @linkurious/rest-client@lk-develop-stable",
     "latest:develop": "npm install --save-exact @linkurious/rest-client@lk-develop",
     "latest:develop-next": "npm install --save-exact @linkurious/rest-client@lk-develop-next",
-    "latest:master": "npm install --save-exact  @linkurious/rest-client@lk-master",
     "latest:master-stable": "npm install --save-exact @linkurious/rest-client@lk-master-stable",
+    "latest:master": "npm install --save-exact  @linkurious/rest-client@lk-master",
     "bump:patch": "bump2version patch && npm version --no-git-tag-version patch",
     "bump:minor": "bump2version minor && npm version --no-git-tag-version minor",
     "bump:major": "bump2version major && npm version --no-git-tag-version major"
