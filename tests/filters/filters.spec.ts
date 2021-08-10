@@ -2,10 +2,13 @@
 
 import {expect} from 'chai';
 import 'mocha';
-import {Filters} from "../../src";
-import Ogma from "ogma";
-import {LkEdgeData, LkNodeData} from "@linkurious/rest-client";
+import Ogma, {RawEdge, RawNode} from 'ogma';
+import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
+
+import {Filters} from '../../src';
 import {Tools} from '../../src/tools/tools';
+
+// TODO remove bang operator
 
 describe('Filters', () => {
   const filterEmpty = {edge: [], node: []};
@@ -15,7 +18,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['CITY'],
-      properties: {"name": "Paris", 'invested_amount': 105519047},
+      properties: {name: 'Paris', investedAmount: 105519047},
       geo: {},
       statistics: {
         supernode: false
@@ -29,7 +32,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['CITY'],
-      properties: {'invested_amount': 105519047},
+      properties: {investedAmount: 105519047},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -41,7 +44,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['CITY'],
-      properties: {"name": "Barcelona", 'invested_amount': 155519047},
+      properties: {name: 'Barcelona', investedAmount: 155519047},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -53,7 +56,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['CITY'],
-      properties: {"name": 1233584, 'invested_amount': 155519047},
+      properties: {name: 1233584, investedAmount: 155519047},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -65,7 +68,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['CITY'],
-      properties: {"name": "Barcelona", 'invested_amount': 'aaa'},
+      properties: {name: 'Barcelona', investedAmount: 'aaa'},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -77,7 +80,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['COMPANY'],
-      properties: {"name": "EDP", 'invested_amount': 105519047},
+      properties: {name: 'EDP', investedAmount: 105519047},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -89,7 +92,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       categories: ['COMPANY'],
-      properties: {"name": 123566, 'invested_amount': 105519047},
+      properties: {name: 123566, investedAmount: 105519047},
       geo: {},
       statistics: {supernode: false},
       readAt: 0
@@ -101,7 +104,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_CITY',
-      properties: {'moved_in': 2000},
+      properties: {movedIn: 2000},
       readAt: 0
     },
     source: '1',
@@ -113,7 +116,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_CITY',
-      properties: {"city": "Paris", 'moved_in': 2000},
+      properties: {city: 'Paris', movedIn: 2000},
       readAt: 0
     },
     source: '1',
@@ -125,7 +128,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_CITY',
-      properties: {"city": "Barcelona", 'moved_in': 2005},
+      properties: {city: 'Barcelona', movedIn: 2005},
       readAt: 0
     },
     source: '2',
@@ -137,7 +140,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_CITY',
-      properties: {"city": 12345667, 'moved_in': 2005},
+      properties: {city: 12345667, movedIn: 2005},
       readAt: 0
     },
     source: '2',
@@ -149,9 +152,9 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_CITY',
-      properties: {"city": "Barcelona", 'moved_in': undefined},
+      properties: {city: 'Barcelona'},
       readAt: 0
-    },
+    } as LkEdgeData,
     source: '2',
     target: '3'
   };
@@ -161,7 +164,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_INVESTOR',
-      properties: {"investor": "EDP", 'moved_in': 2000},
+      properties: {investor: 'EDP', movedIn: 2000},
       readAt: 0
     },
     source: '1',
@@ -173,7 +176,7 @@ describe('Filters', () => {
     attributes: {},
     data: {
       type: 'HAS_INVESTOR',
-      properties: {"investor": 123456, 'moved_in': 2000},
+      properties: {investor: 123456, movedIn: 2000},
       readAt: 0
     },
     source: '1',
@@ -194,9 +197,9 @@ describe('Filters', () => {
     {
       id: 19,
       data: {
-        categories: ["CITY"],
+        categories: ['CITY'],
         properties: {
-          name: "Paris",
+          name: 'Paris',
           long: 2.34575,
           lat: 48.857334
         },
@@ -208,46 +211,47 @@ describe('Filters', () => {
     {
       id: 76529,
       data: {
-        categories: ["INVESTOR"],
+        categories: ['INVESTOR'],
         properties: {
-          market: "Financial Services",
-          country: "FRA",
-          city: "Paris",
-          name: "Ader Finance",
-          category: "|Financial Services|",
-          permalink: "/organization/global-equities-corporate-finance",
-          region: "Paris",
-          url: "http://www.crunchbase.com/organization/global-equities-corporate-finance"
+          market: 'Financial Services',
+          country: 'FRA',
+          city: 'Paris',
+          name: 'Ader Finance',
+          category: '|Financial Services|',
+          permalink: '/organization/global-equities-corporate-finance',
+          region: 'Paris',
+          url: 'http://www.crunchbase.com/organization/global-equities-corporate-finance'
         },
         geo: {},
         statistics: {},
         readAt: 0
       }
     }
-  ];
+  ] as RawNode<LkNodeData>[];
 
   const ogmaFilteredEdge = {
     id: 120463,
     data: {
-      type: "HAS_CITY",
+      type: 'HAS_CITY',
       properties: {
-        city: "Paris",
+        city: 'Paris'
       },
       readAt: 0
     },
     source: 76529,
     target: 19
-  };
+  } as RawEdge<LkEdgeData>;
 
-  const ogma = new Ogma();
+  const ogma = new Ogma<LkNodeData, LkEdgeData>();
   ogma.addNodes(ogmaFilteredNodes);
   ogma.addEdge(ogmaFilteredEdge);
-
 
   describe('MATCH ANY', () => {
     const filterFilledAny = Tools.clone(filterEmpty);
     filterFilledAny.node = [{type: 'any', itemType: 'CITY', input: undefined, value: undefined}];
-    filterFilledAny.edge = [{type: 'any', itemType: 'HAS_CITY', input: undefined, value: undefined}];
+    filterFilledAny.edge = [
+      {type: 'any', itemType: 'HAS_CITY', input: undefined, value: undefined}
+    ];
 
     // todo: removed support for nodes without a category
     // const nodeWithoutCategory = {
@@ -266,17 +270,11 @@ describe('Filters', () => {
     // });
 
     it('should return false if the node categories do not match', () => {
-      expect(Filters.isFiltered(
-        filterFilledAny.node,
-        nodeCompany.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledAny.node, nodeCompany.data)).to.eq(false);
     });
 
     it('should return false if the edge type does not match', () => {
-      expect(Filters.isFiltered(
-        filterFilledAny.edge,
-        edgeHasInvestor.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledAny.edge, edgeHasInvestor.data)).to.eq(false);
     });
 
     // todo: removed support for nodes without a category
@@ -292,76 +290,58 @@ describe('Filters', () => {
     // });
 
     it('should return true if the node categories match', () => {
-      expect(Filters.isFiltered(
-        filterFilledAny.node,
-        nodeCityParis.data
-      )).to.eq(true);
+      expect(Filters.isFiltered(filterFilledAny.node, nodeCityParis.data)).to.eq(true);
     });
 
     it('should return true if the edge has the filtered itemType', () => {
-      expect(Filters.isFiltered(
-        filterFilledAny.edge,
-        edgeHasCityParis.data
-      )).to.eq(true);
+      expect(Filters.isFiltered(filterFilledAny.edge, edgeHasCityParis.data)).to.eq(true);
     });
 
     it('should return true when a node from ogma match with one filter', () => {
-      const node = ogma.getNode(19).getData() as LkNodeData;
+      const node = ogma.getNode(19)!.getData();
       expect(Filters.isFiltered(filterFilledAny.node, node)).to.eq(true);
     });
 
     it('should return true when a edge from ogma match with one filter', () => {
-      expect(Filters.isFiltered(filterFilledAny.edge, ogma.getEdge(120463).getData() as LkEdgeData)).to.eq(true);
+      expect(Filters.isFiltered(filterFilledAny.edge, ogma.getEdge(120463)!.getData())).to.eq(true);
     });
-
   });
 
   describe('MATCH NOVALUE', () => {
     const filterFilledNoValue = Tools.clone(filterEmpty);
     filterFilledNoValue.node = [{type: 'novalue', itemType: 'CITY', input: ['properties', 'name']}];
-    filterFilledNoValue.edge = [{type: 'novalue', itemType: 'HAS_CITY', input: ['properties', 'city']}];
+    filterFilledNoValue.edge = [
+      {type: 'novalue', itemType: 'HAS_CITY', input: ['properties', 'city']}
+    ];
 
     it('should return false if the node categories do not match', () => {
-      expect(Filters.isFiltered(
-        filterFilledNoValue.node,
-        nodeCompany.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledNoValue.node, nodeCompany.data)).to.eq(false);
     });
 
     it('should return false if the node has a property value', () => {
-      expect(Filters.isFiltered(
-        filterFilledNoValue.node,
-        nodeCityBarcelona.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledNoValue.node, nodeCityBarcelona.data)).to.eq(false);
     });
 
     it('should return false if the edge does not have the filtered itemType', () => {
-      expect(Filters.isFiltered(
-        filterFilledNoValue.edge,
-        edgeHasInvestor.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledNoValue.edge, edgeHasInvestor.data)).to.eq(false);
     });
 
     it('should return false if the edge has a property value', () => {
-      expect(Filters.isFiltered(
-        filterFilledNoValue.edge,
-        edgeHasCityBarcelona.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledNoValue.edge, edgeHasCityBarcelona.data)).to.eq(false);
     });
-    it('should return true if the node has at least one of the filtered itemTypes ' +
-      'and dont have property value', () => {
-      expect(Filters.isFiltered(
-        filterFilledNoValue.node,
-        nodeNoValueName.data
-      )).to.eq(true);
-    });
-    it('should return true if the edge has the filtered itemType ' +
-      'and dont have property value', () => {
-      expect(Filters.isFiltered(
-        filterFilledNoValue.edge,
-        edgeNoValueCity.data
-      )).to.eq(true);
-    });
+    it(
+      'should return true if the node has at least one of the filtered itemTypes ' +
+        'and dont have property value',
+      () => {
+        expect(Filters.isFiltered(filterFilledNoValue.node, nodeNoValueName.data)).to.eq(true);
+      }
+    );
+    it(
+      'should return true if the edge has the filtered itemType ' + 'and dont have property value',
+      () => {
+        expect(Filters.isFiltered(filterFilledNoValue.edge, edgeNoValueCity.data)).to.eq(true);
+      }
+    );
   });
 
   describe('MATCH NAN', () => {
@@ -374,205 +354,144 @@ describe('Filters', () => {
     ];
 
     it('should return false if the node categories do not match', () => {
-      expect(Filters.isFiltered(
-        filterFilledNAN.node,
-        nodeInvalidCompany.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledNAN.node, nodeInvalidCompany.data)).to.eq(false);
     });
 
     it('should return false if the node property is a number', () => {
-      expect(Filters.isFiltered(
-        filterFilledNAN.node,
-        nodeInvalidCityBarcelona.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledNAN.node, nodeInvalidCityBarcelona.data)).to.eq(false);
     });
 
     it('should return false if the edge type does not match', () => {
-      expect(Filters.isFiltered(
-        filterFilledNAN.edge,
-        edgeInvalidHasInvestor.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledNAN.edge, edgeInvalidHasInvestor.data)).to.eq(false);
     });
 
     it('should return false if the edge property is a number', () => {
-      expect(Filters.isFiltered(
-        filterFilledNAN.edge,
-        edgeInvalidHasCityBarcelona.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledNAN.edge, edgeInvalidHasCityBarcelona.data)).to.eq(
+        false
+      );
     });
 
     it('should return true if the node categories match and the property is not a number', () => {
-      expect(Filters.isFiltered(
-        filterFilledNAN.node,
-        nodeCityBarcelona.data
-      )).to.eq(true);
+      expect(Filters.isFiltered(filterFilledNAN.node, nodeCityBarcelona.data)).to.eq(true);
     });
 
     it('should return true if the edge type matches and the property is not a number', () => {
-      expect(Filters.isFiltered(
-        filterFilledNAN.edge,
-        edgeHasCityBarcelona.data
-      )).to.eq(true);
+      expect(Filters.isFiltered(filterFilledNAN.edge, edgeHasCityBarcelona.data)).to.eq(true);
     });
   });
 
   describe('MATCH IS', () => {
     const filterFilledIs = Tools.clone(filterEmpty);
-    filterFilledIs.node = [{type: 'is', itemType: 'CITY', input: ['properties', 'name'], value: 'Paris'}];
-    filterFilledIs.edge = [{type: 'is', itemType: 'HAS_CITY', input: ['properties', 'city'], value: 'Paris'}];
+    filterFilledIs.node = [
+      {type: 'is', itemType: 'CITY', input: ['properties', 'name'], value: 'Paris'}
+    ];
+    filterFilledIs.edge = [
+      {type: 'is', itemType: 'HAS_CITY', input: ['properties', 'city'], value: 'Paris'}
+    ];
 
     it('should return false if the node category does not match', () => {
-      expect(Filters.isFiltered(
-        filterFilledIs.node,
-        nodeCompany.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledIs.node, nodeCompany.data)).to.eq(false);
     });
 
     it('should return false if the node property does not match', () => {
-      expect(Filters.isFiltered(
-        filterFilledIs.node,
-        nodeCityBarcelona.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledIs.node, nodeCityBarcelona.data)).to.eq(false);
     });
 
     it('should return false if the edge type does not match', () => {
-      expect(Filters.isFiltered(
-        filterFilledIs.edge,
-        edgeHasInvestor.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledIs.edge, edgeHasInvestor.data)).to.eq(false);
     });
 
     it('should return false if the edge property does not match', () => {
-      expect(Filters.isFiltered(
-        filterFilledIs.edge,
-        edgeHasCityBarcelona.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterFilledIs.edge, edgeHasCityBarcelona.data)).to.eq(false);
     });
 
     it('should return true if the node categories match and property matches', () => {
-      expect(Filters.isFiltered(
-        filterFilledIs.node,
-        nodeCityParis.data
-      )).to.eq(true);
+      expect(Filters.isFiltered(filterFilledIs.node, nodeCityParis.data)).to.eq(true);
     });
 
     it('should return true if the edges type matches and property matches', () => {
-      expect(Filters.isFiltered(
-        filterFilledIs.edge,
-        edgeHasCityParis.data
-      )).to.eq(true);
+      expect(Filters.isFiltered(filterFilledIs.edge, edgeHasCityParis.data)).to.eq(true);
     });
   });
 
   describe('MATCH RANGE', () => {
-
     const filterRules = Tools.clone(filterEmpty);
-    filterRules.node = [{
-      type: 'range',
-      itemType: 'CITY',
-      input: ['properties', 'invested_amount'],
-      value: {'<': 115519047.61904761, '>': 2425700000}
-    }];
-    filterRules.edge = [{
-      type: 'range',
-      itemType: 'HAS_CITY',
-      input: ['properties', 'moved_in'],
-      value: {'<': 2001, '>': 2010}
-    }];
+    filterRules.node = [
+      {
+        type: 'range',
+        itemType: 'CITY',
+        input: ['properties', 'investedAmount'],
+        value: {'<': 115519047.61904761, '>': 2425700000}
+      }
+    ];
+    filterRules.edge = [
+      {
+        type: 'range',
+        itemType: 'HAS_CITY',
+        input: ['properties', 'movedIn'],
+        value: {'<': 2001, '>': 2010}
+      }
+    ];
 
     it('should return false if the node categories do not match', () => {
-      expect(Filters.isFiltered(
-        filterRules.node,
-        nodeCompany.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterRules.node, nodeCompany.data)).to.eq(false);
     });
 
     it('should return false if the node property does not match the range', () => {
-      expect(Filters.isFiltered(
-        filterRules.node,
-        nodeCityBarcelona.data
-      )).to.eq(false);
-
+      expect(Filters.isFiltered(filterRules.node, nodeCityBarcelona.data)).to.eq(false);
     });
 
     it('should return false if the node property is not a number', () => {
-      expect(Filters.isFiltered(
-        filterRules.node,
-        nodeCityLisbon.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterRules.node, nodeCityLisbon.data)).to.eq(false);
     });
 
     it('should return false if the edge type does not match', () => {
-      expect(Filters.isFiltered(
-        filterRules.edge,
-        edgeHasInvestor.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterRules.edge, edgeHasInvestor.data)).to.eq(false);
     });
 
     it('should return false if the edge property does not match the range', () => {
-      // rules: filter/hide edges when "moved_in" < 2001 OR "moved_in" > 2010
-      // here, edge."moved_in" is 2005 => the edge should *not* be hidden/filtered.
-      expect(Filters.isFiltered(
-        filterRules.edge,
-        edgeHasCityBarcelona.data
-      )).to.eq(false);
+      // rules: filter/hide edges when "movedIn" < 2001 OR "movedIn" > 2010
+      // here, edge."movedIn" is 2005 => the edge should *not* be hidden/filtered.
+      expect(Filters.isFiltered(filterRules.edge, edgeHasCityBarcelona.data)).to.eq(false);
     });
 
     it('should return false if the edge property is not a number', () => {
-      expect(Filters.isFiltered(
-        filterRules.edge,
-        edgeHasCityLisbon.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterRules.edge, edgeHasCityLisbon.data)).to.eq(false);
     });
 
     it('should return true if the node categories match and the property matches the range', () => {
-      expect(Filters.isFiltered(
-        filterRules.node,
-        nodeCityParis.data
-      )).to.eq(true);
+      expect(Filters.isFiltered(filterRules.node, nodeCityParis.data)).to.eq(true);
     });
 
     it('should return true if the edge type matches and the property matches the range', () => {
-      // rules: filter/hide edges when "moved_in" < 2001 OR "moved_in" > 2010
-      // here, edge."moved_in" is 2000 => the edge should be hidden/filtered.
-      expect(Filters.isFiltered(
-        filterRules.edge,
-        edgeHasCityParis.data
-      )).to.eq(true);
+      // rules: filter/hide edges when "movedIn" < 2001 OR "movedIn" > 2010
+      // here, edge."movedIn" is 2000 => the edge should be hidden/filtered.
+      expect(Filters.isFiltered(filterRules.edge, edgeHasCityParis.data)).to.eq(true);
     });
   });
 
   describe('EMPTY FILTER', () => {
-
     it('should return false if there are not node filters', () => {
-      expect(Filters.isFiltered(
-        filterEmpty.node,
-        nodeCityParis.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterEmpty.node, nodeCityParis.data)).to.eq(false);
     });
 
     it('should return false if there are not edge filters', () => {
-      expect(Filters.isFiltered(
-        filterEmpty.edge,
-        edgeHasCityParis.data
-      )).to.eq(false);
+      expect(Filters.isFiltered(filterEmpty.edge, edgeHasCityParis.data)).to.eq(false);
     });
 
     it('should return false when a node from ogma dont match with any filter', () => {
-      expect(Filters.isFiltered(
-        filterEmpty.node,
-        ogma.getNode(ogmaFilteredNodes[1].id).getData() as LkNodeData
-      )).to.eq(false);
+      expect(
+        Filters.isFiltered(filterEmpty.node, ogma.getNode(ogmaFilteredNodes[1].id!)!.getData())
+      ).to.eq(false);
     });
 
     it('should return false when a edge from ogma dont match with any filter', () => {
-      expect(Filters.isFiltered(
-        filterEmpty.edge,
-        ogma.getEdge(ogmaFilteredEdge.id).getData() as LkEdgeData
-      )).to.eq(false);
+      expect(
+        Filters.isFiltered(filterEmpty.edge, ogma.getEdge(ogmaFilteredEdge.id!)!.getData())
+      ).to.eq(false);
     });
   });
   after(() => {
-    ogma.destroy()
-  })
+    ogma.destroy();
+  });
 });

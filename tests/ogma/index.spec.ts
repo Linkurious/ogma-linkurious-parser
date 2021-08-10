@@ -3,12 +3,13 @@
 import {expect} from 'chai';
 import 'mocha';
 import Ogma, {NodeList} from 'ogma';
-import {LkEdgeData, LkNodeData} from "@linkurious/rest-client";
-import {Tools} from "../../src/tools/tools";
+import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
+
+import {Tools} from '../../src/tools/tools';
 
 describe('Tools.getHiddenNeighbors', () => {
   it('should return the number of hidden neighbors', () => {
-    let ogma = new Ogma();
+    const ogma = new Ogma();
     ogma.addGraph({
       nodes: [
         {id: 0},
@@ -24,11 +25,21 @@ describe('Tools.getHiddenNeighbors', () => {
         {id: 4, source: 2, target: 3}
       ]
     });
-    expect(Tools.getHiddenNeighbors(ogma.getNodes([0]) as NodeList<LkNodeData, LkEdgeData>)).to.eql(0);
-    expect(Tools.getHiddenNeighbors(ogma.getNodes([1]) as NodeList<LkNodeData, LkEdgeData>)).to.eql(7);
-    expect(Tools.getHiddenNeighbors(ogma.getNodes([2]) as NodeList<LkNodeData, LkEdgeData>)).to.eql(8);
-    expect(Tools.getHiddenNeighbors(ogma.getNodes([3]) as NodeList<LkNodeData, LkEdgeData>)).to.eql(8);
-    expect(Tools.getHiddenNeighbors(ogma.getNodes() as NodeList<LkNodeData, LkEdgeData>)).to.eql(23);
-    ogma.destroy()
+    expect(Tools.getHiddenNeighbors(ogma.getNodes([0]) as NodeList<LkNodeData, LkEdgeData>)).to.eql(
+      0
+    );
+    expect(Tools.getHiddenNeighbors(ogma.getNodes([1]) as NodeList<LkNodeData, LkEdgeData>)).to.eql(
+      7
+    );
+    expect(Tools.getHiddenNeighbors(ogma.getNodes([2]) as NodeList<LkNodeData, LkEdgeData>)).to.eql(
+      8
+    );
+    expect(Tools.getHiddenNeighbors(ogma.getNodes([3]) as NodeList<LkNodeData, LkEdgeData>)).to.eql(
+      8
+    );
+    expect(Tools.getHiddenNeighbors(ogma.getNodes() as NodeList<LkNodeData, LkEdgeData>)).to.eql(
+      23
+    );
+    ogma.destroy();
   });
 });
