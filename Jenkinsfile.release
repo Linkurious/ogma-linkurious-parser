@@ -3,4 +3,6 @@
 lkeSubReleaseJob {
   // General
   projectName = "linkurious/ogma-linkurious-parser"
+
+  nextReleaseJobs = ["linkurious-ui"]
 }
