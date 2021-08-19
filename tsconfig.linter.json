@@ -8,8 +8,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noEmitOnError": false,
-    "outDir": "./dist",
-    "rootDir": "./src",
     "sourceMap": true,
     "inlineSources": true,
     "lib": [
@@ -32,11 +30,11 @@
     "node_modules/@types"
   ],
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "tests/**/*.spec.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist/**/*",
-    "tests/**/*.spec.ts"
+    "dist/**/*"
   ]
 }

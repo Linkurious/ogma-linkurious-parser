@@ -25,14 +25,16 @@ export class Captions {
         : Captions.generateEdgeCaption(itemData, schema) || null;
     }
     if (itemData.properties !== undefined) {
-      const heuristicCaption = Object.keys(itemData.properties).find((k) =>
-        CAPTION_HEURISTIC.includes(k)
-      );
+      const heuristicCaptionElement = CAPTION_HEURISTIC.find((value) => {
+        return itemData.properties[value] !== undefined;
+      });
       if (
-        heuristicCaption !== undefined &&
-        Tools.isDefined(itemData.properties[heuristicCaption])
+        heuristicCaptionElement !== undefined &&
+        Tools.isDefined(itemData.properties[heuristicCaptionElement])
       ) {
-        return `${Tools.getValueFromLkProperty(itemData.properties[heuristicCaption])}`.trim();
+        return `${Tools.getValueFromLkProperty(
+          itemData.properties[heuristicCaptionElement]
+        )}`.trim();
       }
     }
     return null;

@@ -22,26 +22,21 @@ export class EdgeAttributes extends ItemAttributes {
   }
 
   /**
-   * Run the callback if an item match with a style in the array of rules
+   * Return rule that can be applied to the data
    */
-  private matchStyle(
-    styleRules: Array<StyleRule>,
-    data: LkEdgeData,
-    callback: (style: StyleRule) => unknown
-  ): void {
+  private matchStyle(styleRules: Array<StyleRule>, data: LkEdgeData): StyleRule | undefined {
     if (data === undefined) {
       return;
     }
     for (let i = 0; i < styleRules.length; ++i) {
       if (styleRules[i].canApplyTo(data)) {
-        callback(styleRules[i]);
-        break;
+        return styleRules[i];
       }
     }
   }
 
   /**
-   * Generate color for a given node (call only if _rulesMap.color exists)
+   * Generate color for a given edge (call only if _rulesMap.color exists)
    */
   public color(data: LkEdgeData): Color {
     if (!Tools.isDefined(data)) {
@@ -67,40 +62,32 @@ export class EdgeAttributes extends ItemAttributes {
    * Generate shape for a given node
    */
   public shape(data: LkEdgeData): OgmaEdgeShape | undefined {
-    let result = undefined;
     if (this._rulesMap.shape !== undefined) {
-      this.matchStyle(this._rulesMap.shape, data, (styleRule) => {
-        result = styleRule.style.shape;
-      });
+      return this.matchStyle(this._rulesMap.shape, data)?.style.shape;
     }
-    return result;
   }
 
   /**
    * Generate size for a given node
    */
   public width(data: LkEdgeData): string | undefined {
-    let result = undefined;
     if (this._rulesMap.width !== undefined) {
-      this.matchStyle(this._rulesMap.width, data, (styleRule) => {
-        const widthStyle = styleRule.style.width;
-
-        if (widthStyle.type === 'autoRange') {
-          if (
-            widthStyle.input !== undefined &&
-            widthStyle.max !== undefined &&
-            widthStyle.min !== undefined
-          ) {
-            const propertyName: string = widthStyle.input[1];
-            const propertyValue = Tools.parseNumber(data.properties[propertyName]);
-            result = EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule);
-          }
-        } else {
-          result = widthStyle;
+      const styleRule = this.matchStyle(this._rulesMap.width, data);
+      const widthStyle = styleRule?.style.width;
+      if (Tools.isDefined(styleRule) && widthStyle.type === 'autoRange') {
+        if (
+          widthStyle.input !== undefined &&
+          widthStyle.max !== undefined &&
+          widthStyle.min !== undefined
+        ) {
+          const propertyName: string = widthStyle.input[1];
+          const propertyValue = Tools.parseNumber(data.properties[propertyName]);
+          return EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule);
         }
-      });
+      } else {
+        return widthStyle;
+      }
     }
-    return result;
   }
 
   /**
