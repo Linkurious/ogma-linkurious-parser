@@ -1,7 +1,7 @@
 'use strict';
 
-import * as o from 'ogma';
-import {Edge, EdgeAttributesValue, NodeAttributesValue, StyleClass, StyleRule} from 'ogma';
+import * as o from '@linkurious/ogma';
+import {Edge, EdgeAttributesValue, NodeAttributesValue, StyleClass, StyleRule} from '@linkurious/ogma';
 import {
   GenericObject,
   IEdgeStyle,

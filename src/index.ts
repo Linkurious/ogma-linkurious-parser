@@ -18,7 +18,7 @@ export {
   EdgeExtremity,
   EdgeType,
   GeoModeOptions
-} from 'ogma';
+} from '@linkurious/ogma';
 
 export {Captions} from './captions/captions';
 export {ItemAttributes, BASE_GREY} from './styles/itemAttributes';

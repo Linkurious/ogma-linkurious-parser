@@ -19,7 +19,7 @@ import Ogma, {
   RawEdge,
   RawGraph,
   RawNode
-} from 'ogma';
+} from '@linkurious/ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
@@ -30,7 +30,7 @@ import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
 
-export {default as Ogma} from 'ogma';
+export {default as Ogma} from '@linkurious/ogma';
 export const ANIMATION_DURATION = 750;
 
 interface AddItemOptions {
@@ -154,7 +154,11 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       theta: this.getNodes().size > 100 ? 0.8 : 0.34
     };
   }
-  public getRadialLayoutParams(rootNode: string, duration = 0): RadialLayoutOptions {
+
+  public getRadialLayoutParams(
+    rootNode: string,
+    duration = 0
+  ): RadialLayoutOptions<LkNodeData, LkEdgeData> {
     return {
       centralNode: rootNode,
       radiusDelta: 1,
