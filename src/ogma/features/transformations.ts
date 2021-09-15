@@ -1,7 +1,15 @@
 'use strict';
 
 import {GenericObject, IEdgeGroupStyle, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
-import {Edge, EdgeExtremity, EdgeStyle, EdgeType, PixelSize, StyleRule, Transformation} from '@linkurious/ogma';
+import {
+  Edge,
+  EdgeExtremity,
+  EdgeStyle,
+  EdgeType,
+  PixelSize,
+  StyleRule,
+  Transformation
+} from '@linkurious/ogma';
 
 import {LKOgma} from '../index';
 
