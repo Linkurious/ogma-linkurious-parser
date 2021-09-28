@@ -170,7 +170,7 @@ export class StyleRules {
           // style is a custom icon
           const label = Tools.isDefined(styleRule.input)
             ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${
-                styleRule.input![1]
+                styleRule.input[1]
               } ${StyleRules.sanitizeValue(styleRule.type, styleRule.value)}`
             : `${StyleRules.getTypeLabel(styleRule.itemType)}`;
           const value = styleRule.style.image;
@@ -178,7 +178,7 @@ export class StyleRules {
         } else {
           const label = Tools.isDefined(styleRule.input)
             ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${
-                styleRule.input![1]
+                styleRule.input[1]
               } ${StyleRules.sanitizeValue(styleRule.type, styleRule.value)}`
             : `${StyleRules.getTypeLabel(styleRule.itemType)}`;
           const value = styleRule.style[styleType];
@@ -247,7 +247,7 @@ export class StyleRules {
   /**
    * Return the label of item type for a legend item
    */
-  public static getTypeLabel(type: string | undefined): string {
+  public static getTypeLabel(type: string | undefined | null): string {
     return type === undefined ? 'All' : type === null ? 'Others' : type;
   }
 

@@ -49,7 +49,7 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
    *
    * @return {number}
    */
-  get specificity(): number {
+  get specificity(): 1 | 2 | 3 | 4 {
     if (this.itemType !== undefined && this.input !== undefined) {
       return 4;
     }
@@ -65,7 +65,11 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
   /**
    * Return true if this style match values
    */
-  public matchValues(itemType: string | null, input: Array<string>, value: any): boolean {
+  public matchValues(
+    itemType: string | undefined,
+    input: Array<string> | undefined,
+    value: any
+  ): boolean {
     if (Tools.isDefined(input)) {
       return (
         ((itemType === this.itemType || !Tools.isDefined(this.itemType)) &&
@@ -162,23 +166,16 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
    * @param comparator
    * @return {boolean}
    */
-  public static checkRange(value: number, comparator: {[key: string]: number}): boolean {
-    const operators = Object.keys(comparator);
-    return operators.every((op) => {
-      switch (op) {
-        case '<=':
-          return value <= comparator[op];
-
-        case '<':
-          return value < comparator[op];
-
-        case '>':
-          return value > comparator[op];
-
-        case '>=':
-          return value >= comparator[op];
-      }
-    });
+  public static checkRange(
+    value: number,
+    comparator: {[key in '<=' | '<' | '>' | '>=']?: number}
+  ): boolean {
+    return (
+      (comparator['<='] === undefined || value <= comparator['<=']) &&
+      (comparator['<'] === undefined || value < comparator['<']) &&
+      (comparator['>'] === undefined || value > comparator['>']) &&
+      (comparator['>='] === undefined || value >= comparator['>='])
+    );
   }
 
   /**
@@ -212,10 +209,7 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
    * Check that value of itemType match for the node
    */
   public static checkItemType(types: Array<string>, itemType: string | undefined): boolean {
-    return (
-      (itemType !== undefined && StyleRule.matchCategory(types, itemType)) ||
-      StyleRule.matchAny(itemType)
-    );
+    return StyleRule.matchCategory(types, itemType) || StyleRule.matchAny(itemType);
   }
 
   /**
@@ -225,7 +219,10 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
    * @param {string} itemType
    * @return {boolean}
    */
-  public static matchCategory(types: Array<string> | string, itemType: string): boolean {
+  public static matchCategory(
+    types: Array<string> | string,
+    itemType: string | undefined
+  ): boolean {
     return (
       Tools.isDefined(itemType) &&
       (Array.isArray(types) ? types.includes(itemType) : Tools.isEqual(types, itemType))
