@@ -48,7 +48,7 @@
     "sha1": "1.1.1"
   },
   "peerDependencies": {
-    "ogma": "3.4.3"
+    "ogma": "3.4.7"
   },
   "devDependencies": {
     "@linkurious/rest-client": "3.0.4-develop.119",
