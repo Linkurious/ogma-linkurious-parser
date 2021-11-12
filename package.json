@@ -1,6 +1,6 @@
 {
   "name": "@linkurious/ogma-linkurious-parser",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "author": "Linkurious SAS",
   "description": "Parse and load a Linkurious visualization in Ogma with one line of code ",
   "files": [
@@ -13,8 +13,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {
-    "node": "14.16.1",
-    "npm": "6.14.12"
+    "node": "14.18.1",
+    "npm": "6.14.15"
   },
   "scripts": {
     "prepare": "tsc -b",
@@ -44,14 +44,14 @@
   "homepage": "",
   "dependencies": {
     "lodash": "4.17.21",
-    "rxjs": "6.5.3",
+    "rxjs": "6.6.7",
     "sha1": "1.1.1"
   },
   "peerDependencies": {
-    "ogma": "3.3.13"
+    "ogma": "3.4.7"
   },
   "devDependencies": {
-    "@linkurious/rest-client": "3.0.3",
+    "@linkurious/rest-client": "3.0.4",
     "@rollup/plugin-buble": "0.21.3",
     "@rollup/plugin-commonjs": "17.0.0",
     "@rollup/plugin-json": "4.1.0",
