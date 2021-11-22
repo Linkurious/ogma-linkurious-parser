@@ -33,6 +33,11 @@ import {OgmaStore} from './features/OgmaStore';
 export {default as Ogma} from 'ogma';
 export const ANIMATION_DURATION = 750;
 
+interface AddItemOptions {
+  batchSize?: number;
+  virtual?: boolean;
+}
+
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   private _reactive: RxViz;
   public LKStyles!: StylesViz;
@@ -44,9 +49,9 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   public store: OgmaStore;
 
-  constructor(_configuration: IOgmaConfig) {
+  constructor(configuration: IOgmaConfig) {
     // set Ogma global configuration
-    super(_configuration);
+    super(configuration);
     this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
       path: 'categories',
       unwindArrays: true,
@@ -74,8 +79,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this._reactive = new RxViz(this);
     this.store = this._reactive.store;
     this.initSelection();
-    this.initStyles(_configuration);
-    this.initCaptions(_configuration);
+    this.initStyles(configuration);
+    this.initCaptions(configuration);
     this.LKTransformation = new TransformationsViz(this);
 
     this.LKStyles.setNodesDefaultHalo();
@@ -117,18 +122,18 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     });
   }
 
-  private initStyles(_configuration: IOgmaConfig): void {
+  private initStyles(configuration: IOgmaConfig): void {
     this.LKStyles = new StylesViz(this, {
-      node: _configuration?.options?.styles?.node || {},
-      edge: _configuration?.options?.styles?.edge || {}
+      node: configuration?.options?.styles?.node || {},
+      edge: configuration?.options?.styles?.edge || {}
     });
     this.LKStyles.setNodesDefaultStyles();
     this.LKStyles.setEdgesDefaultStyles();
   }
 
-  private initCaptions(_configuration: IOgmaConfig): void {
-    const nodeMaxTextLength = _configuration?.options?.styles?.node?.text?.maxTextLength;
-    const edgeMaxTextLength = _configuration?.options?.styles?.edge?.text?.maxTextLength;
+  private initCaptions(configuration: IOgmaConfig): void {
+    const nodeMaxTextLength = configuration?.options?.styles?.node?.text?.maxTextLength;
+    const edgeMaxTextLength = configuration?.options?.styles?.edge?.text?.maxTextLength;
     this.LKCaptions = new CaptionsViz(this, nodeMaxTextLength, edgeMaxTextLength);
   }
 
@@ -201,7 +206,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       }
       return edge;
     });
-    await this.setGraph({
+    await this.addGraphAfterValidation({
       nodes: fixedNodes as Array<RawNode<LkNodeData>>,
       edges: fixedEdges as Array<RawEdge<LkEdgeData>>
     });
@@ -234,7 +239,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding nodes then adding edges to the graph
    */
-  public async setGraph(
+  public async addGraphAfterValidation(
     graph: RawGraph<LkNodeData, LkEdgeData>
   ): Promise<{
     nodes: NodeList<LkNodeData>;
@@ -251,11 +256,14 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding edges to the graph after filtering disconnected ones
    */
-  public async addEdges(edges: Array<RawEdge<LkEdgeData>>): Promise<EdgeList> {
+  public async addEdges(
+    edges: Array<RawEdge<LkEdgeData>>,
+    options?: AddItemOptions
+  ): Promise<EdgeList> {
     const filteredEdges = edges.filter((edge) => {
       return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
     });
-    return super.addEdges(filteredEdges);
+    return super.addEdges(filteredEdges, options);
   }
 
   /**
@@ -282,7 +290,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public getNonFilteredEdges(items?: Array<any>): EdgeList<LkEdgeData, LkNodeData> {
     return Tools.isDefined(items)
       ? this.getEdges(items).filter((i) => !i.hasClass('filtered'))
-      : this.getEdges().filter((i) => !i.hasClass('filtered'));
+      : this.getEdges('raw').filter((i) => !i.hasClass('filtered'));
   }
 
   /**
@@ -291,7 +299,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public getFilteredEdges(items?: Array<any>): EdgeList<LkEdgeData, LkNodeData> {
     return Tools.isDefined(items)
       ? this.getEdges(items).filter((i) => i.hasClass('filtered'))
-      : this.getEdges().filter((i) => i.hasClass('filtered'));
+      : this.getEdges('raw').filter((i) => i.hasClass('filtered'));
   }
 
   /**
