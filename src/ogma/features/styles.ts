@@ -76,6 +76,10 @@ const EDGE_HALO_CONFIGURATION = {
   width: 4;
 };
 
+const DEFAULT_OGMA_FONT = "'roboto', sans-serif";
+const DARK_FONT_COLOR = '#000';
+const CLEAR_FONT_COLOR = '#FFF';
+const ITEM_DEFAULT_COLOR = '#7f7f7f';
 export const FILTER_OPACITY = 0.2;
 
 export class StylesViz {
@@ -186,7 +190,7 @@ export class StylesViz {
         icon: {
           minVisibleSize: 15
         },
-        color: '#7f7f7f',
+        color: ITEM_DEFAULT_COLOR,
         shape:
           this._defaultConfiguration.node.shape !== undefined
             ? this._defaultConfiguration.node.shape
@@ -247,7 +251,7 @@ export class StylesViz {
           this._defaultConfiguration.edge.shape !== undefined
             ? this._defaultConfiguration.edge.shape
             : 'arrow',
-        color: '#7f7f7f'
+        color: ITEM_DEFAULT_COLOR
       }
     });
   }
@@ -270,10 +274,6 @@ export class StylesViz {
             return {
               ...NODE_HALO_CONFIGURATION,
               scalingMethod: this._ogma.geo.enabled() ? 'fixed' : 'scaled'
-            } as {
-              color: '#FFF';
-              width: 7;
-              strokeWidth: 0;
             };
           }
           return null;
@@ -312,9 +312,6 @@ export class StylesViz {
             return {
               ...EDGE_HALO_CONFIGURATION,
               scalingMethod: this._ogma.geo.enabled() ? 'fixed' : 'scaled'
-            } as {
-              color: '#FFF';
-              width: 4;
             };
           }
           return null;
@@ -460,12 +457,14 @@ export class StylesViz {
           topRight: (node) => {
             if (node !== undefined) {
               const degree = Tools.getHiddenNeighbors(node.toList());
-              const badgeContent = Tools.shortenNumber(degree);
+              const badgeContent = Tools.formatNumber(degree);
               if (degree > 0) {
                 const nodeColor = Array.isArray(node.getAttribute('color'))
                   ? node.getAttribute('color')![0]
                   : node.getAttribute('color');
-                const textColor = OgmaTools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
+                const textColor = OgmaTools.isBright(nodeColor as o.Color)
+                  ? DARK_FONT_COLOR
+                  : CLEAR_FONT_COLOR;
                 const isSupernode = node.getData(['statistics', 'supernode']);
                 let content = null;
                 if (+badgeContent !== 0) {
@@ -483,7 +482,7 @@ export class StylesViz {
                       this._defaultConfiguration.node.text !== undefined &&
                       this._defaultConfiguration.node.text.font !== undefined
                         ? this._defaultConfiguration.node.text.font
-                        : "'roboto', sans-serif",
+                        : DEFAULT_OGMA_FONT,
                     scale: 0.4,
                     color: textColor,
                     content: content
@@ -504,7 +503,9 @@ export class StylesViz {
               const nodeColor = Array.isArray(node.getAttribute('color'))
                 ? node.getAttribute('color')![0]
                 : node.getAttribute('color');
-              const textColor = OgmaTools.isBright(nodeColor as o.Color) ? '#000' : '#FFF';
+              const textColor = OgmaTools.isBright(nodeColor as o.Color)
+                ? DARK_FONT_COLOR
+                : CLEAR_FONT_COLOR;
               return {
                 color: 'inherit',
                 minVisibleSize: 20,

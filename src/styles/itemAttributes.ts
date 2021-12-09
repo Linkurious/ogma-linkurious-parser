@@ -84,13 +84,15 @@ export class ItemAttributes {
     if (!Tools.isDefined(value)) {
       return BASE_GREY;
     }
-    return PALETTE[ItemAttributes.sha1Modulo(value, PALETTE.length, ignoreCase)];
+    return PALETTE[
+      ItemAttributes.getRandomUniqueColorPaletteIndex(value, PALETTE.length, ignoreCase)
+    ];
   }
 
   /**
    * Return a number from 0 to number of occurrence in a palette based on a property
    */
-  private static sha1Modulo(
+  private static getRandomUniqueColorPaletteIndex(
     input: string,
     modulo: number,
     ignoreCase: boolean | undefined
