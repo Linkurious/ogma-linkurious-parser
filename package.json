@@ -1,6 +1,6 @@
 {
   "name": "@linkurious/ogma-linkurious-parser",
-  "version": "3.0.6",
+  "version": "3.1.0",
   "author": "Linkurious SAS",
   "description": "Parse and load a Linkurious visualization in Ogma with one line of code ",
   "files": [
