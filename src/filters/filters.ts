@@ -187,7 +187,7 @@ export class Filters {
       return (itemData: T) =>
         (itemData as LkNodeData).categories.includes(filter.itemType) &&
         Filters.valueShouldBeHidden(
-          Tools.getPropertyValue(Tools.getIn(itemData, filter.input), true),
+          Tools.getPropertyValue(Tools.getIn(itemData, filter.input), false),
           filter.value
         );
     } else {
@@ -195,7 +195,7 @@ export class Filters {
       return (itemData: T) =>
         (itemData as LkEdgeData).type === filter.itemType &&
         Filters.valueShouldBeHidden(
-          Tools.getPropertyValue(Tools.getIn(itemData, filter.input), true),
+          Tools.getPropertyValue(Tools.getIn(itemData, filter.input), false),
           filter.value
         );
     }
