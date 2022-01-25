@@ -534,8 +534,8 @@ export class StylesViz {
         self: {attributes: ['layoutable']}
       }
     });
-    this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent!.nodes.addClass('degreeIndicator'));
-    this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent!.nodes.addClass('pinnedIndicator'));
+    this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent.nodes.addClass('degreeIndicator'));
+    this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent.nodes.addClass('pinnedIndicator'));
   }
 
   /**
