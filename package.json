@@ -1,6 +1,6 @@
 {
   "name": "@linkurious/ogma-linkurious-parser",
-  "version": "2.10.17",
+  "version": "3.0.8",
   "author": "Linkurious SAS",
   "description": "Parse and load a Linkurious visualization in Ogma with one line of code ",
   "files": [
@@ -9,11 +9,12 @@
   "publishConfig": {
     "access": "public"
   },
+  "private": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {
-    "node": "10.23.0",
-    "npm": "6.14.8"
+    "node": "14.18.1",
+    "npm": "6.14.15"
   },
   "scripts": {
     "prepare": "tsc -b",
@@ -21,9 +22,8 @@
     "compile": "tsc -b",
     "tsc": "tsc -b",
     "build:rollup": "rollup -c",
-    "test": "./node_modules/.bin/mocha -r ts-node/register/transpile-only tests/**/*.spec.ts",
+    "test": "mocha -r ts-node/register/transpile-only tests/**/*.spec.ts",
     "test:unit": "nyc --reporter=text-summary --reporter=cobertura --report-dir=reports  mocha -r ts-node/register/transpile-only --reporter mocha-multi-reporters --reporter-options configFile=.test-reporters.json tests/**/*.spec.ts",
-    "dev": "./node_modules/.bin/tsc && node exemple/test_node.js",
     "clean": "rm -rf node_modules; rm -rf package-lock.json; rm -rf dist",
     "lint": "eslint --fix --ext .ts .",
     "lint:ci": "eslint -f checkstyle -o reports/checkstyle.xml --ext .ts .",
@@ -46,11 +46,11 @@
   "homepage": "",
   "dependencies": {
     "lodash": "4.17.21",
-    "rxjs": "6.5.3",
+    "rxjs": "6.6.7",
     "sha1": "1.1.1"
   },
   "peerDependencies": {
-    "ogma": "3.3.12"
+    "ogma": "3.4.7"
   },
   "devDependencies": {
     "@linkurious/rest-client": "3.0.7-develop-stable.55",

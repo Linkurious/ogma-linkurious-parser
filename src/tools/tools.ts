@@ -29,7 +29,7 @@ export class Tools {
    * @param {any} value
    * @return {boolean}
    */
-  public static isDefined(value: unknown): boolean {
+  public static isDefined<T>(value: T): value is NonNullable<T> {
     return value !== undefined && value !== null;
   }
 
@@ -63,7 +63,7 @@ export class Tools {
    * Return a value from a nested object depending on a keyPath
    */
   public static getIn(ref: any, path: Array<string | number>): any {
-    return path.reduce((p, c) => (p && p[c] !== undefined ? p[c] : undefined), Tools.clone(ref));
+    return path.reduce((p, c) => (p && p[c] !== undefined ? p[c] : undefined), ref);
   }
 
   /**
@@ -111,9 +111,9 @@ export class Tools {
   }
 
   /**
-   * Return a shortened version of a number
+   * Return a formatted version of a number
    */
-  public static shortenNumber(number: number): string {
+  public static formatNumber(number: number): string {
     let div = 1;
     let suffix = '';
     const sign = number < 0 ? '-' : '';
@@ -142,10 +142,7 @@ export class Tools {
    * @return {boolean}
    */
   public static isStringFilled(value: string): boolean {
-    if (typeof value === 'string') {
-      return value.trim() !== '';
-    }
-    return true;
+    return value.trim() !== '';
   }
 
   public static getValueFromLkProperty(property: LkProperty): null | string | number | boolean {
@@ -342,8 +339,8 @@ export class Tools {
   /**
    * Return true if a value is not undefined, not null and not an empty string
    */
-  public static valueExists(value: string): boolean {
-    return Tools.isDefined(value) && Tools.isStringFilled(value);
+  public static valueExists(value: LkProperty): boolean {
+    return Tools.isDefined(value) && (typeof value !== 'string' || Tools.isStringFilled(value));
   }
 
   /**
