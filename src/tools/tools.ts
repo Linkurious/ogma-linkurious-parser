@@ -107,7 +107,7 @@ export class Tools {
    * @return {number}
    */
   public static getDegreeWithoutSelfConnection(node: Node<LkNodeData>): number {
-    return node.getAdjacentNodes({policy: 'exclude-sources', filter: 'all'}).size;
+    return node.getAdjacentNodes({policy: 'exclude-sources', filter: 'raw'}).size;
   }
 
   /**

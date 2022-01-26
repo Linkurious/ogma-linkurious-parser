@@ -16,7 +16,8 @@ import {
   EdgeStyle,
   PixelSize,
   EdgeExtremity,
-  EdgeType
+  EdgeType,
+  GeoModeOptions
 } from 'ogma';
 
 import {Captions} from './captions/captions';
@@ -44,6 +45,7 @@ import {
 import {LKOgma, ANIMATION_DURATION} from './ogma';
 
 export {
+  GeoModeOptions,
   EdgeType,
   EdgeExtremity,
   PixelSize,

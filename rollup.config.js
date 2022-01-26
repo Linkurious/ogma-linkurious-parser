@@ -8,11 +8,11 @@ import json from '@rollup/plugin-json';
 
 const banner = `\
 /**
- * Ogma-helper
+ * Ogma-Linkurious parser
  * @description ${description}
  * @version ${version} (built on ${new Date().toString()})
  * @author ${author}
- * @license (c) Linkurious ${new Date().getFullYear()}. All rights reserved.
+ * @license Apache-2.0
  * @preserve
  */
 /* eslint-disable */
@@ -21,9 +21,9 @@ const banner = `\
 export default {
   input: 'src/index.ts',
   output: {
-    file: 'dist/ogma-helper.min.js',
+    file: 'dist/ogma-linkurious-parser.min.js',
     format: 'cjs',
-    name: 'Ogma-helper',
+    name: 'Ogma-Linkurious-parser',
     banner,
   },
   plugins: [

@@ -29,5 +29,6 @@ describe('Tools.getHiddenNeighbors', () => {
     expect(Tools.getHiddenNeighbors(ogma.getNodes([2]) as NodeList<LkNodeData, LkEdgeData>)).to.eql(8);
     expect(Tools.getHiddenNeighbors(ogma.getNodes([3]) as NodeList<LkNodeData, LkEdgeData>)).to.eql(8);
     expect(Tools.getHiddenNeighbors(ogma.getNodes() as NodeList<LkNodeData, LkEdgeData>)).to.eql(23);
+    ogma.destroy()
   });
 });

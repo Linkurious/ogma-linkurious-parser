@@ -2,7 +2,13 @@
 
 nodeJob {
   // General
-  projectName = "linkurious/ogma-helper-library"
+  projectName = "linkurious/ogma-linkurious-parser"
+
+  runForwardMerge = true
 
   createGitTag = true
+  gitTagPrefix = 'v'
+  runBookeeping = true
+
+  runNpmPublish = true
 }
