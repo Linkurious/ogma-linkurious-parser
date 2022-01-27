@@ -39,19 +39,26 @@ interface AddItemOptions {
 }
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
-  private _reactive: RxViz;
+  private _reactive?: RxViz;
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
-  public LKTransformation: TransformationsViz;
+  public LKTransformation!: TransformationsViz;
   // Trigger an event with node category changes
-  public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
+  public nodeCategoriesWatcher!: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   // Trigger an event with edge type changes
-  public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
-  public store: OgmaStore;
+  public edgeTypeWatcher!: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
+  public store!: OgmaStore;
+  private _configuration: IOgmaConfig;
 
   constructor(configuration: IOgmaConfig) {
     // set Ogma global configuration
     super(configuration);
+    this._configuration = configuration;
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.initOgmaLinkuriusParser();
+  }
+
+  private initOgmaLinkuriusParser(): void {
     this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
       path: 'categories',
       unwindArrays: true,
@@ -61,7 +68,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       path: 'type',
       filter: 'all'
     });
-    Object.setPrototypeOf(this, new.target.prototype);
     // set ogma max zoom value  and selection with mouse option (false?)
     this.setOptions({
       interactions: {
@@ -79,8 +85,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this._reactive = new RxViz(this);
     this.store = this._reactive.store;
     this.initSelection();
-    this.initStyles(configuration);
-    this.initCaptions(configuration);
+    this.initStyles(this._configuration);
+    this.initCaptions(this._configuration);
     this.LKTransformation = new TransformationsViz(this);
 
     this.LKStyles.setNodesDefaultHalo();
@@ -305,10 +311,21 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Do a full reset on ogma and streams of ogma
    */
-  public shutDown() {
+  public shutDown(): void {
     this.destroy();
     if (this.store) {
       this.store.clear();
     }
+  }
+
+  /**
+   * Reset the Ogma instance so that it can be used fresh in the next visulization
+   */
+  public reset(): void {
+    this.reset();
+    if (this.store) {
+      this.store.clear();
+    }
+    this.initOgmaLinkuriusParser();
   }
 }
