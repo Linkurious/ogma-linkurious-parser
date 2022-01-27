@@ -321,7 +321,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Reset the Ogma instance so that it can be used fresh in the next visulization
    */
-  public reset(): void {
+  public resetOgmaLKE(): void {
     this.reset();
     if (this.store) {
       this.store.clear();
