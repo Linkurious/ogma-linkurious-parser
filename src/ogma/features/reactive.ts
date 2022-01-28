@@ -103,7 +103,7 @@ export class RxViz {
       this._store.dispatch(this.storeItems.bind(this));
     });
 
-    this._ogma.events.on('removeEdges', () => {
+    this._ogma.events.on('nodesSelected', () => {
       this._store.dispatch(this.storeNodeSelection.bind(this));
     });
 
