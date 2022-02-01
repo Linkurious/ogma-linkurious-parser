@@ -39,7 +39,6 @@ interface AddItemOptions {
 }
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
-  private _reactive?: RxViz;
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
   public LKTransformation!: TransformationsViz;
@@ -48,17 +47,16 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   // Trigger an event with edge type changes
   public edgeTypeWatcher!: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   public store!: OgmaStore;
-  private _configuration: IOgmaConfig;
+  private _reactive!: RxViz;
 
-  constructor(configuration: IOgmaConfig) {
+  constructor(private _configuration: IOgmaConfig) {
     // set Ogma global configuration
-    super(configuration);
-    this._configuration = configuration;
+    super(_configuration);
     Object.setPrototypeOf(this, new.target.prototype);
-    this.initOgmaLinkuriusParser();
+    this.initOgmaLinkuriousParser();
   }
 
-  private initOgmaLinkuriusParser(): void {
+  private initOgmaLinkuriousParser(): void {
     this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
       path: 'categories',
       unwindArrays: true,
@@ -321,11 +319,11 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Reset the Ogma instance so that it can be used fresh in the next visulization
    */
-  public resetOgmaLKE(): void {
+  public clearOgmaState(): void {
     this.reset();
     if (this.store) {
       this.store.clear();
     }
-    this.initOgmaLinkuriusParser();
+    this.initOgmaLinkuriousParser();
   }
 }
