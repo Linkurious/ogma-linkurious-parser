@@ -83,8 +83,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this._reactive = new RxViz(this);
     this.store = this._reactive.store;
     this.initSelection();
-    this.initStyles(this._configuration);
-    this.initCaptions(this._configuration);
+    this.setConfigOgma(this._configuration, true);
     this.LKTransformation = new TransformationsViz(this);
 
     this.LKStyles.setNodesDefaultHalo();
@@ -126,7 +125,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     });
   }
 
-  private initStyles(configuration: IOgmaConfig): void {
+  private setStyles(configuration: IOgmaConfig): void {
     this.LKStyles = new StylesViz(this, {
       node: configuration?.options?.styles?.node || {},
       edge: configuration?.options?.styles?.edge || {}
@@ -135,7 +134,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKStyles.setEdgesDefaultStyles();
   }
 
-  private initCaptions(configuration: IOgmaConfig): void {
+  private setCaptions(configuration: IOgmaConfig): void {
     const nodeMaxTextLength = configuration?.options?.styles?.node?.text?.maxTextLength;
     const edgeMaxTextLength = configuration?.options?.styles?.edge?.text?.maxTextLength;
     this.LKCaptions = new CaptionsViz(this, nodeMaxTextLength, edgeMaxTextLength);
@@ -325,5 +324,16 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this.store.clear();
     }
     this.initOgmaLinkuriousParser();
+  }
+
+  /**
+   * Updates the Ogma config when config changes in LKE. If init, options were already set by the Ogma.reset()
+   */
+  public setConfigOgma(configuration: IOgmaConfig, init?: boolean): void {
+    if (!init) {
+      this.setOptions(configuration);
+    }
+    this.setStyles(configuration);
+    this.setCaptions(configuration);
   }
 }
