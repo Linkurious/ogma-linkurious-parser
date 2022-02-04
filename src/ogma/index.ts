@@ -330,8 +330,11 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Updates the Ogma config when config changes in LKE. If init, options were already set by the Ogma.reset()
    */
   public setConfigOgma(configuration: IOgmaConfig, init?: boolean): void {
-    if (!init && configuration.options) {
-      this.setOptions(configuration.options);
+    if (!init) {
+      this.setOptions({
+        ...configuration.options,
+        renderer: configuration.renderer
+      });
     }
     this.setStyles(configuration);
     this.setCaptions(configuration);
