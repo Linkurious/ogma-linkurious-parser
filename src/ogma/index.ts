@@ -161,7 +161,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public getRadialLayoutParams(
     rootNode: string,
     duration = 0
-  ): RadialLayoutOptions<LkNodeData, LkEdgeData> {
+  ): RadialLayoutOptions<unknown, unknown> {
     return {
       centralNode: rootNode,
       radiusDelta: 1,
