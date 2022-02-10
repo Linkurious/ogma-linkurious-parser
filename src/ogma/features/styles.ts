@@ -428,8 +428,7 @@ export class StylesViz {
         },
         edgeAttributes: {
           text: {
-            scale: 3.0,
-            scaling: true,
+            scaling: false,
             font: 'arial',
             backgroundColor: null,
             minVisibleSize: 0,
