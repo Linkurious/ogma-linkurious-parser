@@ -13,7 +13,7 @@ module.exports = {
   'parserOptions': {
     'ecmaVersion': 2017,
     'sourceType': 'module',
-    'project': './tsconfig.json'
+    'project': './tsconfig.linter.json'
   },
   'rules': {
     'eqeqeq': ['error'], // Requires === or !== in place of == or !=
