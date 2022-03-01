@@ -1,5 +1,5 @@
 'use strict';
-import {Color} from 'ogma';
+import {Color} from '@linkurious/ogma';
 import {LkEdgeData, OgmaEdgeShape} from '@linkurious/rest-client';
 
 import {Tools} from '../tools/tools';
