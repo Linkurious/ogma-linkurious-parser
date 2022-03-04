@@ -80,8 +80,11 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       }
     });
 
-    this._reactive = new RxViz(this);
-    this.store = this._reactive.store;
+    // only instantiate the store once when app is starting
+    if (this._reactive === undefined) {
+      this._reactive = new RxViz(this);
+      this.store = this._reactive.store;
+    }
     this.initSelection();
     this.setConfigOgma(this._configuration, true);
     this.LKTransformation = new TransformationsViz(this);
