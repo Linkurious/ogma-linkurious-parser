@@ -188,7 +188,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * add nodes and edges to the viz and init the selection.
    */
   public async init(visualization: {nodes: Array<VizNode>; edges: Array<VizEdge>}): Promise<void> {
-    this.clearGraph();
+    if (this.getNodes('all').toArray().length) {
+      await this.init(visualization);
+      return;
+    }
     let selectedEntityType: EntityType | undefined = undefined;
     let selectedElements: Array<string> = [];
     // need to remove selected in every items before adding them to Ogma
