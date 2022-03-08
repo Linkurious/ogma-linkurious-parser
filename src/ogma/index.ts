@@ -190,10 +190,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public async init(visualization: {nodes: Array<VizNode>; edges: Array<VizEdge>}): Promise<void> {
     if (this.getNodes('all').toArray().length) {
       console.log(this.getNodes('all').toArray().length);
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(async () => {
           await this.init(visualization);
-          resolve();
+          resolve(undefined);
         }, 100);
       });
       return;
