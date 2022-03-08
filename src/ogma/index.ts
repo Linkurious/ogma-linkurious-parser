@@ -39,7 +39,7 @@ interface AddItemOptions {
 }
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
-  public stopped: boolean = true;
+  public stopped = true;
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
   public LKTransformation!: TransformationsViz;
