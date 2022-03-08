@@ -315,7 +315,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Do a full reset on ogma and streams of ogma
    */
   public shutDown(): void {
-    this.stopped = false;
+    this.stopped = true;
     this.destroy();
     if (this.store) {
       this.store.clear();
