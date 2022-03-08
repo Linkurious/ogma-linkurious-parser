@@ -39,6 +39,7 @@ interface AddItemOptions {
 }
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
+  public stopped: boolean = true;
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
   public LKTransformation!: TransformationsViz;
@@ -188,6 +189,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * add nodes and edges to the viz and init the selection.
    */
   public async init(visualization: {nodes: Array<VizNode>; edges: Array<VizEdge>}): Promise<void> {
+    this.stopped = false;
     this.clearGraph();
     let selectedEntityType: EntityType | undefined = undefined;
     let selectedElements: Array<string> = [];
@@ -313,6 +315,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Do a full reset on ogma and streams of ogma
    */
   public shutDown(): void {
+    this.stopped = false;
     this.destroy();
     if (this.store) {
       this.store.clear();
@@ -323,6 +326,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Reset the Ogma instance so that it can be used fresh in the next visulization
    */
   public clearOgmaState(): void {
+    this.stopped = true;
     this.reset();
     if (this.store) {
       this.store.clear();
