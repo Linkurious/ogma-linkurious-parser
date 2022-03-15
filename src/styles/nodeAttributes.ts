@@ -1,5 +1,5 @@
 'use strict';
-import {Color} from 'ogma';
+import {Color} from '@linkurious/ogma';
 import {LkNodeData, OgmaNodeShape, IStyleImage, IStyleIcon} from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
