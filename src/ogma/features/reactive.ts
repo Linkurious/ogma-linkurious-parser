@@ -34,42 +34,9 @@ export class RxViz {
   }
 
   /**
-   * Store new items in state
-   */
-  private storeItems(state: OgmaState): OgmaState {
-    return {
-      ...state,
-      items: {
-        node: this._ogma.getNodes().getId(),
-        edge: this._ogma.getEdges().getId()
-      }
-    };
-  }
-
-  /**
-   * Store new node selection in state
-   */
-  private storeNodeSelection(state: OgmaState): OgmaState {
-    return {
-      ...state,
-      selection: this._ogma.getSelectedNodes() as NodeList<LkNodeData, LkEdgeData>
-    };
-  }
-
-  /**
-   * store new edge selection in state
-   */
-  private storeEdgeSelection(state: OgmaState): OgmaState {
-    return {
-      ...state,
-      selection: this._ogma.getSelectedEdges() as EdgeList<LkEdgeData, LkNodeData>
-    };
-  }
-
-  /**
    * Listen to ogma events and update the state
    */
-  private listenToSelectionEvents(): void {
+  public listenToSelectionEvents(): void {
     let count = 0;
     this._ogma.events.on('animate', (e: {duration: number}) => {
       const animationEnd = ++count;
@@ -148,6 +115,39 @@ export class RxViz {
         });
       }
     });
+  }
+
+  /**
+   * Store new items in state
+   */
+  private storeItems(state: OgmaState): OgmaState {
+    return {
+      ...state,
+      items: {
+        node: this._ogma.getNodes().getId(),
+        edge: this._ogma.getEdges().getId()
+      }
+    };
+  }
+
+  /**
+   * Store new node selection in state
+   */
+  private storeNodeSelection(state: OgmaState): OgmaState {
+    return {
+      ...state,
+      selection: this._ogma.getSelectedNodes()
+    };
+  }
+
+  /**
+   * store new edge selection in state
+   */
+  private storeEdgeSelection(state: OgmaState): OgmaState {
+    return {
+      ...state,
+      selection: this._ogma.getSelectedEdges()
+    };
   }
 }
 
