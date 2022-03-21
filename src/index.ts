@@ -17,8 +17,12 @@ export {
   PixelSize,
   EdgeExtremity,
   EdgeType,
-  GeoModeOptions
-} from 'ogma';
+  GeoModeOptions,
+  EdgesDataEvent,
+  NodesDataEvent,
+  NodesDragEndEvent,
+  NodesEvent
+} from '@linkurious/ogma';
 
 export {Captions} from './captions/captions';
 export {ItemAttributes, BASE_GREY} from './styles/itemAttributes';
@@ -33,14 +37,4 @@ export {OgmaState} from './ogma/features/reactive';
 export {OgmaTools} from './tools/ogmaTool';
 export {HTML_COLORS} from './tools/colorPalette';
 export {Filters} from './filters/filters';
-export {
-  getSelectionSize,
-  getSelectionState,
-  getSelectionEntity,
-  getUniqSelection,
-  getUniqSelectionTypes,
-  getUniqSelectionEntity,
-  getSelectionProperties,
-  hasSelectionProperties
-} from './ogma/features/selectors';
 export {LKOgma, ANIMATION_DURATION} from './ogma';
