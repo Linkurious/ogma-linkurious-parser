@@ -1,7 +1,7 @@
 'use strict';
 
 import sha1 from 'sha1';
-import {Color} from 'ogma';
+import {Color} from '@linkurious/ogma';
 
 import {Tools} from '../tools/tools';
 
