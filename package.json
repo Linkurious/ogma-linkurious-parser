@@ -53,7 +53,7 @@
     "@linkurious/ogma": "4.0.9"
   },
   "devDependencies": {
-    "@linkurious/rest-client": "3.1.0-develop.141",
+    "@linkurious/rest-client": "3.1.0-develop.147",
     "@linkurious/ogma": "4.0.9",
     "@rollup/plugin-buble": "0.21.3",
     "@rollup/plugin-commonjs": "17.0.0",
