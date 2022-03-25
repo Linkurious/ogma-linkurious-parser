@@ -19,7 +19,7 @@ import Ogma, {
   RawEdge,
   RawGraph,
   RawNode
-} from 'ogma';
+} from '@linkurious/ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
@@ -30,7 +30,7 @@ import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
 
-export {default as Ogma} from 'ogma';
+export {default as Ogma} from '@linkurious/ogma';
 export const ANIMATION_DURATION = 750;
 
 interface AddItemOptions {
@@ -39,19 +39,24 @@ interface AddItemOptions {
 }
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
-  private _reactive: RxViz;
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
-  public LKTransformation: TransformationsViz;
+  public LKTransformation!: TransformationsViz;
   // Trigger an event with node category changes
-  public nodeCategoriesWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
+  public nodeCategoriesWatcher!: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   // Trigger an event with edge type changes
-  public edgeTypeWatcher: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
-  public store: OgmaStore;
+  public edgeTypeWatcher!: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
+  public store!: OgmaStore;
+  private _reactive!: RxViz;
 
-  constructor(configuration: IOgmaConfig) {
+  constructor(private _configuration: IOgmaConfig) {
     // set Ogma global configuration
-    super(configuration);
+    super(_configuration);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.initOgmaLinkuriousParser();
+  }
+
+  private initOgmaLinkuriousParser(): void {
     this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
       path: 'categories',
       unwindArrays: true,
@@ -61,7 +66,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       path: 'type',
       filter: 'all'
     });
-    Object.setPrototypeOf(this, new.target.prototype);
     // set ogma max zoom value  and selection with mouse option (false?)
     this.setOptions({
       interactions: {
@@ -76,11 +80,16 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       }
     });
 
-    this._reactive = new RxViz(this);
-    this.store = this._reactive.store;
+    // only instantiate the store once when app is starting
+    if (this._reactive === undefined) {
+      this._reactive = new RxViz(this);
+      this.store = this._reactive.store;
+    } else {
+      // if store already exist, but ogma was reset, create new ogma event listener
+      this._reactive.listenToSelectionEvents();
+    }
     this.initSelection();
-    this.initStyles(configuration);
-    this.initCaptions(configuration);
+    this.setConfigOgma(this._configuration, true);
     this.LKTransformation = new TransformationsViz(this);
 
     this.LKStyles.setNodesDefaultHalo();
@@ -122,7 +131,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     });
   }
 
-  private initStyles(configuration: IOgmaConfig): void {
+  private setStyles(configuration: IOgmaConfig): void {
     this.LKStyles = new StylesViz(this, {
       node: configuration?.options?.styles?.node || {},
       edge: configuration?.options?.styles?.edge || {}
@@ -131,7 +140,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKStyles.setEdgesDefaultStyles();
   }
 
-  private initCaptions(configuration: IOgmaConfig): void {
+  private setCaptions(configuration: IOgmaConfig): void {
     const nodeMaxTextLength = configuration?.options?.styles?.node?.text?.maxTextLength;
     const edgeMaxTextLength = configuration?.options?.styles?.edge?.text?.maxTextLength;
     this.LKCaptions = new CaptionsViz(this, nodeMaxTextLength, edgeMaxTextLength);
@@ -154,7 +163,11 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       theta: this.getNodes().size > 100 ? 0.8 : 0.34
     };
   }
-  public getRadialLayoutParams(rootNode: string, duration = 0): RadialLayoutOptions {
+
+  public getRadialLayoutParams(
+    rootNode: string,
+    duration = 0
+  ): RadialLayoutOptions<unknown, unknown> {
     return {
       centralNode: rootNode,
       radiusDelta: 1,
@@ -305,10 +318,35 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Do a full reset on ogma and streams of ogma
    */
-  public shutDown() {
+  public shutDown(): void {
     this.destroy();
     if (this.store) {
       this.store.clear();
     }
+  }
+
+  /**
+   * Reset the Ogma instance so that it can be used fresh in the next visulization
+   */
+  public clearOgmaState(): void {
+    this.reset();
+    if (this.store) {
+      this.store.clear();
+    }
+    this.initOgmaLinkuriousParser();
+  }
+
+  /**
+   * Updates the Ogma config when config changes in LKE. If init, options were already set by the Ogma.reset()
+   */
+  public setConfigOgma(configuration: IOgmaConfig, init?: boolean): void {
+    if (!init) {
+      this.setOptions({
+        ...configuration.options,
+        renderer: configuration.renderer
+      });
+    }
+    this.setStyles(configuration);
+    this.setCaptions(configuration);
   }
 }
