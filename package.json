@@ -1,6 +1,6 @@
 {
   "name": "@linkurious/ogma-linkurious-parser",
-  "version": "2.10.19",
+  "version": "3.0.11",
   "author": "Linkurious SAS",
   "description": "Parse and load a Linkurious visualization in Ogma with one line of code ",
   "files": [
@@ -9,11 +9,12 @@
   "publishConfig": {
     "access": "public"
   },
+  "private": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {
-    "node": "10.23.0",
-    "npm": "6.14.8"
+    "node": "14.19.1",
+    "npm": "6.14.15"
   },
   "scripts": {
     "prepare": "tsc -b",
@@ -21,16 +22,14 @@
     "compile": "tsc -b",
     "tsc": "tsc -b",
     "build:rollup": "rollup -c",
-    "test": "./node_modules/.bin/mocha -r ts-node/register/transpile-only tests/**/*.spec.ts",
+    "test": "mocha -r ts-node/register/transpile-only tests/**/*.spec.ts",
     "test:unit": "nyc --reporter=text-summary --reporter=cobertura --report-dir=reports  mocha -r ts-node/register/transpile-only --reporter mocha-multi-reporters --reporter-options configFile=.test-reporters.json tests/**/*.spec.ts",
-    "dev": "./node_modules/.bin/tsc && node exemple/test_node.js",
     "clean": "rm -rf node_modules; rm -rf package-lock.json; rm -rf dist",
     "lint": "eslint --fix --ext .ts .",
     "lint:ci": "eslint -f checkstyle -o reports/checkstyle.xml --ext .ts .",
     "latest:develop-maintenance": "npm install --save-exact @linkurious/rest-client@lk-develop-maintenance",
     "latest:develop-stable": "npm install --save-exact @linkurious/rest-client@lk-develop-stable",
     "latest:develop": "npm install --save-exact @linkurious/rest-client@lk-develop",
-    "latest:develop-next": "npm install --save-exact @linkurious/rest-client@lk-develop-next",
     "latest:master-maintenance": "npm install --save-exact @linkurious/rest-client@lk-master-maintenance",
     "latest:master-stable": "npm install --save-exact @linkurious/rest-client@lk-master-stable",
     "latest:master": "npm install --save-exact  @linkurious/rest-client@lk-master",
@@ -46,11 +45,11 @@
   "homepage": "",
   "dependencies": {
     "lodash": "4.17.21",
-    "rxjs": "6.5.3",
+    "rxjs": "6.6.7",
     "sha1": "1.1.1"
   },
   "peerDependencies": {
-    "ogma": "3.3.12"
+    "ogma": "3.3.18"
   },
   "devDependencies": {
     "@linkurious/rest-client": "3.0.11-develop-stable.63",
@@ -73,7 +72,7 @@
     "mocha-junit-reporter": "2.0.0",
     "mocha-multi-reporters": "1.5.1",
     "nyc": "15.1.0",
-    "ogma": "3.3.12",
+    "ogma": "3.3.18",
     "prettier": "2.2.1",
     "rollup": "2.47.0",
     "rollup-plugin-node-globals": "1.4.0",
