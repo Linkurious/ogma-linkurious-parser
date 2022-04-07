@@ -155,9 +155,11 @@ export class ItemAttributes {
     lower: EdgeWidthExtrema | NodeSizeExtrema,
     higher: EdgeWidthExtrema | NodeSizeExtrema
   ): string {
-    // apply an offset for all the values if min is smaller than one
+    // apply an offset for all the values (including max) if min is smaller than one and set min to 1
     if (min < 1) {
       value += -min + 1;
+      max += -min + 1;
+      min = 1;
     }
     // apply default style when min equal max
     if (max === min) {
