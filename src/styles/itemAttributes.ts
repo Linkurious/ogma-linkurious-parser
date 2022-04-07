@@ -117,13 +117,13 @@ export class ItemAttributes {
   }
 
   /**
-   * return the corresponding size to the value
+   * return the corresponding size to the value with a linear function
    * @param value
    * @param lower
    * @param higher
    * @param extrema
    */
-  public static getAutomaticRangeStyle(
+  public static getAutomaticRangeStyleLinear(
     value: number,
     {max, min}: {max: number; min: number},
     lower: EdgeWidthExtrema | NodeSizeExtrema,
@@ -138,6 +138,35 @@ export class ItemAttributes {
     const a = (higher - lower) / (max - min);
     const b = (lower * max - higher * min) / (max - min);
     const size = Math.floor(value * a + b);
+
+    return `${size}%`;
+  }
+
+  /**
+   * return the corresponding size to the value with a logarithmic function
+   * @param value
+   * @param lower
+   * @param higher
+   * @param extrema
+   */
+  public static getAutomaticRangeStyleLog(
+    value: number,
+    {max, min}: {max: number; min: number},
+    lower: EdgeWidthExtrema | NodeSizeExtrema,
+    higher: EdgeWidthExtrema | NodeSizeExtrema
+  ): string {
+    // apply minimum size if value is equal or lower to zero
+    if (value <= 0) {
+      return '50%';
+    }
+    // apply default style when min equal max
+    if (max === min) {
+      return '100%';
+    }
+    // calculate the logarithmic function  f(x) = Math.floor(a*log(x) + b)
+    const a = (higher - lower) / (Math.log(max) - Math.log(min));
+    const b = (lower * Math.log(max) - higher * Math.log(min)) / (Math.log(max) - Math.log(min));
+    const size = Math.floor(a * Math.log(value) + b);
 
     return `${size}%`;
   }
