@@ -24,7 +24,7 @@ export class EdgeAttributes extends ItemAttributes {
   /**
    * Return rule that can be applied to the data
    */
-  private matchStyle(styleRules: Array<StyleRule>, data: LkEdgeData): StyleRule | undefined {
+  private static matchStyle(styleRules: Array<StyleRule>, data: LkEdgeData): StyleRule | undefined {
     if (data === undefined) {
       return;
     }
@@ -63,7 +63,7 @@ export class EdgeAttributes extends ItemAttributes {
    */
   public shape(data: LkEdgeData): OgmaEdgeShape | undefined {
     if (this._rulesMap.shape !== undefined) {
-      return this.matchStyle(this._rulesMap.shape, data)?.style.shape;
+      return EdgeAttributes.matchStyle(this._rulesMap.shape, data)?.style.shape;
     }
   }
 
@@ -72,7 +72,7 @@ export class EdgeAttributes extends ItemAttributes {
    */
   public width(data: LkEdgeData): string | undefined {
     if (this._rulesMap.width !== undefined) {
-      const styleRule = this.matchStyle(this._rulesMap.width, data);
+      const styleRule = EdgeAttributes.matchStyle(this._rulesMap.width, data);
       const widthStyle = styleRule?.style.width;
       if (Tools.isDefined(styleRule) && widthStyle.type === 'autoRange') {
         if (

@@ -32,7 +32,7 @@ export class NodeAttributes extends ItemAttributes {
   /**
    * Run the callback if an item match with a style in the array of rules
    */
-  private matchStyle(
+  private static matchStyle(
     styleRules: Array<StyleRule>,
     itemData: LkNodeData,
     callback: (style: StyleRule) => unknown
@@ -158,7 +158,7 @@ export class NodeAttributes extends ItemAttributes {
   public shape(itemData: LkNodeData): OgmaNodeShape | undefined {
     let result = undefined;
     if (this._rulesMap.shape !== undefined) {
-      this.matchStyle(this._rulesMap.shape, itemData, (styleRule) => {
+      NodeAttributes.matchStyle(this._rulesMap.shape, itemData, (styleRule) => {
         result = styleRule.style.shape;
       });
     }
@@ -171,7 +171,7 @@ export class NodeAttributes extends ItemAttributes {
   public size(itemData: LkNodeData): number | undefined {
     let result = undefined;
     if (this._rulesMap.size !== undefined) {
-      this.matchStyle(this._rulesMap.size, itemData, (styleRule) => {
+      NodeAttributes.matchStyle(this._rulesMap.size, itemData, (styleRule) => {
         const sizeStyle = styleRule.style.size;
         if (sizeStyle.type === 'autoRange') {
           if (
