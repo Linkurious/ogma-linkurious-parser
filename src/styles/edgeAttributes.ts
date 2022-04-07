@@ -82,7 +82,9 @@ export class EdgeAttributes extends ItemAttributes {
         ) {
           const propertyName: string = widthStyle.input[1];
           const propertyValue = Tools.parseNumber(data.properties[propertyName]);
-          return EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule);
+          return widthStyle.scale && widthStyle.scale === 'log'
+            ? EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule, true)
+            : EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule);
         }
       } else {
         return widthStyle;
@@ -94,14 +96,22 @@ export class EdgeAttributes extends ItemAttributes {
    * return the corresponding width to the value
    * @param value
    * @param rule
+   * @param isLog
    */
-  public static getAutomaticRangeWidth(value: number, rule: StyleRule): string {
-    return this.getAutomaticRangeStyle(
-      value,
-      rule.style.width,
-      EdgeWidthExtrema.MIN,
-      EdgeWidthExtrema.MAX
-    );
+  public static getAutomaticRangeWidth(value: number, rule: StyleRule, isLog = false): string {
+    return isLog
+      ? this.getAutomaticRangeStyleLog(
+          value,
+          rule.style.size,
+          EdgeWidthExtrema.MIN,
+          EdgeWidthExtrema.MAX
+        )
+      : this.getAutomaticRangeStyleLinear(
+          value,
+          rule.style.size,
+          EdgeWidthExtrema.MIN,
+          EdgeWidthExtrema.MAX
+        );
   }
 
   /**
