@@ -181,8 +181,9 @@ export class NodeAttributes extends ItemAttributes {
           ) {
             const propertyName: string = sizeStyle.input[1];
             const propertyValue = Tools.parseNumber(itemData.properties[propertyName]);
+            //to update with the correct enum type
             result =
-              sizeStyle.scale && sizeStyle.scale === 'log'
+              sizeStyle.scale && sizeStyle.scale === 'logarithmic'
                 ? NodeAttributes.getAutomaticRangeSize(propertyValue, styleRule, true)
                 : NodeAttributes.getAutomaticRangeSize(propertyValue, styleRule);
           }
