@@ -181,7 +181,10 @@ export class NodeAttributes extends ItemAttributes {
           ) {
             const propertyName: string = sizeStyle.input[1];
             const propertyValue = Tools.parseNumber(itemData.properties[propertyName]);
-            result = NodeAttributes.getAutomaticRangeSize(propertyValue, styleRule);
+            result =
+              sizeStyle.scale && sizeStyle.scale === 'log'
+                ? NodeAttributes.getAutomaticRangeSize(propertyValue, styleRule, true)
+                : NodeAttributes.getAutomaticRangeSize(propertyValue, styleRule);
           }
         } else {
           result = sizeStyle;
@@ -195,14 +198,22 @@ export class NodeAttributes extends ItemAttributes {
    * return the corresponding size to the value
    * @param value
    * @param rule
+   * @param isLog
    */
-  public static getAutomaticRangeSize(value: number, rule: StyleRule): string {
-    return this.getAutomaticRangeStyle(
-      value,
-      rule.style.size,
-      NodeSizeExtrema.MIN,
-      NodeSizeExtrema.MAX
-    );
+  public static getAutomaticRangeSize(value: number, rule: StyleRule, isLog = false): string {
+    return isLog
+      ? this.getAutomaticRangeStyleLog(
+          value,
+          rule.style.size,
+          NodeSizeExtrema.MIN,
+          NodeSizeExtrema.MAX
+        )
+      : this.getAutomaticRangeStyleLinear(
+          value,
+          rule.style.size,
+          NodeSizeExtrema.MIN,
+          NodeSizeExtrema.MAX
+        );
   }
 
   /**
