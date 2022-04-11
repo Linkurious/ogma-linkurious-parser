@@ -83,9 +83,8 @@ export class EdgeAttributes extends ItemAttributes {
           const propertyName: string = widthStyle.input[1];
           const propertyValue = Tools.parseNumber(data.properties[propertyName]);
           //to update with the correct enum type
-          return widthStyle.scale && widthStyle.scale === 'logarithmic'
-            ? EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule, true)
-            : EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule);
+          const isLog = widthStyle.scale && widthStyle.scale === 'logarithmic';
+          return EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule, isLog);
         }
       } else {
         return widthStyle;
