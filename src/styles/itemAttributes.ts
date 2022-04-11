@@ -155,15 +155,15 @@ export class ItemAttributes {
     lower: EdgeWidthExtrema | NodeSizeExtrema,
     higher: EdgeWidthExtrema | NodeSizeExtrema
   ): string {
-    // apply an offset for all the values (including max) if min is smaller than one and set min to 1
-    if (min < 1) {
-      value += -min + 1;
-      max += -min + 1;
-      min = 1;
-    }
     // apply default style when min equal max
     if (max === min) {
       return '100%';
+    }
+    // apply an offset for all the values (including max) if min is smaller than one and set min to 1
+    if (min < 1) {
+      value += Math.abs(min) + 1;
+      max += Math.abs(min) + 1;
+      min += Math.abs(min) + 1;
     }
     // calculate the logarithmic function  f(x) = Math.floor(a*log(x) + b)
     const a = (higher - lower) / (Math.log(max) - Math.log(min));
