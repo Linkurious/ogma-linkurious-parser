@@ -102,13 +102,13 @@ export class EdgeAttributes extends ItemAttributes {
     return isLog
       ? this.getAutomaticRangeStyleLog(
           value,
-          rule.style.size,
+          rule.style.width,
           EdgeWidthExtrema.MIN,
           EdgeWidthExtrema.MAX
         )
       : this.getAutomaticRangeStyleLinear(
           value,
-          rule.style.size,
+          rule.style.width,
           EdgeWidthExtrema.MIN,
           EdgeWidthExtrema.MAX
         );
