@@ -159,7 +159,7 @@ export class ItemAttributes {
     if (max === min) {
       return '100%';
     }
-    // apply an offset for all the values (including max) if min is smaller than one and set min to 1
+    // apply an offset for all the values (including min and max)
     if (min < 1) {
       value += Math.abs(min) + 1;
       max += Math.abs(min) + 1;
