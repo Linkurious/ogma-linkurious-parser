@@ -414,6 +414,29 @@ describe('EdgeAttributes', () => {
           })
         )
       ).to.equal('50%');
+
+      expect(
+        EdgeAttributes.getAutomaticRangeWidth(
+          1000,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
+              width: {
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: 400,
+                max: 8000,
+                scale: 'logarithmic'
+              }
+            }
+          }),
+          true
+        )
+      ).to.equal('95%');
     });
   });
 });

@@ -4928,6 +4928,29 @@ describe('NodeAttributes', function () {
           })
         )
       ).to.equal('93%');
+
+      expect(
+        NodeAttributes.getAutomaticRangeSize(
+          200,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
+              size: {
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: 10,
+                max: 1995,
+                scale: 'logarithmic'
+              }
+            }
+          }),
+          true
+        )
+      ).to.equal('304%');
     });
   });
 });
