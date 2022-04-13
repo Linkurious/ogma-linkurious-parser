@@ -437,6 +437,75 @@ describe('EdgeAttributes', () => {
           true
         )
       ).to.equal('95%');
+
+      expect(
+        EdgeAttributes.getAutomaticRangeWidth(
+          -10,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
+              width: {
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: -50,
+                max: 8000,
+                scale: 'logarithmic'
+              }
+            }
+          }),
+          true
+        )
+      ).to.equal('111%');
+
+      expect(
+        EdgeAttributes.getAutomaticRangeWidth(
+          100,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
+              width: {
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: -50,
+                max: 8000,
+                scale: 'logarithmic'
+              }
+            }
+          }),
+          true
+        )
+      ).to.equal('133%');
+
+      expect(
+        EdgeAttributes.getAutomaticRangeWidth(
+          -10,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
+              width: {
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: -500,
+                max: -10,
+                scale: 'logarithmic'
+              }
+            }
+          }),
+          true
+        )
+      ).to.equal('200%');
     });
   });
 });
