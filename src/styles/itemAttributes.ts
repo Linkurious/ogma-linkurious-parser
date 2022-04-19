@@ -86,7 +86,7 @@ export class ItemAttributes {
     }
     return PALETTE[
       ItemAttributes.getRandomUniqueColorPaletteIndex(value, PALETTE.length, ignoreCase)
-      ];
+    ];
   }
 
   /**
