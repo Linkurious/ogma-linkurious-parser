@@ -86,7 +86,7 @@ export class ItemAttributes {
     }
     return PALETTE[
       ItemAttributes.getRandomUniqueColorPaletteIndex(value, PALETTE.length, ignoreCase)
-    ];
+      ];
   }
 
   /**
@@ -130,7 +130,7 @@ export class ItemAttributes {
     higher: EdgeWidthExtrema | NodeSizeExtrema
   ): string {
     // apply default style when min equal max
-    if (max === min) {
+    if (max === min || isNaN(value)) {
       return '100%';
     }
 
@@ -156,7 +156,7 @@ export class ItemAttributes {
     higher: EdgeWidthExtrema | NodeSizeExtrema
   ): string {
     // apply default style when min equal max
-    if (max === min) {
+    if (max === min || isNaN(value)) {
       return '100%';
     }
     // apply an offset for all the values (including min and max)
