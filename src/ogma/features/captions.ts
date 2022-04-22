@@ -1,7 +1,7 @@
 'use strict';
 
-import * as Ogma from 'ogma';
-import {Node, Edge} from 'ogma';
+import * as Ogma from '@linkurious/ogma';
+import {Node, Edge} from '@linkurious/ogma';
 import {ItemFieldsCaptions} from '@linkurious/rest-client';
 
 import {Captions, LKOgma} from '../..';
