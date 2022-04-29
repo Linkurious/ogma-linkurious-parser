@@ -1,6 +1,6 @@
 'use strict';
 
-import Ogma, {NodeList, EdgeList} from 'ogma';
+import Ogma, {NodeList, EdgeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {ANIMATION_DURATION, LKOgma} from '../index';
@@ -34,6 +34,90 @@ export class RxViz {
   }
 
   /**
+   * Listen to ogma events and update the state
+   */
+  public listenToSelectionEvents(): void {
+    let count = 0;
+    this._ogma.events.on('animate', (e: {duration: number}) => {
+      const animationEnd = ++count;
+      this._store.dispatch((state) => ({...state, animation: true}));
+      clearTimeout(this._animationThrottle);
+      this._animationThrottle = setTimeout(() => {
+        if (count === animationEnd) {
+          this._store.dispatch((state) => ({...state, animation: false}));
+        }
+      }, e.duration + ANIMATION_DURATION + 100);
+    });
+
+    this._ogma.events.on('dragStart', () => {
+      this._store.dispatch((state) => ({...state, animation: true}));
+    });
+
+    this._ogma.events.on('dragEnd', () => {
+      this._store.dispatch((state) => ({...state, animation: false}));
+    });
+
+    this._ogma.events.on('addNodes', () => {
+      this._store.dispatch(this.storeItems.bind(this));
+    });
+    this._ogma.events.on('removeNodes', () => {
+      this._store.dispatch(this.storeItems.bind(this));
+    });
+    this._ogma.events.on('addEdges', () => {
+      this._store.dispatch(this.storeItems.bind(this));
+    });
+    this._ogma.events.on('removeEdges', () => {
+      this._store.dispatch(this.storeItems.bind(this));
+    });
+
+    this._ogma.events.on('nodesSelected', () => {
+      this._store.dispatch(this.storeNodeSelection.bind(this));
+    });
+
+    this._ogma.events.on('edgesSelected', () => {
+      this._store.dispatch(this.storeEdgeSelection.bind(this));
+    });
+
+    this._ogma.events.on('nodesUnselected', () => {
+      this._store.dispatch(this.storeNodeSelection.bind(this));
+    });
+
+    this._ogma.events.on('edgesUnselected', () => {
+      this._store.dispatch(this.storeEdgeSelection.bind(this));
+    });
+
+    this._ogma.events.on('updateNodeData', (evt) => {
+      if (evt !== undefined) {
+        evt.changes.forEach((change) => {
+          this._store.dispatch((state) => ({
+            ...state,
+            changes: {
+              entityType: 'node',
+              input: change.property,
+              value: change.newValues[0]
+            }
+          }));
+        });
+      }
+    });
+
+    this._ogma.events.on('updateEdgeData', (evt) => {
+      if (evt !== undefined) {
+        evt.changes.forEach((change) => {
+          this._store.dispatch((state) => ({
+            ...state,
+            changes: {
+              entityType: 'edge',
+              input: change.property,
+              value: change.newValues[0]
+            }
+          }));
+        });
+      }
+    });
+  }
+
+  /**
    * Store new items in state
    */
   private storeItems(state: OgmaState): OgmaState {
@@ -52,7 +136,7 @@ export class RxViz {
   private storeNodeSelection(state: OgmaState): OgmaState {
     return {
       ...state,
-      selection: this._ogma.getSelectedNodes() as NodeList<LkNodeData, LkEdgeData>
+      selection: this._ogma.getSelectedNodes()
     };
   }
 
@@ -62,92 +146,8 @@ export class RxViz {
   private storeEdgeSelection(state: OgmaState): OgmaState {
     return {
       ...state,
-      selection: this._ogma.getSelectedEdges() as EdgeList<LkEdgeData, LkNodeData>
+      selection: this._ogma.getSelectedEdges()
     };
-  }
-
-  /**
-   * Listen to ogma events and update the state
-   */
-  private listenToSelectionEvents(): void {
-    let count = 0;
-    (this._ogma as any).modules.events.on('animate', (e: {duration: number}) => {
-      const animationEnd = ++count;
-      this._store.dispatch((state) => ({...state, animation: true}));
-      clearTimeout(this._animationThrottle);
-      this._animationThrottle = setTimeout(() => {
-        if (count === animationEnd) {
-          this._store.dispatch((state) => ({...state, animation: false}));
-        }
-      }, e.duration + ANIMATION_DURATION + 100);
-    });
-
-    this._ogma.events.onDragStart(() => {
-      this._store.dispatch((state) => ({...state, animation: true}));
-    });
-
-    this._ogma.events.onDragEnd(() => {
-      this._store.dispatch((state) => ({...state, animation: false}));
-    });
-
-    this._ogma.events.onNodesAdded(() => {
-      this._store.dispatch(this.storeItems.bind(this));
-    });
-    this._ogma.events.onNodesRemoved(() => {
-      this._store.dispatch(this.storeItems.bind(this));
-    });
-    this._ogma.events.onEdgesAdded(() => {
-      this._store.dispatch(this.storeItems.bind(this));
-    });
-    this._ogma.events.onEdgesRemoved(() => {
-      this._store.dispatch(this.storeItems.bind(this));
-    });
-
-    this._ogma.events.onNodesSelected(() => {
-      this._store.dispatch(this.storeNodeSelection.bind(this));
-    });
-
-    this._ogma.events.onEdgesSelected(() => {
-      this._store.dispatch(this.storeEdgeSelection.bind(this));
-    });
-
-    this._ogma.events.onNodesUnselected(() => {
-      this._store.dispatch(this.storeNodeSelection.bind(this));
-    });
-
-    this._ogma.events.onEdgesUnselected(() => {
-      this._store.dispatch(this.storeEdgeSelection.bind(this));
-    });
-
-    this._ogma.events.onNodeDataChange((evt) => {
-      if (evt !== undefined) {
-        evt.changes.forEach((change) => {
-          this._store.dispatch((state) => ({
-            ...state,
-            changes: {
-              entityType: 'node',
-              input: change.property,
-              value: change.newValues[0]
-            }
-          }));
-        });
-      }
-    });
-
-    this._ogma.events.onEdgeDataChange((evt) => {
-      if (evt !== undefined) {
-        evt.changes.forEach((change) => {
-          this._store.dispatch((state) => ({
-            ...state,
-            changes: {
-              entityType: 'edge',
-              input: change.property,
-              value: change.newValues[0]
-            }
-          }));
-        });
-      }
-    });
   }
 }
 
