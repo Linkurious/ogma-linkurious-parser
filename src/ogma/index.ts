@@ -92,8 +92,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.setConfigOgma(this._configuration, true);
     this.LKTransformation = new TransformationsViz(this);
 
-    this.LKStyles.setNodesDefaultHalo();
-    this.LKStyles.setEdgesDefaultHalo();
+    // this.LKStyles.setNodesDefaultHalo();
+    // this.LKStyles.setEdgesDefaultHalo();
     this.LKStyles.setBadgeRule();
     this.LKStyles.setFilterClass();
   }
