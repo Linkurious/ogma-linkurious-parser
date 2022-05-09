@@ -426,7 +426,9 @@ export class StylesViz {
             font: 'arial',
             backgroundColor: null,
             minVisibleSize: 0,
-            size: 3,
+            size: (edge) => {
+              return edge.getTarget().getAttribute(['text', 'size']);
+            },
             margin: 0
           },
           halo: null,
