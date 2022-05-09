@@ -427,7 +427,9 @@ export class StylesViz {
             backgroundColor: null,
             minVisibleSize: 0,
             size: (edge) => {
-              return edge.getTarget().getAttribute(['text', 'size']);
+              if (edge !== undefined) {
+                return edge.getTarget().getAttribute(['text', 'size']);
+              }
             },
             margin: 0
           },
