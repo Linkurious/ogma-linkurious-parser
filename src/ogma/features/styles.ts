@@ -1,7 +1,14 @@
 'use strict';
 
 import * as o from 'ogma';
-import { Edge, EdgeAttributesValue, NodeAttributesValue, PixelSize, StyleClass, StyleRule } from "ogma";
+import {
+  Edge,
+  EdgeAttributesValue,
+  NodeAttributesValue,
+  PixelSize,
+  StyleClass,
+  StyleRule
+} from 'ogma';
 import {
   GenericObject,
   IEdgeStyle,
