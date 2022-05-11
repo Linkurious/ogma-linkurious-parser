@@ -33,13 +33,14 @@ const DEFAULT_EDGE_GROUP_STYLE: {
 
 export class TransformationsViz {
   private _ogma: LKOgma;
-  public groupedEdges!: GenericObject<boolean>;
+  public groupedEdges: GenericObject<boolean>;
   public edgeGroupStyle!: IEdgeGroupStyle;
   public transformation!: Transformation<LkNodeData, LkEdgeData>;
   public edgeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
+    this.groupedEdges = {};
   }
 
   /**
