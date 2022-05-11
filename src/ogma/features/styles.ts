@@ -6,6 +6,7 @@ import {
   EdgeAttributesValue,
   NodeAttributesValue,
   StyleClass,
+  PixelSize,
   StyleRule
 } from '@linkurious/ogma';
 import {
@@ -432,7 +433,11 @@ export class StylesViz {
             font: 'arial',
             backgroundColor: null,
             minVisibleSize: 0,
-            size: 3,
+            size: (edge): PixelSize | undefined => {
+              if (edge !== undefined) {
+                return edge.getTarget().getAttribute(['text', 'size']);
+              }
+            },
             margin: 0
           },
           halo: null,
