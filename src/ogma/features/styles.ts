@@ -1,14 +1,7 @@
 'use strict';
 
 import * as o from 'ogma';
-import {
-  Edge,
-  EdgeAttributesValue,
-  NodeAttributesValue,
-  PixelSize,
-  StyleClass,
-  StyleRule
-} from 'ogma';
+import {Edge, EdgeAttributesValue, NodeAttributesValue, StyleClass, StyleRule} from 'ogma';
 import {
   GenericObject,
   IEdgeStyle,
@@ -418,7 +411,7 @@ export class StylesViz {
           text: {
             minVisibleSize: 0,
             size: 8,
-            maxLineLength: textWrappingLength ? 30 : 0,
+            maxLineLength: textWrappingLength ? 30 : 0
           },
           halo: null
         },

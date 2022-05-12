@@ -1,7 +1,6 @@
 'use strict';
 
 import * as Ogma from 'ogma';
-import {Node, Edge} from 'ogma';
 import {ItemFieldsCaptions} from '@linkurious/rest-client';
 
 import {Captions, LKOgma} from '../..';
@@ -17,7 +16,6 @@ export class CaptionsViz {
   public edgesCaptionsRule!: Ogma.StyleRule;
   private _ogma: LKOgma;
   private _schema: CaptionState = {node: {}, edge: {}};
-  private _exportCaptionClass!: Ogma.StyleClass;
 
   constructor(
     ogma: LKOgma,
