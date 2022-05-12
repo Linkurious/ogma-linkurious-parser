@@ -3,7 +3,7 @@
 
 import {expect} from 'chai';
 import 'mocha';
-import Ogma, {Node} from 'ogma';
+import Ogma, {Node} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData, SelectorType} from '@linkurious/rest-client';
 
 import {NodeAttributes, StyleRule, StyleRules} from '../../src';
@@ -4928,6 +4928,98 @@ describe('NodeAttributes', function () {
           })
         )
       ).to.equal('93%');
+
+      expect(
+        NodeAttributes.getAutomaticRangeSize(
+          200,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
+              size: {
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: 10,
+                max: 1995,
+                scale: 'logarithmic'
+              }
+            }
+          }),
+          true
+        )
+      ).to.equal('304%');
+
+      expect(
+        NodeAttributes.getAutomaticRangeSize(
+          0.5,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
+              size: {
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: -10,
+                max: 1995,
+                scale: 'logarithmic'
+              }
+            }
+          }),
+          true
+        )
+      ).to.equal('194%');
+
+      expect(
+        NodeAttributes.getAutomaticRangeSize(
+          -50,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
+              size: {
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: -110,
+                max: -10,
+                scale: 'logarithmic'
+              }
+            }
+          }),
+          true
+        )
+      ).to.equal('450%');
+
+      expect(
+        NodeAttributes.getAutomaticRangeSize(
+          -30,
+          new StyleRule({
+            index: 0,
+            type: SelectorType.NO_VALUE,
+            itemType: undefined,
+            input: undefined,
+            value: undefined,
+            style: {
+              size: {
+                type: 'autoRange',
+                input: ['properties', 'age'],
+                min: -30,
+                max: 1995,
+                scale: 'logarithmic'
+              }
+            }
+          }),
+          true
+        )
+      ).to.equal('50%');
     });
   });
 });

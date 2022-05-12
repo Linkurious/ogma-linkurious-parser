@@ -1,14 +1,14 @@
 'use strict';
 
-import * as o from 'ogma';
+import * as o from '@linkurious/ogma';
 import {
   Edge,
   EdgeAttributesValue,
   NodeAttributesValue,
-  PixelSize,
   StyleClass,
+  PixelSize,
   StyleRule
-} from 'ogma';
+} from '@linkurious/ogma';
 import {
   GenericObject,
   IEdgeStyle,
@@ -538,8 +538,8 @@ export class StylesViz {
         self: {attributes: ['layoutable']}
       }
     });
-    this._ogma.events.onNodesAdded((nodesEvent) => nodesEvent!.nodes.addClass('degreeIndicator'));
-    this._ogma.events.onNodesAdded((nodesEvent) => nodesEvent!.nodes.addClass('pinnedIndicator'));
+    this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent.nodes.addClass('degreeIndicator'));
+    this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent.nodes.addClass('pinnedIndicator'));
   }
 
   /**

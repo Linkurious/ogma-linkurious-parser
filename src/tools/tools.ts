@@ -2,7 +2,7 @@
 
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
-import {Node, NodeList} from 'ogma';
+import {Node, NodeList} from '@linkurious/ogma';
 import {LkNodeData, LkProperty} from '@linkurious/rest-client';
 
 export {sortBy};
