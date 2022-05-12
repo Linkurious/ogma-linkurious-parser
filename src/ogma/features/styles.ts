@@ -1,14 +1,7 @@
 'use strict';
 
 import * as o from 'ogma';
-import {
-  Edge,
-  EdgeAttributesValue,
-  NodeAttributesValue,
-  PixelSize,
-  StyleClass,
-  StyleRule
-} from 'ogma';
+import {Edge, EdgeAttributesValue, NodeAttributesValue, StyleClass, StyleRule} from 'ogma';
 import {
   GenericObject,
   IEdgeStyle,
@@ -417,31 +410,17 @@ export class StylesViz {
         nodeAttributes: {
           text: {
             minVisibleSize: 0,
-            font: 'arial',
-            backgroundColor: null,
-            maxLineLength: textWrappingLength ? 30 : 0,
-            scale: 0.3,
-            margin: 0,
-            scaling: true,
-            tip: false
+            size: 8,
+            maxLineLength: textWrappingLength ? 30 : 0
           },
           halo: null
         },
         edgeAttributes: {
           text: {
-            scaling: false,
-            font: 'arial',
-            backgroundColor: null,
             minVisibleSize: 0,
-            size: (edge): PixelSize | undefined => {
-              if (edge !== undefined) {
-                return edge.getTarget().getAttribute(['text', 'size']);
-              }
-            },
-            margin: 0
+            size: 8
           },
-          halo: null,
-          shape: 'tapered'
+          halo: null
         }
       });
     } else {
