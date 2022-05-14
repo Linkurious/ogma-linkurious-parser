@@ -48,7 +48,7 @@
     "sha1": "1.1.1"
   },
   "peerDependencies": {
-    "ogma": "3.3.19"
+    "ogma": "2.1.1"
   },
   "devDependencies": {
     "@linkurious/rest-client": "3.0.13-develop-stable.77",
@@ -71,7 +71,7 @@
     "mocha-junit-reporter": "2.0.2",
     "mocha-multi-reporters": "1.5.1",
     "nyc": "15.1.0",
-    "ogma": "3.3.19",
+    "ogma": "2.1.1",
     "prettier": "2.2.1",
     "rollup": "2.47.0",
     "rollup-plugin-node-globals": "1.4.0",
