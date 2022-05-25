@@ -334,6 +334,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this.store.clear();
     }
     this.initOgmaLinkuriousParser();
+    this.setConfigOgma(this._configuration);
   }
 
   /**
