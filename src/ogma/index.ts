@@ -53,10 +53,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     // set Ogma global configuration
     super(_configuration);
     Object.setPrototypeOf(this, new.target.prototype);
-    this.initOgmaLinkuriousParser();
+    this.initOgmaLinkuriousParser(true);
   }
 
-  private initOgmaLinkuriousParser(): void {
+  private initOgmaLinkuriousParser(init?: boolean): void {
     this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
       path: 'categories',
       unwindArrays: true,
@@ -89,7 +89,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this._reactive.listenToSelectionEvents();
     }
     this.initSelection();
-    this.setConfigOgma(this._configuration, true);
+    this.setConfigOgma(this._configuration, init);
     this.LKTransformation = new TransformationsViz(this);
 
     this.LKStyles.setNodesDefaultHalo();
@@ -334,26 +334,23 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this.store.clear();
     }
     this.initOgmaLinkuriousParser();
-    // we have to set the config manually because when instantiating Ogma, the config object is empty
-    // due to angular dependency injection (we cannot inject a global service asynchronously, and the config has not been loaded yet)
-    // when resetting Ogma, the config is reset to its initial value in Ogma which is an empty object.
-    // So when resetting Ogma we set the config again to have the correct config and not an empty one
-    this.setConfigOgma(this._configuration);
   }
 
   /**
    * Updates the Ogma config when config changes in LKE. If init, options were already set by the Ogma.reset()
    */
-  public setConfigOgma(configuration: IOgmaConfig, init?: boolean): void {
-    // here we make sure that the config is updated and we have the correct one when resetting
-    this._configuration = configuration;
+  public setConfigOgma(configuration?: IOgmaConfig, init?: boolean): void {
+    if (configuration) {
+      // here we make sure that the internal config object is updated and we have the correct one when resetting
+      this._configuration = configuration;
+    }
     if (!init) {
       this.setOptions({
-        ...configuration.options,
-        renderer: configuration.renderer
+        ...this._configuration.options,
+        renderer: this._configuration.renderer
       });
     }
-    this.setStyles(configuration);
-    this.setCaptions(configuration);
+    this.setStyles(this._configuration);
+    this.setCaptions(this._configuration);
   }
 }
