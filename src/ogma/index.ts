@@ -336,8 +336,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.initOgmaLinkuriousParser();
     // we have to set the config manually because when instantiating Ogma, the config object is empty
     // due to angular dependency injection (we cannot inject a global service asynchronously, and the config has not been loaded yet)
-    // when resetting Ogma, the config is reset to its initial value in Ogma which is an emtpy object.
-    // So when resetting we need to set the config manually again to have the latest config object
+    // when resetting Ogma, the config is reset to its initial value in Ogma which is an empty object.
+    // So when resetting Ogma we set the config again to have the correct config and not an empty one
     this.setConfigOgma(this._configuration);
   }
 
