@@ -17,8 +17,12 @@ export {
   PixelSize,
   EdgeExtremity,
   EdgeType,
-  GeoModeOptions
-} from 'ogma';
+  GeoModeOptions,
+  EdgesDataEvent,
+  NodesDataEvent,
+  NodesDragEndEvent,
+  NodesEvent
+} from '@linkurious/ogma';
 
 export {Captions} from './captions/captions';
 export {ItemAttributes, BASE_GREY} from './styles/itemAttributes';

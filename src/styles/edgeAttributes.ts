@@ -1,5 +1,5 @@
 'use strict';
-import {Color} from 'ogma';
+import {Color} from '@linkurious/ogma';
 import {LkEdgeData, OgmaEdgeShape} from '@linkurious/rest-client';
 
 import {Tools} from '../tools/tools';
@@ -24,7 +24,7 @@ export class EdgeAttributes extends ItemAttributes {
   /**
    * Return rule that can be applied to the data
    */
-  private matchStyle(styleRules: Array<StyleRule>, data: LkEdgeData): StyleRule | undefined {
+  private static matchStyle(styleRules: Array<StyleRule>, data: LkEdgeData): StyleRule | undefined {
     if (data === undefined) {
       return;
     }
@@ -63,7 +63,7 @@ export class EdgeAttributes extends ItemAttributes {
    */
   public shape(data: LkEdgeData): OgmaEdgeShape | undefined {
     if (this._rulesMap.shape !== undefined) {
-      return this.matchStyle(this._rulesMap.shape, data)?.style.shape;
+      return EdgeAttributes.matchStyle(this._rulesMap.shape, data)?.style.shape;
     }
   }
 
@@ -72,7 +72,7 @@ export class EdgeAttributes extends ItemAttributes {
    */
   public width(data: LkEdgeData): string | undefined {
     if (this._rulesMap.width !== undefined) {
-      const styleRule = this.matchStyle(this._rulesMap.width, data);
+      const styleRule = EdgeAttributes.matchStyle(this._rulesMap.width, data);
       const widthStyle = styleRule?.style.width;
       if (Tools.isDefined(styleRule) && widthStyle.type === 'autoRange') {
         if (
@@ -82,7 +82,9 @@ export class EdgeAttributes extends ItemAttributes {
         ) {
           const propertyName: string = widthStyle.input[1];
           const propertyValue = Tools.parseNumber(data.properties[propertyName]);
-          return EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule);
+          //to update with the correct enum type
+          const isLog = widthStyle.scale && widthStyle.scale === 'logarithmic';
+          return EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule, isLog);
         }
       } else {
         return widthStyle;
@@ -94,14 +96,22 @@ export class EdgeAttributes extends ItemAttributes {
    * return the corresponding width to the value
    * @param value
    * @param rule
+   * @param isLog
    */
-  public static getAutomaticRangeWidth(value: number, rule: StyleRule): string {
-    return this.getAutomaticRangeStyle(
-      value,
-      rule.style.width,
-      EdgeWidthExtrema.MIN,
-      EdgeWidthExtrema.MAX
-    );
+  public static getAutomaticRangeWidth(value: number, rule: StyleRule, isLog = false): string {
+    return isLog
+      ? this.getAutomaticRangeStyleLog(
+          value,
+          rule.style.width,
+          EdgeWidthExtrema.MIN,
+          EdgeWidthExtrema.MAX
+        )
+      : this.getAutomaticRangeStyleLinear(
+          value,
+          rule.style.width,
+          EdgeWidthExtrema.MIN,
+          EdgeWidthExtrema.MAX
+        );
   }
 
   /**
