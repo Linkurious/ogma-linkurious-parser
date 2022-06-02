@@ -1,5 +1,5 @@
 'use strict';
-import {Color} from 'ogma';
+import {Color} from '@linkurious/ogma';
 import {LkNodeData, OgmaNodeShape, IStyleImage, IStyleIcon} from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
@@ -32,7 +32,7 @@ export class NodeAttributes extends ItemAttributes {
   /**
    * Run the callback if an item match with a style in the array of rules
    */
-  private matchStyle(
+  private static matchStyle(
     styleRules: Array<StyleRule>,
     itemData: LkNodeData,
     callback: (style: StyleRule) => unknown
@@ -158,7 +158,7 @@ export class NodeAttributes extends ItemAttributes {
   public shape(itemData: LkNodeData): OgmaNodeShape | undefined {
     let result = undefined;
     if (this._rulesMap.shape !== undefined) {
-      this.matchStyle(this._rulesMap.shape, itemData, (styleRule) => {
+      NodeAttributes.matchStyle(this._rulesMap.shape, itemData, (styleRule) => {
         result = styleRule.style.shape;
       });
     }
@@ -171,7 +171,7 @@ export class NodeAttributes extends ItemAttributes {
   public size(itemData: LkNodeData): number | undefined {
     let result = undefined;
     if (this._rulesMap.size !== undefined) {
-      this.matchStyle(this._rulesMap.size, itemData, (styleRule) => {
+      NodeAttributes.matchStyle(this._rulesMap.size, itemData, (styleRule) => {
         const sizeStyle = styleRule.style.size;
         if (sizeStyle.type === 'autoRange') {
           if (
@@ -181,7 +181,9 @@ export class NodeAttributes extends ItemAttributes {
           ) {
             const propertyName: string = sizeStyle.input[1];
             const propertyValue = Tools.parseNumber(itemData.properties[propertyName]);
-            result = NodeAttributes.getAutomaticRangeSize(propertyValue, styleRule);
+            //to update with the correct enum type
+            const isLog = sizeStyle.scale && sizeStyle.scale === 'logarithmic';
+            result = NodeAttributes.getAutomaticRangeSize(propertyValue, styleRule, isLog);
           }
         } else {
           result = sizeStyle;
@@ -195,14 +197,22 @@ export class NodeAttributes extends ItemAttributes {
    * return the corresponding size to the value
    * @param value
    * @param rule
+   * @param isLog
    */
-  public static getAutomaticRangeSize(value: number, rule: StyleRule): string {
-    return this.getAutomaticRangeStyle(
-      value,
-      rule.style.size,
-      NodeSizeExtrema.MIN,
-      NodeSizeExtrema.MAX
-    );
+  public static getAutomaticRangeSize(value: number, rule: StyleRule, isLog = false): string {
+    return isLog
+      ? this.getAutomaticRangeStyleLog(
+          value,
+          rule.style.size,
+          NodeSizeExtrema.MIN,
+          NodeSizeExtrema.MAX
+        )
+      : this.getAutomaticRangeStyleLinear(
+          value,
+          rule.style.size,
+          NodeSizeExtrema.MIN,
+          NodeSizeExtrema.MAX
+        );
   }
 
   /**
