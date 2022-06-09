@@ -90,8 +90,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     }
     this.initSelection();
     this.setConfigOgma(this._configuration, init);
-    this.LKTransformation.transformation.refresh();
     this.LKTransformation = new TransformationsViz(this);
+    this.LKTransformation.transformation.refresh();
 
     this.LKStyles.setNodesDefaultHalo();
     this.LKStyles.setEdgesDefaultHalo();
