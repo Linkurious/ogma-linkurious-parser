@@ -309,7 +309,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Return the list of filtered edges
    */
-  public getFilteredEdges(items?: Array<any>, filter: 'visible' | 'raw' | 'all' = 'raw'): EdgeList<LkEdgeData, LkNodeData> {
+  public getFilteredEdges(
+    items?: Array<any>,
+    filter: 'visible' | 'raw' | 'all' = 'raw'
+  ): EdgeList<LkEdgeData, LkNodeData> {
     return Tools.isDefined(items)
       ? this.getEdges(items).filter((i) => i.hasClass('filtered'))
       : this.getEdges(filter).filter((i) => i.hasClass('filtered'));
