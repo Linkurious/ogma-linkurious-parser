@@ -53,10 +53,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     // set Ogma global configuration
     super(_configuration);
     Object.setPrototypeOf(this, new.target.prototype);
-    this.initOgmaLinkuriousParser();
+    this.initOgmaLinkuriousParser(true);
   }
 
-  private initOgmaLinkuriousParser(): void {
+  private initOgmaLinkuriousParser(init?: boolean): void {
     this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
       path: 'categories',
       unwindArrays: true,
@@ -89,7 +89,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this._reactive.listenToSelectionEvents();
     }
     this.initSelection();
-    this.setConfigOgma(this._configuration, true);
+    this.setConfigOgma(this._configuration, init);
     this.LKTransformation = new TransformationsViz(this);
 
     this.LKStyles.setNodesDefaultHalo();
@@ -309,10 +309,13 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Return the list of filtered edges
    */
-  public getFilteredEdges(items?: Array<any>): EdgeList<LkEdgeData, LkNodeData> {
+  public getFilteredEdges(
+    items?: Array<any>,
+    filter: 'visible' | 'raw' | 'all' = 'raw'
+  ): EdgeList<LkEdgeData, LkNodeData> {
     return Tools.isDefined(items)
       ? this.getEdges(items).filter((i) => i.hasClass('filtered'))
-      : this.getEdges('raw').filter((i) => i.hasClass('filtered'));
+      : this.getEdges(filter).filter((i) => i.hasClass('filtered'));
   }
 
   /**
@@ -339,14 +342,18 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Updates the Ogma config when config changes in LKE. If init, options were already set by the Ogma.reset()
    */
-  public setConfigOgma(configuration: IOgmaConfig, init?: boolean): void {
+  public setConfigOgma(configuration?: IOgmaConfig, init?: boolean): void {
+    if (configuration) {
+      // here we make sure that the internal config object is updated and we have the correct one when resetting
+      this._configuration = configuration;
+    }
     if (!init) {
       this.setOptions({
-        ...configuration.options,
-        renderer: configuration.renderer
+        ...this._configuration.options,
+        renderer: this._configuration.renderer
       });
     }
-    this.setStyles(configuration);
-    this.setCaptions(configuration);
+    this.setStyles(this._configuration);
+    this.setCaptions(this._configuration);
   }
 }
