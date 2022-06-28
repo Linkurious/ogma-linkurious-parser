@@ -1,6 +1,6 @@
 'use strict';
 
-import * as Ogma from 'ogma';
+import * as Ogma from '@linkurious/ogma';
 import {ItemFieldsCaptions} from '@linkurious/rest-client';
 
 import {Captions, LKOgma} from '../..';
