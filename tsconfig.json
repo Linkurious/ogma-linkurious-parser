@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "module": "commonjs",
+    "module": "ES2015",
     "moduleResolution": "node",
     "target": "ES2018",
     "stripInternal": true,
