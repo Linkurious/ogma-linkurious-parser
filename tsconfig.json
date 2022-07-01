@@ -3,7 +3,7 @@
     "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "ES2018",
     "stripInternal": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -14,10 +14,10 @@
     "inlineSources": true,
     "lib": [
       "ES5",
-      "ES6",
+      "ES2015",
       "ES2016",
       "ES2017",
-      "ES2015",
+      "ES2018",
       "dom"
     ],
     "skipLibCheck": true,
