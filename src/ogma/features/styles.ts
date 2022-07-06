@@ -416,7 +416,7 @@ export class StylesViz {
         nodeAttributes: {
           text: {
             minVisibleSize: 0,
-            size: 8,
+            size: 12,
             maxLineLength: textWrappingLength ? 30 : 0
           },
           halo: null
@@ -424,7 +424,7 @@ export class StylesViz {
         edgeAttributes: {
           text: {
             minVisibleSize: 0,
-            size: 8
+            size: 12
           },
           halo: null
         }
