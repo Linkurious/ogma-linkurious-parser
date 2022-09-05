@@ -64,7 +64,7 @@ export class Captions {
         return Tools.formatDate(
           new Date(
             new Date(propertyValue.value).getTime() +
-              Tools.timezoneToMilliseconds(propertyValue.timezone)
+            Tools.timezoneToMilliseconds(propertyValue.timezone)
           ).toISOString()
         );
       }
@@ -123,9 +123,9 @@ export class Captions {
     itemType: string
   ): PropertyType | undefined {
     const typeGraphSchema = graphSchema.find((schemaType) => schemaType.itemType === itemType);
-    const property = (typeGraphSchema?.properties.find(
+    const property = typeGraphSchema?.properties.find(
       (property) => property.propertyKey === propertyKey
-    ) as unknown) as GraphSchemaPropertyWithAccess;
+    );
     return property?.propertyType;
   }
 
