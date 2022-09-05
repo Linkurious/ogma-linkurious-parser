@@ -1,12 +1,17 @@
 'use strict';
 
 import {
+  GraphSchemaTypeWithAccess,
   ICaptionConfig,
   ItemFieldsCaptions,
   LkEdgeData,
   LkNodeData,
-  LkProperty
+  LkProperty,
+  PropertyType,
+  PropertyTypeName,
+  GraphSchemaPropertyWithAccess
 } from '@linkurious/rest-client';
+import {Tools as Utils} from '@linkurious/shared';
 
 import {CAPTION_HEURISTIC, Tools} from '../tools/tools';
 
@@ -16,13 +21,14 @@ export class Captions {
    */
   public static getText(
     itemData: LkNodeData | LkEdgeData,
-    schema: ItemFieldsCaptions
+    schema: ItemFieldsCaptions,
+    graphSchema?: GraphSchemaTypeWithAccess[]
   ): string | null {
     const types = 'categories' in itemData ? itemData.categories : [itemData.type];
     if (Captions.captionExist(types, schema)) {
       return 'categories' in itemData
-        ? Captions.generateNodeCaption(itemData, schema) || null
-        : Captions.generateEdgeCaption(itemData, schema) || null;
+        ? Captions.generateNodeCaption(itemData, schema, graphSchema) || null
+        : Captions.generateEdgeCaption(itemData, schema, graphSchema) || null;
     }
     if (itemData.properties !== undefined) {
       const heuristicCaptionElement = CAPTION_HEURISTIC.find((value) => {
@@ -43,7 +49,10 @@ export class Captions {
   /**
    * Return a readable string from an LkProperty
    */
-  private static getLabel(propertyValue: LkProperty): string | null {
+  private static getLabel(
+    propertyValue: LkProperty,
+    propertyType?: PropertyType | undefined
+  ): string | null {
     if (typeof propertyValue === 'object' && 'type' in propertyValue) {
       if (!('original' in propertyValue) && !('value' in propertyValue)) {
         return null;
@@ -59,6 +68,11 @@ export class Captions {
           ).toISOString()
         );
       }
+    } else if (
+      propertyType?.name === PropertyTypeName.NUMBER &&
+      propertyType.options !== undefined
+    ) {
+      return Utils.formatCurrencyValue(propertyValue as number, propertyType.options);
     }
     return `${propertyValue}`.trim();
   }
@@ -75,7 +89,8 @@ export class Captions {
    */
   public static generateNodeCaption(
     itemData: LkNodeData,
-    schema: {[key: string]: ICaptionConfig}
+    schema: {[key: string]: ICaptionConfig},
+    graphSchema?: GraphSchemaTypeWithAccess[]
   ): string {
     const categories = itemData.categories;
     const caption: Array<string | null> = [];
@@ -90,7 +105,10 @@ export class Captions {
     });
     Tools.uniqBy(captionProps).forEach((propertyKey) => {
       if (itemData.properties[propertyKey] !== undefined) {
-        caption.push(this.getLabel(itemData.properties[propertyKey]));
+        const propertyType = graphSchema
+          ? Captions.getPropertyType(graphSchema, propertyKey, categories[0])
+          : undefined;
+        caption.push(this.getLabel(itemData.properties[propertyKey], propertyType));
       }
     });
     return caption
@@ -99,12 +117,25 @@ export class Captions {
       .trim();
   }
 
+  public static getPropertyType(
+    graphSchema: GraphSchemaTypeWithAccess[],
+    propertyKey: string,
+    itemType: string
+  ): PropertyType | undefined {
+    const typeGraphSchema = graphSchema.find((schemaType) => schemaType.itemType === itemType);
+    const property = (typeGraphSchema?.properties.find(
+      (property) => property.propertyKey === propertyKey
+    ) as unknown) as GraphSchemaPropertyWithAccess;
+    return property?.propertyType;
+  }
+
   /**
    * Generate text from edge data and captions schema
    */
   public static generateEdgeCaption(
     itemData: LkEdgeData,
-    schema: {[key: string]: ICaptionConfig}
+    schema: {[key: string]: ICaptionConfig},
+    graphSchema?: GraphSchemaTypeWithAccess[]
   ): string {
     const type = itemData.type;
     const caption: Array<string | null> = [];
@@ -116,7 +147,10 @@ export class Captions {
       captionProps = [...captionProps, ...schema[type].properties];
       Tools.uniqBy(captionProps).forEach((propertyKey) => {
         if (Tools.isDefined(itemData.properties[propertyKey])) {
-          caption.push(Captions.getLabel(itemData.properties[propertyKey]));
+          const propertyType = graphSchema
+            ? Captions.getPropertyType(graphSchema, propertyKey, type)
+            : undefined;
+          caption.push(Captions.getLabel(itemData.properties[propertyKey], propertyType));
         }
       });
       return caption.join(' - ').trim();

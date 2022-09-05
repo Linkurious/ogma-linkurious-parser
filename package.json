@@ -53,7 +53,8 @@
   },
   "devDependencies": {
     "@linkurious/ogma": "4.1.4",
-    "@linkurious/rest-client": "3.1.7",
+    "@linkurious/rest-client": "3.1.8-PR-501.10",
+    "@linkurious/shared": "3.1.8-PR-336.17",
     "@rollup/plugin-buble": "0.21.3",
     "@rollup/plugin-commonjs": "17.0.0",
     "@rollup/plugin-json": "4.1.0",
