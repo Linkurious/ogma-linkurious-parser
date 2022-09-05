@@ -9,11 +9,11 @@ import {
   LkProperty,
   PropertyType,
   PropertyTypeName,
-  GraphSchemaPropertyWithAccess
 } from '@linkurious/rest-client';
 import {Tools as Utils} from '@linkurious/shared';
 
 import {CAPTION_HEURISTIC, Tools} from '../tools/tools';
+import {GraphSchemaPropertyWithAccess} from "@linkurious/rest-client/dist/src/api/GraphSchema/types";
 
 export class Captions {
   /**
@@ -126,7 +126,7 @@ export class Captions {
     const property = typeGraphSchema?.properties.find(
       (property) => property.propertyKey === propertyKey
     );
-    return property?.propertyType;
+    return ((property as unknown) as GraphSchemaPropertyWithAccess).propertyType;
   }
 
   /**
