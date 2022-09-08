@@ -2,8 +2,14 @@
 'use strict';
 
 import {expect} from 'chai';
-
 import 'mocha';
+import {
+  CurrencyFormat,
+  DataVisibility,
+  PropertyTypeName
+} from '@linkurious/rest-client/dist/src/api/GraphSchema/types';
+import {ItemTypeAccessRightType} from '@linkurious/rest-client/dist/src/api/AccessRight';
+
 import {Captions} from '../../src';
 
 describe('Captions', () => {
@@ -191,6 +197,45 @@ describe('Captions', () => {
         )
       ).to.eql('');
     });
+    it('should return formatted caption for monetary values', () => {
+      expect(
+        Captions.generateNodeCaption(
+          {
+            categories: ['CITY'],
+            properties: {name: 'paris', inhabitants: 9000000000},
+            geo: {},
+            readAt: 0
+          },
+          {
+            CITY: {active: true, displayName: false, properties: ['inhabitants']}
+          },
+          [
+            {
+              itemType: 'CITY',
+              properties: [
+                {
+                  propertyKey: 'inhabitants',
+                  required: false,
+                  visibility: DataVisibility.SEARCHABLE,
+                  propertyType: {
+                    name: PropertyTypeName.NUMBER,
+                    options: {
+                      type: 'currency',
+                      symbol: '$',
+                      format: CurrencyFormat.DOTS_COMMA_SYMBOL
+                    }
+                  },
+                  indexed: true
+                }
+              ],
+              visibility: DataVisibility.SEARCHABLE,
+              indexed: true,
+              access: ItemTypeAccessRightType.WRITE
+            }
+          ]
+        )
+      ).to.eql('9.000.000.000,00 $');
+    });
   });
 
   describe('Captions.generateEdgeCaption', () => {
@@ -258,8 +303,39 @@ describe('Captions', () => {
         )
       ).to.eql('');
     });
+    it('should return formatted caption for monetary values', () => {
+      expect(
+        Captions.generateEdgeCaption(
+          {type: 'HAS_CITY', properties: {number: 1234125.34}, readAt: 0},
+          {HAS_CITY: {active: true, displayName: false, properties: ['number']}},
+          [
+            {
+              itemType: 'HAS_CITY',
+              properties: [
+                {
+                  propertyKey: 'number',
+                  required: false,
+                  visibility: DataVisibility.SEARCHABLE,
+                  propertyType: {
+                    name: PropertyTypeName.NUMBER,
+                    options: {
+                      type: 'currency',
+                      symbol: '$',
+                      format: CurrencyFormat.DOTS_COMMA_SYMBOL
+                    }
+                  },
+                  indexed: true
+                }
+              ],
+              visibility: DataVisibility.SEARCHABLE,
+              indexed: true,
+              access: ItemTypeAccessRightType.WRITE
+            }
+          ]
+        )
+      ).to.eql('1.234.125,34 $');
+    });
   });
-
   describe('Captions.captionExists', () => {
     it('should return true', () => {
       expect(Captions.captionExist(['CITY'], captionConfiguration)).to.be.true;
