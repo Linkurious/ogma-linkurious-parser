@@ -49,3 +49,4 @@ export {
   hasSelectionProperties
 } from './ogma/features/selectors';
 export {LKOgma, ANIMATION_DURATION} from './ogma';
+export {Tools} from './tools/tools';
