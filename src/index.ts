@@ -25,7 +25,7 @@ export {
 } from '@linkurious/ogma';
 
 export {Captions} from './captions/captions';
-export {ItemAttributes, BASE_GREY} from './styles/itemAttributes';
+export {ItemAttributes, BASE_GREY, PALETTE} from './styles/itemAttributes';
 export {EdgeAttributes} from './styles/edgeAttributes';
 export {NodeAttributes} from './styles/nodeAttributes';
 export {StyleRule, StyleRuleType} from './styles/styleRule';
@@ -37,6 +37,7 @@ export {OgmaState} from './ogma/features/reactive';
 export {OgmaTools} from './tools/ogmaTool';
 export {HTML_COLORS} from './tools/colorPalette';
 export {Filters} from './filters/filters';
+export {OgmaStore} from './ogma/features/OgmaStore';
 export {
   getSelectionSize,
   getSelectionState,
@@ -48,3 +49,4 @@ export {
   hasSelectionProperties
 } from './ogma/features/selectors';
 export {LKOgma, ANIMATION_DURATION} from './ogma';
+export {Tools} from './tools/tools';
