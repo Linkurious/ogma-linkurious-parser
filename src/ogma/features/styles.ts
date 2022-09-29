@@ -273,6 +273,7 @@ export class StylesViz {
         halo: (node) => {
           if (
             node !== undefined &&
+            !node.hasClass('filtered') &&
             (node.isSelected() ||
               node.getAdjacentNodes({}).isSelected().includes(true) ||
               node.getAdjacentEdges().isSelected().includes(true))
@@ -313,6 +314,7 @@ export class StylesViz {
         halo: (edge) => {
           if (
             edge &&
+            !edge.hasClass('filtered') &&
             (edge.isSelected() || edge.getSource().isSelected() || edge.getTarget().isSelected())
           ) {
             return {
