@@ -51,7 +51,6 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   constructor(private _configuration: IOgmaConfig) {
     // set Ogma global configuration
     super(_configuration);
-    Object.setPrototypeOf(this, new.target.prototype);
     this.initOgmaLinkuriousParser(true);
   }
 
