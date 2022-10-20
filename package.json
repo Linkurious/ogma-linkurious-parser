@@ -49,10 +49,10 @@
     "sha1": "1.1.1"
   },
   "peerDependencies": {
-    "@linkurious/ogma": "4.1.4"
+    "@linkurious/ogma": "4.3.2"
   },
   "devDependencies": {
-    "@linkurious/ogma": "4.1.4",
+    "@linkurious/ogma": "4.3.2",
     "@linkurious/rest-client": "3.1.12-develop-stable.112",
     "@rollup/plugin-buble": "0.21.3",
     "@rollup/plugin-commonjs": "17.0.0",
