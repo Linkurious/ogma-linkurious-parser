@@ -30,7 +30,6 @@ import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
 
-export {default as Ogma} from '@linkurious/ogma';
 export const ANIMATION_DURATION = 750;
 
 interface AddItemOptions {
