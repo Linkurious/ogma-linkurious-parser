@@ -30,6 +30,7 @@ import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
 
+export {default as Ogma} from '@linkurious/ogma';
 export const ANIMATION_DURATION = 750;
 
 interface AddItemOptions {
@@ -51,6 +52,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   constructor(private _configuration: IOgmaConfig) {
     // set Ogma global configuration
     super(_configuration);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.initOgmaLinkuriousParser(true);
   }
 
