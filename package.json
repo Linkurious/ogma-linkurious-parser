@@ -13,7 +13,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {
-    "node": "16.17.1"
+    "node": "16.18.1"
   },
   "scripts": {
     "prepare": "tsc -b",
@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "@linkurious/ogma": "4.3.2",
-    "@linkurious/rest-client": "4.0.0-develop.225",
+    "@linkurious/rest-client": "4.0.0-develop.228",
     "@rollup/plugin-buble": "0.21.3",
     "@rollup/plugin-commonjs": "17.0.0",
     "@rollup/plugin-json": "4.1.0",
