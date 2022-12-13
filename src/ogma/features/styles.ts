@@ -155,6 +155,7 @@ export class StylesViz {
     this._nodeDefaultStylesRules = this._ogma.styles.addRule({
       nodeAttributes: {
         text: {
+          padding: 5,
           minVisibleSize:
             this._defaultConfiguration.node.text !== undefined &&
             this._defaultConfiguration.node.text.minVisibleSize
@@ -273,6 +274,7 @@ export class StylesViz {
         halo: (node) => {
           if (
             node !== undefined &&
+            !node.hasClass('filtered') &&
             (node.isSelected() ||
               node.getAdjacentNodes({}).isSelected().includes(true) ||
               node.getAdjacentEdges().isSelected().includes(true))
@@ -313,6 +315,7 @@ export class StylesViz {
         halo: (edge) => {
           if (
             edge &&
+            !edge.hasClass('filtered') &&
             (edge.isSelected() || edge.getSource().isSelected() || edge.getTarget().isSelected())
           ) {
             return {
@@ -416,7 +419,7 @@ export class StylesViz {
         nodeAttributes: {
           text: {
             minVisibleSize: 0,
-            size: 8,
+            size: 12,
             maxLineLength: textWrappingLength ? 30 : 0
           },
           halo: null
@@ -424,7 +427,7 @@ export class StylesViz {
         edgeAttributes: {
           text: {
             minVisibleSize: 0,
-            size: 8
+            size: 12
           },
           halo: null
         }
