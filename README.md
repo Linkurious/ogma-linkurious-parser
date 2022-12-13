@@ -69,7 +69,7 @@ async function main() {
       ogma.setContainer('graph-container');
 
       // Initialize the visualization content & styles
-      ogma.initVisualization(visualizationConfiguration);
+      await ogma.initVisualization(visualizationConfiguration);
   }
 }
 
