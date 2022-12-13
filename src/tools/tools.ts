@@ -2,8 +2,8 @@
 
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
-import {Node, NodeList} from 'ogma';
-import {LkNodeData, LkProperty} from '@linkurious/rest-client';
+import {Node, NodeList} from '@linkurious/ogma';
+import {CurrencyFormat, ICurrencyOptions, LkNodeData, LkProperty} from '@linkurious/rest-client';
 
 export {sortBy};
 const URL_PATTERN = /([a-zA-Z][a-zA-Z0-9\+\-\.]*:\/\/[^\s]+)/i;
@@ -383,5 +383,52 @@ export class Tools {
    */
   public static parseFloat(n: unknown): number {
     return Tools.parseNumber(n);
+  }
+
+  /**
+   * Format a currency value to string.
+   *
+   * eg: 4123 -> 4.123,00 $
+   */
+  public static formatCurrencyValue(value: number, options: ICurrencyOptions): string {
+    const sign = value < 0 ? '- ' : '';
+    switch (options.format) {
+      case CurrencyFormat.SYMBOL_COMMAS_DOT:
+        return `${sign}${options.symbol} ${Tools.formatNumberToCurrency(value, ',', '.')}`;
+
+      case CurrencyFormat.DOTS_COMMA_SYMBOL:
+        return `${sign}${Tools.formatNumberToCurrency(value, '.', ',')} ${options.symbol}`;
+
+      case CurrencyFormat.SPACES_COMMA_DOT:
+        return `${sign}${Tools.formatNumberToCurrency(value, ' ', ',')} ${options.symbol}`;
+
+      default:
+        throw Error(`Cannot format property value ${value}, unknown format ${options.format}.`);
+    }
+  }
+
+  private static formatNumberToCurrency(
+    value: number,
+    thousandSeparator: string,
+    decimalSeparator: string
+  ): string {
+    if (!Number.isFinite(value)) {
+      return value.toString();
+    }
+
+    const [integerPart, fractionalPart] = Math.abs(value).toFixed(2).split('.');
+
+    let i = -1;
+    const thousands = integerPart
+      .split('')
+      .reverse()
+      .map((digit) => {
+        i++;
+        return i > 0 && i % 3 === 0 ? digit + thousandSeparator : digit;
+      })
+      .reverse()
+      .join('');
+
+    return thousands + decimalSeparator + fractionalPart;
   }
 }

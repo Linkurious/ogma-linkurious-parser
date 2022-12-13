@@ -1,7 +1,7 @@
 'use strict';
 
-import * as Ogma from 'ogma';
-import {ItemFieldsCaptions} from '@linkurious/rest-client';
+import * as Ogma from '@linkurious/ogma';
+import {GraphSchemaTypeWithAccess, ItemFieldsCaptions} from '@linkurious/rest-client';
 
 import {Captions, LKOgma} from '../..';
 import {Tools} from '../../tools/tools';
@@ -15,7 +15,11 @@ export class CaptionsViz {
   public nodesCaptionsRule!: Ogma.StyleRule;
   public edgesCaptionsRule!: Ogma.StyleRule;
   private _ogma: LKOgma;
-  private _schema: CaptionState = {node: {}, edge: {}};
+  private _captionSchema: CaptionState = {node: {}, edge: {}};
+  private _graphSchema: {
+    node: Array<GraphSchemaTypeWithAccess>;
+    edge: Array<GraphSchemaTypeWithAccess>;
+  } = {node: [], edge: []};
 
   constructor(
     ogma: LKOgma,
@@ -25,11 +29,18 @@ export class CaptionsViz {
     this._ogma = ogma;
   }
 
+  public set graphSchema(graphSchema: {
+    node: Array<GraphSchemaTypeWithAccess>;
+    edge: Array<GraphSchemaTypeWithAccess>;
+  }) {
+    this._graphSchema = graphSchema;
+  }
+
   /**
    * Refresh the schema
    */
   public refreshSchema(schema: CaptionState): void {
-    this._schema = schema;
+    this._captionSchema = schema;
   }
 
   /**
@@ -55,7 +66,7 @@ export class CaptionsViz {
    */
   public updateNodeCaptions(schema?: ItemFieldsCaptions): Promise<void> | void {
     if (schema) {
-      this._schema.node = schema;
+      this._captionSchema.node = schema;
     }
     if (!Tools.isDefined(this.nodesCaptionsRule)) {
       this.nodesCaptionsRule = this._ogma.styles.addRule({
@@ -65,7 +76,11 @@ export class CaptionsViz {
               if (node === undefined) {
                 return ``;
               }
-              const value = Captions.getText(node.getData(), this._schema.node);
+              const value = Captions.getText(
+                node.getData(),
+                this._captionSchema.node,
+                this._graphSchema.node
+              );
               return Tools.isDefined(this._nodeMaxTextLength)
                 ? Tools.truncate(value, 'middle', this._nodeMaxTextLength)
                 : value;
@@ -84,7 +99,7 @@ export class CaptionsViz {
    */
   public updateEdgeCaptions(schema?: ItemFieldsCaptions): Promise<void> | void {
     if (schema) {
-      this._schema.edge = schema;
+      this._captionSchema.edge = schema;
     }
     if (!Tools.isDefined(this.edgesCaptionsRule)) {
       this.edgesCaptionsRule = this._ogma.styles.addRule({
@@ -94,7 +109,11 @@ export class CaptionsViz {
               if (edge === undefined || edge.getData() === undefined) {
                 return ``;
               }
-              const value = Captions.getText(edge.getData(), this._schema.edge);
+              const value = Captions.getText(
+                edge.getData(),
+                this._captionSchema.edge,
+                this._graphSchema.edge
+              );
               return Tools.isDefined(this._edgeMaxTextLength)
                 ? Tools.truncate(value, 'middle', this._edgeMaxTextLength)
                 : value;
