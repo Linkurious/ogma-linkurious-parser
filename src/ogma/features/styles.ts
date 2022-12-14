@@ -155,6 +155,7 @@ export class StylesViz {
     this._nodeDefaultStylesRules = this._ogma.styles.addRule({
       nodeAttributes: {
         text: {
+          padding: 5,
           minVisibleSize:
             this._defaultConfiguration.node.text !== undefined &&
             this._defaultConfiguration.node.text.minVisibleSize
