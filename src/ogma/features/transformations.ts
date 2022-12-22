@@ -56,14 +56,14 @@ export class TransformationsViz {
         }
       });
     } else {
-      this.transformation.refresh();
+      await this.transformation.refresh();
     }
   }
 
   /**
    * init edge grouping style
    */
-  public async initEdgeGroupingStyle() {
+  public initEdgeGroupingStyle(): void {
     this.edgeGroupingStyleRule = this._ogma.styles.addRule({
       edgeAttributes: {
         ...DEFAULT_EDGE_GROUP_STYLE,
