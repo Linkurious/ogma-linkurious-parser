@@ -23,10 +23,11 @@ module.exports = {
     '@typescript-eslint/ban-ts-ignore': ['off'], // Allows @ts-ignore
     '@typescript-eslint/interface-name-prefix': ['off'], // Allows interfaces prefixed with I
     '@typescript-eslint/no-non-null-assertion': ['off'], // Allows non-null assertion
-    '@typescript-eslint/no-empty-function': ['off'], // Allows empty functions
-    '@typescript-eslint/require-await': ['off'], // Allows async without await
+    '@typescript-eslint/no-empty-function': ['error'], // Allows empty functions
+    '@typescript-eslint/require-await': ['error'], // Allows async without await
     'import/no-unresolved': ['off'], // Disable non working rule
     'import/order': ['error', {'newlines-between': 'always'}], // Orders imports by ['builtin', 'external', 'parent', 'sibling', 'index']
+    '@typescript-eslint/no-misused-promises': ['error'],
 
     // Shared specific
     '@typescript-eslint/unbound-method': ['off'],
@@ -38,7 +39,6 @@ module.exports = {
     'no-case-declarations': ['warn'],
     '@typescript-eslint/adjacent-overload-signatures': ['warn'],
     '@typescript-eslint/consistent-type-assertions': ['warn'],
-    '@typescript-eslint/no-misused-promises': ['warn'],
     '@typescript-eslint/no-use-before-define': ['warn'],
     '@typescript-eslint/prefer-regexp-exec': ['warn'],
     '@typescript-eslint/prefer-string-starts-ends-with': ['warn'],
