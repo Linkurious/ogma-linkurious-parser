@@ -154,6 +154,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       theta: this.getNodes().size > 100 ? 0.8 : 0.34
     };
   }
+
   public getRadialLayoutParams(rootNode: string, duration = 0): RadialLayoutOptions {
     return {
       centralNode: rootNode,
@@ -256,10 +257,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding edges to the graph after filtering disconnected ones
    */
-  public async addEdges(
-    edges: Array<RawEdge<LkEdgeData>>,
-    options?: AddItemOptions
-  ): Promise<EdgeList> {
+  public addEdges(edges: Array<RawEdge<LkEdgeData>>, options?: AddItemOptions): Promise<EdgeList> {
     const filteredEdges = edges.filter((edge) => {
       return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
     });
