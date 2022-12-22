@@ -24,7 +24,7 @@ module.exports = {
     '@typescript-eslint/interface-name-prefix': ['off'], // Allows interfaces prefixed with I
     '@typescript-eslint/no-non-null-assertion': ['off'], // Allows non-null assertion
     '@typescript-eslint/no-empty-function': ['error'], // Allows empty functions
-    '@typescript-eslint/require-await': ['error'], // Allows async without await
+    '@typescript-eslint/require-await': ['error'], // Disallows async without await
     'import/no-unresolved': ['off'], // Disable non working rule
     'import/order': ['error', {'newlines-between': 'always'}], // Orders imports by ['builtin', 'external', 'parent', 'sibling', 'index']
     '@typescript-eslint/no-misused-promises': ['error'],
