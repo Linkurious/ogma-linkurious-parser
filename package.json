@@ -13,7 +13,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {
-    "node": "16.18.1"
+    "node": "16.19.0"
   },
   "scripts": {
     "prepare": "tsc -b",
