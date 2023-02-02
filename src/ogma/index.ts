@@ -230,8 +230,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     }
   }
 
-  public async initVisualization(visualization: PopulatedVisualization) {
-    this.init(visualization);
+  public async initVisualization(visualization: PopulatedVisualization): Promise<void> {
+    await this.init(visualization);
     const styles = StyleRules.sanitizeStylesIndex(visualization.design.styles);
     this.LKStyles.initNodeColors(styles.node);
     this.LKStyles.initNodesIcons(styles.node);
@@ -240,12 +240,12 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.LKStyles.initEdgesWidth(styles.edge);
     this.LKStyles.initEdgesShape(styles.edge);
     this.LKStyles.initEdgesColor(styles.edge);
-    this.LKCaptions.initVizCaptions({
+    await this.LKCaptions.initVizCaptions({
       node: visualization.nodeFields.captions || {},
       edge: visualization.edgeFields.captions || {}
     });
     this.LKTransformation.groupedEdges = visualization.edgeGrouping;
-    this.LKTransformation.initTransformation();
+    await this.LKTransformation.initTransformation();
     this.LKTransformation.initEdgeGroupingStyle();
   }
 
@@ -269,10 +269,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding edges to the graph after filtering disconnected ones
    */
-  public async addEdges(
-    edges: Array<RawEdge<LkEdgeData>>,
-    options?: AddItemOptions
-  ): Promise<EdgeList> {
+  public addEdges(edges: Array<RawEdge<LkEdgeData>>, options?: AddItemOptions): Promise<EdgeList> {
     const filteredEdges = edges.filter((edge) => {
       return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
     });
