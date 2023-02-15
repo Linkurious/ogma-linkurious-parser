@@ -92,7 +92,6 @@ export class EdgeAttributes extends ItemAttributes<IEdgeStyle> {
           ) {
             const propertyName: string = widthStyle.input[1];
             const propertyValue = Tools.parseNumber(data.properties[propertyName]);
-            //to update with the correct enum type
             const isLog = widthStyle.scale && widthStyle.scale === AutoRangeScale.LOGARITHMIC;
             return EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule, isLog);
           }
