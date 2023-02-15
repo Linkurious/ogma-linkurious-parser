@@ -1,6 +1,12 @@
 'use strict';
 import {Color} from '@linkurious/ogma';
-import {LkEdgeData, OgmaEdgeShape} from '@linkurious/rest-client';
+import {
+  AutoRangeScale,
+  IEdgeStyle,
+  LkEdgeData,
+  OgmaEdgeShape,
+  IStyleAutoRange
+} from '@linkurious/rest-client';
 
 import {Tools} from '../tools/tools';
 
@@ -12,11 +18,11 @@ export enum EdgeWidthExtrema {
   MAX = 200
 }
 
-export class EdgeAttributes extends ItemAttributes {
+export class EdgeAttributes extends ItemAttributes<IEdgeStyle> {
   constructor(rulesMap: {
-    color?: Array<StyleRule>;
-    shape?: Array<StyleRule>;
-    width?: Array<StyleRule>;
+    color?: Array<StyleRule<IEdgeStyle>>;
+    shape?: Array<StyleRule<IEdgeStyle>>;
+    width?: Array<StyleRule<IEdgeStyle>>;
   }) {
     super(rulesMap);
   }
@@ -24,7 +30,10 @@ export class EdgeAttributes extends ItemAttributes {
   /**
    * Return rule that can be applied to the data
    */
-  private static matchStyle(styleRules: Array<StyleRule>, data: LkEdgeData): StyleRule | undefined {
+  private static matchStyle(
+    styleRules: Array<StyleRule<IEdgeStyle>>,
+    data: LkEdgeData
+  ): StyleRule<IEdgeStyle> | undefined {
     if (data === undefined) {
       return;
     }
@@ -50,7 +59,7 @@ export class EdgeAttributes extends ItemAttributes {
           color = rule.style.color;
         } else if (typeof rule.style.color === 'object') {
           const propValue = Tools.getIn(data, rule.style.color.input);
-          color = ItemAttributes.autoColor(`${propValue}`, rule.style.ignoreCase);
+          color = ItemAttributes.autoColor(`${propValue}`, rule.style.color.ignoreCase);
         }
         break;
       }
@@ -70,24 +79,26 @@ export class EdgeAttributes extends ItemAttributes {
   /**
    * Generate size for a given node
    */
-  public width(data: LkEdgeData): string | undefined {
+  public width(data: LkEdgeData): string | number | undefined {
     if (this._rulesMap.width !== undefined) {
       const styleRule = EdgeAttributes.matchStyle(this._rulesMap.width, data);
-      const widthStyle = styleRule?.style.width;
-      if (Tools.isDefined(styleRule) && widthStyle.type === 'autoRange') {
-        if (
-          widthStyle.input !== undefined &&
-          widthStyle.max !== undefined &&
-          widthStyle.min !== undefined
-        ) {
-          const propertyName: string = widthStyle.input[1];
-          const propertyValue = Tools.parseNumber(data.properties[propertyName]);
-          //to update with the correct enum type
-          const isLog = widthStyle.scale && widthStyle.scale === 'logarithmic';
-          return EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule, isLog);
+      if (styleRule !== undefined) {
+        const widthStyle = styleRule?.style.width;
+        if (widthStyle !== undefined && this.isAutoRange(widthStyle)) {
+          if (
+            widthStyle.input !== undefined &&
+            widthStyle.max !== undefined &&
+            widthStyle.min !== undefined
+          ) {
+            const propertyName: string = widthStyle.input[1];
+            const propertyValue = Tools.parseNumber(data.properties[propertyName]);
+            //to update with the correct enum type
+            const isLog = widthStyle.scale && widthStyle.scale === AutoRangeScale.LOGARITHMIC;
+            return EdgeAttributes.getAutomaticRangeWidth(propertyValue, styleRule, isLog);
+          }
+        } else {
+          return widthStyle;
         }
-      } else {
-        return widthStyle;
       }
     }
   }
@@ -98,17 +109,21 @@ export class EdgeAttributes extends ItemAttributes {
    * @param rule
    * @param isLog
    */
-  public static getAutomaticRangeWidth(value: number, rule: StyleRule, isLog = false): string {
+  public static getAutomaticRangeWidth(
+    value: number,
+    rule: StyleRule<IEdgeStyle>,
+    isLog = false
+  ): string | undefined {
     return isLog
       ? this.getAutomaticRangeStyleLog(
           value,
-          rule.style.width,
+          rule.style.width as IStyleAutoRange,
           EdgeWidthExtrema.MIN,
           EdgeWidthExtrema.MAX
         )
       : this.getAutomaticRangeStyleLinear(
           value,
-          rule.style.width,
+          rule.style.width as IStyleAutoRange,
           EdgeWidthExtrema.MIN,
           EdgeWidthExtrema.MAX
         );
@@ -122,7 +137,7 @@ export class EdgeAttributes extends ItemAttributes {
   ): {
     color: Color;
     shape: OgmaEdgeShape | undefined;
-    width: string | undefined;
+    width: string | undefined | number;
   } {
     if (!Tools.isDefined(data)) {
       return {
