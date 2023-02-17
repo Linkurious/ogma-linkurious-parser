@@ -6,6 +6,7 @@ import {
   LkEdgeData,
   LkNodeData,
   INodeStyle,
+  IRangeValues,
   SelectorType,
   IStyleAutoRange
 } from '@linkurious/rest-client';
@@ -17,21 +18,23 @@ export enum StyleRuleType {
   AUTO_RANGE = 'autoRange'
 }
 
-export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
+export class StyleRule<T extends INodeStyle | IEdgeStyle = INodeStyle | IEdgeStyle>
+  implements IStyleRule<T> {
   public type: SelectorType;
   public input: string[] | undefined;
   public index: number;
+  public style: T;
   public itemType?: string;
-  public value: any;
-  public style: any;
+  public value: IRangeValues | number | string | boolean;
 
-  constructor(model: IStyleRule<INodeStyle | IEdgeStyle>) {
+  constructor(model: IStyleRule<T>) {
     this.type = model.type;
     this.input = model.input;
     this.index = model.index;
     this.itemType = model.itemType;
     this.style = model.style;
-    this.value = model.value;
+    // cast to remove undefined from type
+    this.value = model.value as IRangeValues | number | string | boolean;
   }
 
   public static isAutomaticRange(rule: IStyleRule<IEdgeStyle | INodeStyle>): boolean {
@@ -68,7 +71,7 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
   public matchValues(
     itemType: string | undefined,
     input: Array<string> | undefined,
-    value: any
+    value: string
   ): boolean {
     if (Tools.isDefined(input)) {
       return (
@@ -121,7 +124,10 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
 
       case SelectorType.RANGE:
         if (StyleRule.inputExists(this.type, this.input)) {
-          typePredicate = StyleRule.checkRange(Tools.getIn(data, this.input), this.value);
+          typePredicate = StyleRule.checkRange(
+            Tools.getIn(data, this.input),
+            this.value as IRangeValues
+          );
         }
         break;
 
@@ -181,7 +187,11 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
   /**
    * Return true or false on rule type 'is' if the current node match the rule
    */
-  public static checkIs(data: LkNodeData | LkEdgeData, input: Array<string>, value: any): boolean {
+  public static checkIs(
+    data: LkNodeData | LkEdgeData,
+    input: Array<string>,
+    value: IRangeValues | number | string | boolean
+  ): boolean {
     if (!Tools.isDefined(input)) {
       return false;
     }
@@ -235,7 +245,7 @@ export class StyleRule implements IStyleRule<INodeStyle | IEdgeStyle> {
    * @param {string} itemType
    * @return {boolean}
    */
-  public static matchAny(itemType: any | null): boolean {
+  public static matchAny(itemType: string | null | undefined): boolean {
     return itemType === undefined;
   }
 
