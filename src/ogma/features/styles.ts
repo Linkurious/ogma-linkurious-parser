@@ -558,7 +558,7 @@ export class StylesViz {
   /**
    * Create / refresh an ogma rule for node colors
    */
-  public refreshNodeColors(colorStyleRules: Array<LKStyleRule>): void {
+  public refreshNodeColors(colorStyleRules: Array<LKStyleRule<INodeStyle>>): void {
     if (!Tools.isDefined(this._ogmaNodeColor)) {
       this._nodeAttributes.refresh({color: colorStyleRules});
       this._ogmaNodeColor = this._ogma.styles.addRule({
@@ -589,38 +589,56 @@ export class StylesViz {
     return new StyleRules(state)[styleType];
   }
 
-  public initNodeColors(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
-    const nodeColorRules = this.getStyleRule(nodeRules, StyleType.COLOR);
+  public initNodeColors(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>): void {
+    const nodeColorRules = this.getStyleRule(
+      nodeRules,
+      StyleType.COLOR
+    ) as LKStyleRule<INodeStyle>[];
     this.refreshNodeColors(nodeColorRules);
   }
 
   public initNodesIcons(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
-    const nodeIconsRules = this.getStyleRule(nodeRules, StyleType.ICON);
+    const nodeIconsRules = this.getStyleRule(
+      nodeRules,
+      StyleType.ICON
+    ) as LKStyleRule<INodeStyle>[];
     this.refreshNodeIcons(nodeIconsRules);
   }
 
   public initNodesSizes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
-    const nodeSizeRules = this.getStyleRule(nodeRules, StyleType.SIZE);
+    const nodeSizeRules = this.getStyleRule(nodeRules, StyleType.SIZE) as LKStyleRule<INodeStyle>[];
     this.refreshNodeSize(nodeSizeRules);
   }
 
   public initNodesShapes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
-    const nodeShapesRules = this.getStyleRule(nodeRules, StyleType.SHAPE);
+    const nodeShapesRules = this.getStyleRule(
+      nodeRules,
+      StyleType.SHAPE
+    ) as LKStyleRule<INodeStyle>[];
     this.refreshNodeShape(nodeShapesRules);
   }
 
   public initEdgesWidth(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
-    const edgesWidthRules = this.getStyleRule(edgeRules, StyleType.WIDTH);
+    const edgesWidthRules = this.getStyleRule(
+      edgeRules,
+      StyleType.WIDTH
+    ) as LKStyleRule<IEdgeStyle>[];
     this.refreshEdgeWidth(edgesWidthRules);
   }
 
   public initEdgesShape(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
-    const edgesShapeRules = this.getStyleRule(edgeRules, StyleType.SHAPE);
+    const edgesShapeRules = this.getStyleRule(
+      edgeRules,
+      StyleType.SHAPE
+    ) as LKStyleRule<IEdgeStyle>[];
     this.refreshEdgeShape(edgesShapeRules);
   }
 
   public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
-    const edgesColorRules = this.getStyleRule(edgeRules, StyleType.COLOR);
+    const edgesColorRules = this.getStyleRule(
+      edgeRules,
+      StyleType.COLOR
+    ) as LKStyleRule<IEdgeStyle>[];
     this.refreshEdgeColors(edgesColorRules);
   }
 
@@ -629,7 +647,7 @@ export class StylesViz {
    *
    * @param {Array<any>} iconStyleRules
    */
-  public refreshNodeIcons(iconStyleRules: Array<LKStyleRule>): void {
+  public refreshNodeIcons(iconStyleRules: Array<LKStyleRule<INodeStyle>>): void {
     if (!Tools.isDefined(this._ogmaNodeIcon)) {
       this._nodeAttributes.refresh({icon: iconStyleRules});
       this._ogmaNodeIcon = this._ogma.styles.addRule({
@@ -658,7 +676,7 @@ export class StylesViz {
    *
    * @param {Array<any>} sizeStyleRules
    */
-  public refreshNodeSize(sizeStyleRules: Array<LKStyleRule>): void {
+  public refreshNodeSize(sizeStyleRules: Array<LKStyleRule<INodeStyle>>): void {
     if (!Tools.isDefined(this._ogmaNodeSize)) {
       this._nodeAttributes.refresh({size: sizeStyleRules});
       this._ogmaNodeSize = this._ogma.styles.addRule({
@@ -682,7 +700,7 @@ export class StylesViz {
    *
    * @param {Array<any>} shapeStyleRules
    */
-  public refreshNodeShape(shapeStyleRules: Array<LKStyleRule>): void {
+  public refreshNodeShape(shapeStyleRules: Array<LKStyleRule<INodeStyle>>): void {
     if (!Tools.isDefined(this._ogmaNodeShape)) {
       this._nodeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaNodeShape = this._ogma.styles.addRule({
@@ -704,7 +722,7 @@ export class StylesViz {
   /**
    * Create / refresh an ogma rule for edge colors
    */
-  public refreshEdgeColors(colorStyleRules: Array<LKStyleRule>): void {
+  public refreshEdgeColors(colorStyleRules: Array<LKStyleRule<IEdgeStyle>>): void {
     if (!Tools.isDefined(this._ogmaEdgeColor)) {
       this._edgeAttributes.refresh({color: colorStyleRules});
       this._ogmaEdgeColor = this._ogma.styles.addRule({
@@ -728,7 +746,7 @@ export class StylesViz {
    *
    * @param {Array<LKStyleRule>} widthStyleRules
    */
-  public refreshEdgeWidth(widthStyleRules: Array<LKStyleRule>): void {
+  public refreshEdgeWidth(widthStyleRules: Array<LKStyleRule<IEdgeStyle>>): void {
     if (!Tools.isDefined(this._ogmaEdgeWidth)) {
       this._edgeAttributes.refresh({width: widthStyleRules});
       this._ogmaEdgeWidth = this._ogma.styles.addRule({
@@ -754,7 +772,7 @@ export class StylesViz {
    *
    * @param {Array<LKStyleRule>} shapeStyleRules
    */
-  public refreshEdgeShape(shapeStyleRules: Array<LKStyleRule>): void {
+  public refreshEdgeShape(shapeStyleRules: Array<LKStyleRule<IEdgeStyle>>): void {
     if (!Tools.isDefined(this._ogmaEdgeShape)) {
       this._edgeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaEdgeShape = this._ogma.styles.addRule({
