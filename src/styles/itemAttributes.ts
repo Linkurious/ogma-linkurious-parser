@@ -2,6 +2,7 @@
 
 import sha1 from 'sha1';
 import {Color} from '@linkurious/ogma';
+import {IEdgeStyle, INodeStyle, IStyleAutoRange} from '@linkurious/rest-client';
 
 import {Tools} from '../tools/tools';
 
@@ -31,24 +32,24 @@ export const PALETTE = [
   '#c49c94'
 ];
 
-export class ItemAttributes {
+export class ItemAttributes<T extends INodeStyle | IEdgeStyle> {
   protected colorsCache: Map<string, Color | Array<Color>> = new Map();
   protected _rulesMap: {
-    color?: Array<StyleRule>;
-    icon?: Array<StyleRule>;
-    image?: Array<StyleRule>;
-    shape?: Array<StyleRule>;
-    size?: Array<StyleRule>;
-    width?: Array<StyleRule>;
+    color?: Array<StyleRule<T>>;
+    icon?: Array<StyleRule<T>>;
+    image?: Array<StyleRule<T>>;
+    shape?: Array<StyleRule<T>>;
+    size?: Array<StyleRule<T>>;
+    width?: Array<StyleRule<T>>;
   } = {};
 
   constructor(rulesMap: {
-    color?: Array<StyleRule>;
-    icon?: Array<StyleRule>;
-    image?: Array<StyleRule>;
-    shape?: Array<StyleRule>;
-    size?: Array<StyleRule>;
-    width?: Array<StyleRule>;
+    color?: Array<StyleRule<T>>;
+    icon?: Array<StyleRule<T>>;
+    image?: Array<StyleRule<T>>;
+    shape?: Array<StyleRule<T>>;
+    size?: Array<StyleRule<T>>;
+    width?: Array<StyleRule<T>>;
   }) {
     this.refresh(rulesMap);
   }
@@ -57,12 +58,12 @@ export class ItemAttributes {
    * Refresh the rules
    */
   public refresh(rulesMap: {
-    color?: Array<StyleRule>;
-    icon?: Array<StyleRule>;
-    image?: Array<StyleRule>;
-    shape?: Array<StyleRule>;
-    size?: Array<StyleRule>;
-    width?: Array<StyleRule>;
+    color?: Array<StyleRule<T>>;
+    icon?: Array<StyleRule<T>>;
+    image?: Array<StyleRule<T>>;
+    shape?: Array<StyleRule<T>>;
+    size?: Array<StyleRule<T>>;
+    width?: Array<StyleRule<T>>;
   }): void {
     if (rulesMap.color !== undefined) {
       this.colorsCache = new Map();
@@ -106,7 +107,10 @@ export class ItemAttributes {
   /**
    * Get color of a type
    */
-  public static getTypeColor(rule: StyleRule, type: string): string | null {
+  public static getTypeColor(
+    rule: StyleRule<IEdgeStyle | INodeStyle>,
+    type: string
+  ): string | undefined | null {
     if (typeof rule.style.color === 'object' && rule.style.color.input[0] !== 'properties') {
       return ItemAttributes.autoColor(type, rule.style.color.ignoreCase);
     }
@@ -125,21 +129,23 @@ export class ItemAttributes {
    */
   public static getAutomaticRangeStyleLinear(
     value: number,
-    {max, min}: {max: number; min: number},
+    {max, min}: IStyleAutoRange,
     lower: EdgeWidthExtrema | NodeSizeExtrema,
     higher: EdgeWidthExtrema | NodeSizeExtrema
-  ): string {
-    // apply default style when min equal max
-    if (max === min || isNaN(value)) {
-      return '100%';
+  ): string | undefined {
+    if (max !== undefined && min !== undefined) {
+      // apply default style when min equal max
+      if (max === min || isNaN(value)) {
+        return '100%';
+      }
+
+      // calculate the linear function f(x) = ax + b
+      const a = (higher - lower) / (max - min);
+      const b = (lower * max - higher * min) / (max - min);
+      const size = Math.floor(value * a + b);
+
+      return `${size}%`;
     }
-
-    // calculate the linear function f(x) = ax + b
-    const a = (higher - lower) / (max - min);
-    const b = (lower * max - higher * min) / (max - min);
-    const size = Math.floor(value * a + b);
-
-    return `${size}%`;
   }
 
   /**
@@ -151,25 +157,31 @@ export class ItemAttributes {
    */
   public static getAutomaticRangeStyleLog(
     value: number,
-    {max, min}: {max: number; min: number},
+    {max, min}: IStyleAutoRange,
     lower: EdgeWidthExtrema | NodeSizeExtrema,
     higher: EdgeWidthExtrema | NodeSizeExtrema
-  ): string {
-    // apply default style when min equal max
-    if (max === min || isNaN(value)) {
-      return '100%';
-    }
-    // apply an offset for all the values (including min and max)
-    if (min < 1) {
-      value += Math.abs(min) + 1;
-      max += Math.abs(min) + 1;
-      min += Math.abs(min) + 1;
-    }
-    // calculate the logarithmic function  f(x) = Math.floor(a*log(x) + b)
-    const a = (higher - lower) / (Math.log(max) - Math.log(min));
-    const b = (lower * Math.log(max) - higher * Math.log(min)) / (Math.log(max) - Math.log(min));
-    const size = Math.floor(a * Math.log(value) + b);
+  ): string | undefined {
+    if (min !== undefined && max !== undefined) {
+      // apply default style when min equal max
+      if (max === min || isNaN(value)) {
+        return '100%';
+      }
+      // apply an offset for all the values (including min and max)
+      if (min < 1) {
+        value += Math.abs(min) + 1;
+        max += Math.abs(min) + 1;
+        min += Math.abs(min) + 1;
+      }
+      // calculate the logarithmic function  f(x) = Math.floor(a*log(x) + b)
+      const a = (higher - lower) / (Math.log(max) - Math.log(min));
+      const b = (lower * Math.log(max) - higher * Math.log(min)) / (Math.log(max) - Math.log(min));
+      const size = Math.floor(a * Math.log(value) + b);
 
-    return `${size}%`;
+      return `${size}%`;
+    }
+  }
+
+  public isAutoRange(value: string | number | IStyleAutoRange): value is IStyleAutoRange {
+    return typeof value === 'object' && value?.type === 'autoRange';
   }
 }

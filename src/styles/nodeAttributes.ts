@@ -1,6 +1,15 @@
 'use strict';
 import {Color} from '@linkurious/ogma';
-import {LkNodeData, OgmaNodeShape, IStyleImage, IStyleIcon} from '@linkurious/rest-client';
+import {
+  AutoRangeScale,
+  IImageDataValue,
+  INodeStyle,
+  IStyleAutoRange,
+  IStyleIcon,
+  IStyleImage,
+  LkNodeData,
+  OgmaNodeShape
+} from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
 import {Tools} from '../tools/tools';
@@ -18,13 +27,13 @@ export enum NodeSizeExtrema {
   MAX = 500
 }
 
-export class NodeAttributes extends ItemAttributes {
+export class NodeAttributes extends ItemAttributes<INodeStyle> {
   constructor(rulesMap: {
-    color?: Array<StyleRule>;
-    icon?: Array<StyleRule>;
-    image?: Array<StyleRule>;
-    shape?: Array<StyleRule>;
-    size?: Array<StyleRule>;
+    color?: Array<StyleRule<INodeStyle>>;
+    icon?: Array<StyleRule<INodeStyle>>;
+    image?: Array<StyleRule<INodeStyle>>;
+    shape?: Array<StyleRule<INodeStyle>>;
+    size?: Array<StyleRule<INodeStyle>>;
   }) {
     super(rulesMap);
   }
@@ -33,9 +42,9 @@ export class NodeAttributes extends ItemAttributes {
    * Run the callback if an item match with a style in the array of rules
    */
   private static matchStyle(
-    styleRules: Array<StyleRule>,
+    styleRules: Array<StyleRule<INodeStyle>>,
     itemData: LkNodeData,
-    callback: (style: StyleRule) => unknown
+    callback: (style: StyleRule<INodeStyle>) => unknown
   ): void {
     if (!Tools.isDefined(itemData)) {
       return;
@@ -63,9 +72,9 @@ export class NodeAttributes extends ItemAttributes {
     if (cachedColor !== undefined) {
       return cachedColor;
     }
-    let colors = [];
+    let colors: Array<string | null> = [];
     for (let i = 0; i < itemData.categories.length; ++i) {
-      let c = null;
+      let color = null;
       for (let j = 0; j < this._rulesMap.color!.length; ++j) {
         const rule = this._rulesMap.color![j];
         if (
@@ -79,17 +88,17 @@ export class NodeAttributes extends ItemAttributes {
           if (typeof rule.style.color === 'object') {
             const propValue = Tools.getIn(itemData, rule.style.color.input);
             if (Array.isArray(propValue)) {
-              c = ItemAttributes.autoColor(itemData.categories[i], rule.style.ignoreCase);
+              color = ItemAttributes.autoColor(itemData.categories[i], rule.style.color.ignoreCase);
             } else {
-              c = ItemAttributes.autoColor(`${propValue}`, rule.style.ignoreCase);
+              color = ItemAttributes.autoColor(`${propValue}`, rule.style.color.ignoreCase);
             }
           } else {
-            c = rule.style.color;
+            color = rule.style.color as string;
           }
           break;
         }
       }
-      colors.push(c);
+      colors.push(color);
     }
     colors = colors.filter((c) => Tools.isDefined(c));
     if (colors.length === 0) {
@@ -121,26 +130,27 @@ export class NodeAttributes extends ItemAttributes {
     }
     for (let i = 0; i < rules.length; ++i) {
       if (rules[i].canApplyTo(itemData)) {
-        if ('icon' in rules[i].style) {
+        const style = rules[i].style;
+        if ('icon' in style && typeof style.icon === 'object') {
           result = {
             icon: {
-              content: rules[i].style.icon.content,
-              font: rules[i].style.icon.font,
+              content: style.icon?.content as string,
+              font: style.icon?.font,
               scale: 0.5,
               color: OgmaTools.isBright(color) ? '#000000' : '#FFFFFF'
             }
           };
-        } else if ('image' in rules[i].style) {
+        } else if ('image' in style && typeof style.image === 'object') {
           result = {
             image: {
               url:
-                Tools.getType(rules[i].style.image.url) === 'imageUrl' ||
-                Tools.getType(rules[i].style.image.url) === 'image'
-                  ? rules[i].style.image.url
-                  : Tools.getIn(itemData, rules[i].style.image.url.path),
-              scale: rules[i].style.image.scale,
-              fit: rules[i].style.image.fit,
-              tile: rules[i].style.image.tile,
+                Tools.getType(style.image.url as string) === 'imageUrl' ||
+                Tools.getType(style.image.url as string) === 'image'
+                  ? style.image.url
+                  : Tools.getIn(itemData, (style.image.url as IImageDataValue).path),
+              scale: style.image.scale,
+              fit: style.image.fit,
+              tile: style.image.tile,
               minVisibleSize: 0
             }
           };
@@ -171,24 +181,27 @@ export class NodeAttributes extends ItemAttributes {
   public size(itemData: LkNodeData): number | undefined {
     let result = undefined;
     if (this._rulesMap.size !== undefined) {
-      NodeAttributes.matchStyle(this._rulesMap.size, itemData, (styleRule) => {
-        const sizeStyle = styleRule.style.size;
-        if (sizeStyle.type === 'autoRange') {
-          if (
-            sizeStyle.input !== undefined &&
-            sizeStyle.max !== undefined &&
-            sizeStyle.min !== undefined
-          ) {
-            const propertyName: string = sizeStyle.input[1];
-            const propertyValue = Tools.parseNumber(itemData.properties[propertyName]);
-            //to update with the correct enum type
-            const isLog = sizeStyle.scale && sizeStyle.scale === 'logarithmic';
-            result = NodeAttributes.getAutomaticRangeSize(propertyValue, styleRule, isLog);
+      NodeAttributes.matchStyle(
+        this._rulesMap.size,
+        itemData,
+        (styleRule: StyleRule<INodeStyle>) => {
+          const sizeStyle = styleRule.style.size as string | number | IStyleAutoRange;
+          if (this.isAutoRange(sizeStyle)) {
+            if (
+              sizeStyle.input !== undefined &&
+              sizeStyle.max !== undefined &&
+              sizeStyle.min !== undefined
+            ) {
+              const propertyName: string = sizeStyle.input[1];
+              const propertyValue = Tools.parseNumber(itemData.properties[propertyName]);
+              const isLog = sizeStyle.scale && sizeStyle.scale === AutoRangeScale.LOGARITHMIC;
+              result = NodeAttributes.getAutomaticRangeSize(propertyValue, styleRule, isLog);
+            }
+          } else {
+            result = sizeStyle;
           }
-        } else {
-          result = sizeStyle;
         }
-      });
+      );
     }
     return result;
   }
@@ -199,17 +212,21 @@ export class NodeAttributes extends ItemAttributes {
    * @param rule
    * @param isLog
    */
-  public static getAutomaticRangeSize(value: number, rule: StyleRule, isLog = false): string {
+  public static getAutomaticRangeSize(
+    value: number,
+    rule: StyleRule<INodeStyle>,
+    isLog = false
+  ): string | undefined {
     return isLog
       ? this.getAutomaticRangeStyleLog(
           value,
-          rule.style.size,
+          rule.style.size as IStyleAutoRange,
           NodeSizeExtrema.MIN,
           NodeSizeExtrema.MAX
         )
       : this.getAutomaticRangeStyleLinear(
           value,
-          rule.style.size,
+          rule.style.size as IStyleAutoRange,
           NodeSizeExtrema.MIN,
           NodeSizeExtrema.MAX
         );

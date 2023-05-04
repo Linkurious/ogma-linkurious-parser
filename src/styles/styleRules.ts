@@ -9,7 +9,9 @@ import {
   SelectorType,
   IStyleIcon,
   IStyleImage,
-  IStyles
+  IStyles,
+  IStyleColor,
+  IRangeValues
 } from '@linkurious/rest-client';
 
 import {sortBy, Tools} from '../tools/tools';
@@ -102,7 +104,7 @@ export class StyleRules {
   /**
    * Return an object containing for each node style a sorted array of StyleRule
    *
-   * @return {any}
+   * @return {{[key: string]: Array<StyleRule>} }
    */
   public get nodeRules(): {[key: string]: Array<StyleRule>} {
     return {
@@ -117,7 +119,7 @@ export class StyleRules {
   /**
    * Return an object containing for each edge style a sorted array of StyleRule
    *
-   * @return {any}
+   * @return { {[key: string]: Array<StyleRule>}}
    */
   public get edgeRules(): {[key: string]: Array<StyleRule>} {
     return {
@@ -138,11 +140,19 @@ export class StyleRules {
 
     if ('categories' in itemsData[0]) {
       Object.keys(this.nodeRules).forEach((style: string) => {
-        result[style] = StyleRules.getLegendForStyle(style, this.nodeRules[style], itemsData);
+        result[style] = StyleRules.getLegendForStyle(
+          style as StyleType,
+          this.nodeRules[style],
+          itemsData
+        );
       });
     } else {
       Object.keys(this.edgeRules).forEach((style: string) => {
-        result[style] = StyleRules.getLegendForStyle(style, this.edgeRules[style], itemsData);
+        result[style] = StyleRules.getLegendForStyle(
+          style as StyleType,
+          this.edgeRules[style],
+          itemsData
+        );
       });
     }
     return result;
@@ -152,7 +162,7 @@ export class StyleRules {
    * Return the legend for a specific style type (color, icon, image...)
    */
   public static getLegendForStyle(
-    styleType: string,
+    styleType: StyleType,
     styles: Array<StyleRule>,
     itemsData: Array<LkNodeData | LkEdgeData>
   ): Array<{label: string; value: string | number | IStyleIcon | IStyleImage}> {
@@ -184,7 +194,7 @@ export class StyleRules {
             // thus bloating the legend.
           } else {
             const value = styleRule.style.image;
-            StyleRules.updateLegend(result, {label: label, value: value});
+            StyleRules.updateLegend(result, {label: label, value: value as string});
           }
         } else {
           const label = Tools.isDefined(styleRule.input)
@@ -192,8 +202,11 @@ export class StyleRules {
                 styleRule.input[1]
               } ${StyleRules.sanitizeValue(styleRule.type, styleRule.value)}`
             : `${StyleRules.getTypeLabel(styleRule.itemType)}`;
-          const value = styleRule.style[styleType];
-          StyleRules.updateLegend(result, {label: label, value: value});
+          const value =
+            styleType === StyleType.WIDTH
+              ? (styleRule.style as IEdgeStyle)[styleType]
+              : (styleRule.style as INodeStyle)[styleType];
+          StyleRules.updateLegend(result, {label: label, value: value as string});
         }
       }
     }
@@ -204,7 +217,11 @@ export class StyleRules {
   /**
    * Sanitize value for legend
    */
-  public static sanitizeValue(styleType: SelectorType, value: any): string {
+  public static sanitizeValue(
+    styleType: SelectorType,
+    value: IRangeValues | number | string | boolean
+  ): string {
+    let template = '';
     switch (styleType) {
       case SelectorType.NO_VALUE:
         return 'is undefined';
@@ -213,12 +230,11 @@ export class StyleRules {
         return 'is not an number';
 
       case SelectorType.RANGE:
-        let template = '';
         Object.keys(value).forEach((k, i) => {
           if (i > 0) {
             template += ' and ';
           }
-          template += `${k} ${value[k]}`;
+          template += `${k} ${(value as IRangeValues)[k as keyof IRangeValues]}`;
         });
         return template;
     }
@@ -234,22 +250,23 @@ export class StyleRules {
     styleRule: StyleRule,
     currentLegend: Array<{label: string; value: string | number | IStyleIcon | IStyleImage}>
   ): void {
-    const propertyKey: string = styleRule.style.color.input[1];
+    const colorStyle = styleRule.style.color as IStyleColor;
+    const propertyKey: string = colorStyle.input[1];
     itemsData.forEach((data) => {
-      const propValue = Tools.getIn(data, styleRule.style.color.input);
+      const propValue = Tools.getIn(data, colorStyle.input);
       if (Array.isArray(propValue)) {
         propValue.forEach((value) => {
-          const label = styleRule.style.color.input.includes('properties')
+          const label = colorStyle.input.includes('properties')
             ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${propertyKey} = ${value}`
             : `${StyleRules.getTypeLabel(value)}`;
-          const color = ItemAttributes.autoColor(value, styleRule.style.color.ignoreCase);
+          const color = ItemAttributes.autoColor(value, colorStyle.ignoreCase);
           StyleRules.updateLegend(currentLegend, {label: label, value: color});
         });
       } else {
-        const label = styleRule.style.color.input.includes('properties')
+        const label = colorStyle.input.includes('properties')
           ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${propertyKey} = ${propValue}`
           : `${StyleRules.getTypeLabel(propValue)}`;
-        const value = ItemAttributes.autoColor(propValue, styleRule.style.color.ignoreCase);
+        const value = ItemAttributes.autoColor(propValue, colorStyle.ignoreCase);
         StyleRules.updateLegend(currentLegend, {label: label, value: value});
       }
     });
