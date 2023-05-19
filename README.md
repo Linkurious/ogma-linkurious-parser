@@ -18,11 +18,11 @@ In order to create an Ogma visualization with your Linkurious styles:
 
 1. Get your visualization using [Linkurios REST API](https://doc.linkurio.us/server-sdk/latest/apidoc/#api-Visualization-getVisualization).
 
+2. Get Linkurious configuration using [Linkurios REST API](https://doc.linkurio.us/server-sdk/latest/apidoc/#api-Config-getConfiguration).
 
-2. Get the Linkurious configuration using [Linkurios REST API](https://doc.linkurio.us/server-sdk/latest/apidoc/#api-Config-getConfiguration).
+3. If you need to reproduce the same caption styles, get graph schema using [Linkurios REST API](https://doc.linkurious.com/server-sdk/latest/apidoc/#api-Schema-getTypes).
 
-
-3. Initialize `LKOgma` and call `initVisualization` with the configuration and the visualization data from the previous steps.
+4. Initialize `LKOgma` and call `initVisualization` with the configuration and the visualization data from the previous steps.
 
 
 A full working example using the [Linkurious REST Client](https://github.com/Linkurious/linkurious-rest-client/) library:
@@ -51,9 +51,24 @@ async function main() {
           id: 3
       });
 
-  if (linkuriousConfigurationResponse.isSuccess() && visualizationResponse.isSuccess()) {
-      const ogmaConfiguration = linkuriousConfigurationResponse.body.ogma;
 
+  const nodeTypesResponse = await this.rc.graphSchema.getTypesWithAccess({
+    entityType: 'node'
+  });
+  const edgeTypesResponse = await this.rc.graphSchema.getTypesWithAccess({
+    entityType: 'edge'
+  });
+  
+
+  if (linkuriousConfigurationResponse.isSuccess() && visualizationResponse.isSuccess() && nodeTypesResponse.isSuccess() && edgeTypesResponse.isSuccess) {
+    
+      const ogmaConfiguration = linkuriousConfigurationResponse.body.ogma;
+      
+      const graphSchema = {
+        node: nodeTypesResponse.body.node.results,
+        edge: edgeTypesResponse.body.edge.results
+      }
+      
       const visualizationConfiguration = visualizationResponse.body;
 
        // Initialize ogma object
@@ -68,8 +83,12 @@ async function main() {
       // Set HTML container where Ogma will be rendered
       ogma.setContainer('graph-container');
 
+      // Set graphSchema that will be used in defining caption styles
+      ogma.LKCaptions.graphSchema = graphSchema;
+      
       // Initialize the visualization content & styles
       await ogma.initVisualization(visualizationConfiguration);
+
   }
 }
 
