@@ -1,7 +1,7 @@
 'use strict';
 
 import sha1 from 'sha1';
-import {Color} from 'ogma';
+import {Color} from '@linkurious/ogma';
 
 import {Tools} from '../tools/tools';
 
@@ -117,20 +117,20 @@ export class ItemAttributes {
   }
 
   /**
-   * return the corresponding size to the value
+   * return the corresponding size to the value with a linear function
    * @param value
    * @param lower
    * @param higher
    * @param extrema
    */
-  public static getAutomaticRangeStyle(
+  public static getAutomaticRangeStyleLinear(
     value: number,
     {max, min}: {max: number; min: number},
     lower: EdgeWidthExtrema | NodeSizeExtrema,
     higher: EdgeWidthExtrema | NodeSizeExtrema
   ): string {
     // apply default style when min equal max
-    if (max === min) {
+    if (max === min || isNaN(value)) {
       return '100%';
     }
 
@@ -138,6 +138,37 @@ export class ItemAttributes {
     const a = (higher - lower) / (max - min);
     const b = (lower * max - higher * min) / (max - min);
     const size = Math.floor(value * a + b);
+
+    return `${size}%`;
+  }
+
+  /**
+   * return the corresponding size to the value with a logarithmic function
+   * @param value
+   * @param lower
+   * @param higher
+   * @param extrema
+   */
+  public static getAutomaticRangeStyleLog(
+    value: number,
+    {max, min}: {max: number; min: number},
+    lower: EdgeWidthExtrema | NodeSizeExtrema,
+    higher: EdgeWidthExtrema | NodeSizeExtrema
+  ): string {
+    // apply default style when min equal max
+    if (max === min || isNaN(value)) {
+      return '100%';
+    }
+    // apply an offset for all the values (including min and max)
+    if (min < 1) {
+      value += Math.abs(min) + 1;
+      max += Math.abs(min) + 1;
+      min += Math.abs(min) + 1;
+    }
+    // calculate the logarithmic function  f(x) = Math.floor(a*log(x) + b)
+    const a = (higher - lower) / (Math.log(max) - Math.log(min));
+    const b = (lower * Math.log(max) - higher * Math.log(min)) / (Math.log(max) - Math.log(min));
+    const size = Math.floor(a * Math.log(value) + b);
 
     return `${size}%`;
   }

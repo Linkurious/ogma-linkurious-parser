@@ -160,8 +160,8 @@ export class StyleRules {
     const data = itemsData.filter((i) => i);
     for (let i = 0; i < styles.length; i++) {
       const styleRule = new StyleRule(styles[i]);
-      const ruleExistsInViz = data.some((d) => {
-        return styleRule.canApplyTo(d);
+      const ruleExistsInViz = data.some((itemData) => {
+        return styleRule.canApplyTo(itemData);
       });
       if (ruleExistsInViz) {
         if (styleType === StyleType.COLOR && typeof styleRule.style.color === 'object') {
@@ -173,8 +173,19 @@ export class StyleRules {
                 styleRule.input[1]
               } ${StyleRules.sanitizeValue(styleRule.type, styleRule.value)}`
             : `${StyleRules.getTypeLabel(styleRule.itemType)}`;
-          const value = styleRule.style.image;
-          StyleRules.updateLegend(result, {label: label, value: value});
+          const imageStyle = styleRule.style.image as IStyleImage;
+          if (
+            imageStyle.url &&
+            typeof imageStyle.url === 'object' &&
+            imageStyle.url.type === 'data'
+          ) {
+            // If the custom icon is read from a node property-value dynamically, then we
+            // skip it from the legend, because it could be a different image for each node,
+            // thus bloating the legend.
+          } else {
+            const value = styleRule.style.image;
+            StyleRules.updateLegend(result, {label: label, value: value});
+          }
         } else {
           const label = Tools.isDefined(styleRule.input)
             ? `${StyleRules.getTypeLabel(styleRule.itemType)}.${
