@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
-'use strict';
-
 import {expect} from 'chai';
 import 'mocha';
 import {
-  CurrencyFormat,
   DataVisibility,
-  PropertyTypeName
-} from '@linkurious/rest-client/dist/src/api/GraphSchema/types';
-import {ItemTypeAccessRightType} from '@linkurious/rest-client/dist/src/api/AccessRight';
+  PropertyTypeName,
+  ItemTypeAccessRightType,
+  CurrencyFormat
+} from '@linkurious/rest-client';
 
 import {Captions} from '../../src';
 
