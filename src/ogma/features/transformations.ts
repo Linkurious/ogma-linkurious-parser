@@ -4,11 +4,11 @@ import {GenericObject, IEdgeGroupStyle, LkEdgeData, LkNodeData} from '@linkuriou
 import {
   Edge,
   EdgeExtremity,
+  EdgeGrouping,
   EdgeStyle,
   EdgeType,
   PixelSize,
-  StyleRule,
-  Transformation
+  StyleRule
 } from '@linkurious/ogma';
 
 import {LKOgma} from '../index';
@@ -35,7 +35,7 @@ export class TransformationsViz {
   private _ogma: LKOgma;
   public groupedEdges: GenericObject<boolean>;
   public edgeGroupStyle!: IEdgeGroupStyle;
-  public transformation!: Transformation<LkNodeData, LkEdgeData>;
+  public transformation!: EdgeGrouping<LkEdgeData, LkNodeData>;
   public edgeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
 
   constructor(ogma: LKOgma) {
