@@ -3,11 +3,7 @@
 
 import {expect} from 'chai';
 import 'mocha';
-import {
-  CurrencyFormat,
-  DataVisibility,
-  PropertyTypeName
-} from '@linkurious/rest-client/dist/src/api/GraphSchema/types';
+import {CurrencyFormat, DataVisibility, PropertyTypeName} from '@linkurious/rest-client';
 import {ItemTypeAccessRightType} from '@linkurious/rest-client/dist/src/api/AccessRight';
 
 import {Captions} from '../../src';
