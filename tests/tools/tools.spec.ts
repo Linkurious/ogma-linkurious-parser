@@ -205,7 +205,6 @@ describe('Tools', () => {
         });
         expect(result).eql('- 7 456 123,00');
       });
-
     });
   });
 });
