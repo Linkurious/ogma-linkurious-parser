@@ -57,6 +57,20 @@ describe('Tools', () => {
         const result = Tools.formatCurrencyValue(Number.MAX_SAFE_INTEGER, options);
         expect(result).eql('$ 9,007,199,254,740,991.00');
       });
+      it('should return formatted value without symbol', () => {
+        const result = Tools.formatCurrencyValue(Number.MAX_SAFE_INTEGER, {
+          ...options,
+          symbol: undefined
+        });
+        expect(result).eql('9,007,199,254,740,991.00');
+      });
+      it('should format a signed value without a symbol', () => {
+        const result = Tools.formatCurrencyValue(-7456123, {
+          ...options,
+          symbol: undefined
+        });
+        expect(result).eql('- 7,456,123.00');
+      });
     });
 
     describe('Format: "#.###,## [Symbol]"', () => {
@@ -110,6 +124,20 @@ describe('Tools', () => {
         const result = Tools.formatCurrencyValue(Number.MAX_SAFE_INTEGER, options);
         expect(result).eql('9.007.199.254.740.991,00 $');
       });
+      it('should return formatted value without symbol', () => {
+        const result = Tools.formatCurrencyValue(Number.MAX_SAFE_INTEGER, {
+          ...options,
+          symbol: undefined
+        });
+        expect(result).eql('9.007.199.254.740.991,00');
+      });
+      it('should format a signed value without a symbol', () => {
+        const result = Tools.formatCurrencyValue(-7456123, {
+          ...options,
+          symbol: undefined
+        });
+        expect(result).eql('- 7.456.123,00');
+      });
     });
 
     describe('Format: "# ###,## [Symbol]"', () => {
@@ -162,6 +190,20 @@ describe('Tools', () => {
       it('should format max safe integer', () => {
         const result = Tools.formatCurrencyValue(Number.MAX_SAFE_INTEGER, options);
         expect(result).eql('9 007 199 254 740 991,00 $');
+      });
+      it('should return formatted value without symbol', () => {
+        const result = Tools.formatCurrencyValue(Number.MAX_SAFE_INTEGER, {
+          ...options,
+          symbol: undefined
+        });
+        expect(result).eql('9 007 199 254 740 991,00');
+      });
+      it('should format a signed value without a symbol', () => {
+        const result = Tools.formatCurrencyValue(-7456123, {
+          ...options,
+          symbol: undefined
+        });
+        expect(result).eql('- 7 456 123,00');
       });
     });
   });

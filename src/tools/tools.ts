@@ -394,13 +394,19 @@ export class Tools {
     const sign = value < 0 ? '- ' : '';
     switch (options.format) {
       case CurrencyFormat.SYMBOL_COMMAS_DOT:
-        return `${sign}${options.symbol} ${Tools.formatNumberToCurrency(value, ',', '.')}`;
+        return `${sign}${
+          options.symbol !== undefined ? options.symbol + ' ' : ''
+        }${Tools.formatNumberToCurrency(value, ',', '.')}`;
 
       case CurrencyFormat.DOTS_COMMA_SYMBOL:
-        return `${sign}${Tools.formatNumberToCurrency(value, '.', ',')} ${options.symbol}`;
+        return `${sign}${Tools.formatNumberToCurrency(value, '.', ',')}${
+          options.symbol !== undefined ? ' ' + options.symbol : ''
+        }`;
 
       case CurrencyFormat.SPACES_COMMA_DOT:
-        return `${sign}${Tools.formatNumberToCurrency(value, ' ', ',')} ${options.symbol}`;
+        return `${sign}${Tools.formatNumberToCurrency(value, ' ', ',')}${
+          options.symbol !== undefined ? ' ' + options.symbol : ''
+        }`;
 
       default:
         throw Error(`Cannot format property value ${value}, unknown format ${options.format}.`);
