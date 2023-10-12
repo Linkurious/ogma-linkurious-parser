@@ -16,7 +16,6 @@
     "node": "18.17.1"
   },
   "scripts": {
-    "prepare": "tsc -b",
     "build": "tsc -b",
     "compile": "tsc -b",
     "tsc": "tsc -b",
