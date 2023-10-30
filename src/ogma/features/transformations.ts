@@ -141,7 +141,8 @@ export class TransformationsViz {
         }, 0);
         properties[`${key}_Sum`] = Math.round(average * 100) / 100;
         const numberValuesCount = value.values.filter((v) => Tools.isNumber(v)).length;
-        properties[`${key}_Average`] = Math.round((properties[`${key}_Sum`] as number) / numberValuesCount * 100) / 100;
+        properties[`${key}_Average`] =
+          Math.round(((properties[`${key}_Sum`] as number) / numberValuesCount) * 100) / 100;
       }
       if (value.aggregatedString !== undefined) {
         properties[`${key}_CountDistinct`] = value.aggregatedString.countDistinct;
