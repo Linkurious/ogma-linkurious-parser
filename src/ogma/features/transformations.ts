@@ -108,12 +108,18 @@ export class TransformationsViz {
         } else {
           const currentProperty = propertiesMap.get(key)!;
           if (isNumber) {
-            const aggregatedNumber: {min: number; max: number} = currentProperty?.aggregatedNumber!;
+            const aggregatedNumber: {min: number; max: number} =
+              currentProperty?.aggregatedNumber !== undefined
+                ? currentProperty.aggregatedNumber
+                : {min: properties[key] as number, max: properties[key] as number};
             aggregatedNumber.max = Math.max(aggregatedNumber.max, properties[key] as number);
             aggregatedNumber.min = Math.min(aggregatedNumber.min, properties[key] as number);
             currentProperty.values.push(properties[key]);
           } else {
-            const aggregatedString = currentProperty.aggregatedString!;
+            const aggregatedString =
+              currentProperty.aggregatedString !== undefined
+                ? currentProperty.aggregatedString
+                : {countDistinct: 0};
             if (!currentProperty.values.includes(properties[key])) {
               aggregatedString.countDistinct++;
             }
