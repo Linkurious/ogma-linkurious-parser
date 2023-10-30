@@ -134,6 +134,13 @@ export class TransformationsViz {
       if (value.aggregatedNumber !== undefined) {
         properties[`${key}_Max`] = value.aggregatedNumber.max;
         properties[`${key}_Min`] = value.aggregatedNumber.min;
+        properties[`${key}_Sum`] = value.values.reduce((sum: number, value) => {
+          if (Tools.isNumber(value)) {
+            return sum + (value as number);
+          }
+          return sum;
+        }, 0);
+        properties[`${key}_Average`] = (properties[`${key}_Sum`] as number) / value.values.length;
       }
       if (value.aggregatedString !== undefined) {
         properties[`${key}_CountDistinct`] = value.aggregatedString.countDistinct;
