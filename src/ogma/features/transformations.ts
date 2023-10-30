@@ -130,18 +130,18 @@ export class TransformationsViz {
     });
     const properties: Record<string, unknown> = {};
     propertiesMap.forEach(function (value, key) {
-      properties['propertyName'] = key;
       if (value.aggregatedNumber !== undefined) {
         properties[`${key}_Max`] = value.aggregatedNumber.max;
         properties[`${key}_Min`] = value.aggregatedNumber.min;
-        properties[`${key}_Sum`] = value.values.reduce((sum: number, value) => {
+        const average = value.values.reduce((sum: number, value) => {
           if (Tools.isNumber(value)) {
             return sum + Number(value);
           }
           return sum;
         }, 0);
+        properties[`${key}_Sum`] = Math.round(average * 100) / 100;
         const numberValuesCount = value.values.filter((v) => Tools.isNumber(v)).length;
-        properties[`${key}_Average`] = (properties[`${key}_Sum`] as number) / numberValuesCount;
+        properties[`${key}_Average`] = Math.round((properties[`${key}_Sum`] as number) / numberValuesCount * 100) / 100;
       }
       if (value.aggregatedString !== undefined) {
         properties[`${key}_CountDistinct`] = value.aggregatedString.countDistinct;
