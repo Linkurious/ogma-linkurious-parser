@@ -136,16 +136,17 @@ export class TransformationsViz {
         properties[`${key}_Min`] = value.aggregatedNumber.min;
         properties[`${key}_Sum`] = value.values.reduce((sum: number, value) => {
           if (Tools.isNumber(value)) {
-            return sum + (value as number);
+            return sum + Number(value);
           }
           return sum;
         }, 0);
-        properties[`${key}_Average`] = (properties[`${key}_Sum`] as number) / value.values.length;
+        const numberValuesCount = value.values.filter((v) => Tools.isNumber(v)).length;
+        properties[`${key}_Average`] = (properties[`${key}_Sum`] as number) / numberValuesCount;
       }
       if (value.aggregatedString !== undefined) {
         properties[`${key}_CountDistinct`] = value.aggregatedString.countDistinct;
       }
-      properties[`${key}_Values`] = value.values;
+      properties[`${key}_Values`] = value.values.join(' | ');
     });
     return properties;
   }
