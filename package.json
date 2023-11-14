@@ -35,7 +35,8 @@
     "latest:master": "npm install --save-exact  @linkurious/rest-client@lk-master",
     "bump:patch": "bump2version patch && npm version --no-git-tag-version patch",
     "bump:minor": "bump2version minor && npm version --no-git-tag-version minor",
-    "bump:major": "bump2version major && npm version --no-git-tag-version major"
+    "bump:major": "bump2version major && npm version --no-git-tag-version major",
+    "ogma-update": "git checkout -b update_ogma-to-${ogma_version} && npm i --save-exact --save-peer @linkurious/ogma@${ogma_version} && npm i --save-exact --save-dev @linkurious/ogma@${ogma_version} && git commit -a -m 'Bumping Ogma to ${ogma_version}' && git push"
   },
   "repository": {
     "type": "git",
@@ -49,10 +50,10 @@
     "sha1": "1.1.1"
   },
   "peerDependencies": {
-    "@linkurious/ogma": "4.4.4"
+    "@linkurious/ogma": "4.5.5"
   },
   "devDependencies": {
-    "@linkurious/ogma": "4.4.4",
+    "@linkurious/ogma": "4.5.5",
     "@linkurious/rest-client": "~4.0.17-develop-stable.162",
     "@rollup/plugin-buble": "0.21.3",
     "@rollup/plugin-commonjs": "17.0.0",
