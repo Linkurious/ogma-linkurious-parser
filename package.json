@@ -35,8 +35,7 @@
     "latest:master": "npm install --save-exact  @linkurious/rest-client@lk-master",
     "bump:patch": "bump2version patch && npm version --no-git-tag-version patch",
     "bump:minor": "bump2version minor && npm version --no-git-tag-version minor",
-    "bump:major": "bump2version major && npm version --no-git-tag-version major",
-    "ogma-update": "git checkout -b ${jira_ticket}-update-ogma-to-${ogma_version} && npm i --save-exact --save-peer @linkurious/ogma@${ogma_version} && npm i --save-exact --save-dev @linkurious/ogma@${ogma_version} && git commit -a -m 'Bumping Ogma to ${ogma_version}' && git push"
+    "bump:major": "bump2version major && npm version --no-git-tag-version major"
   },
   "repository": {
     "type": "git",
