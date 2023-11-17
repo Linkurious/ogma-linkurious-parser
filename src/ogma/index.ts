@@ -25,7 +25,7 @@ import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
 
 import {StylesViz} from './features/styles';
-import {TransformationsViz} from './features/transformations';
+import {GroupedEdges, TransformationsViz} from './features/transformations';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
@@ -244,7 +244,13 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       node: visualization.nodeFields.captions || {},
       edge: visualization.edgeFields.captions || {}
     });
-    this.LKTransformation.groupedEdges = visualization.edgeGrouping;
+    this.LKTransformation.groupedEdges = Object.entries(visualization.edgeGrouping).reduce(
+      (result, [key, value]) => {
+        result[key] = {transformation: value};
+        return result;
+      },
+      {} as GroupedEdges
+    );
     await this.LKTransformation.initTransformation();
     this.LKTransformation.initEdgeGroupingStyle();
   }

@@ -1,6 +1,6 @@
 'use strict';
 
-import {GenericObject, IEdgeGroupStyle, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
+import {IEdgeGroupStyle, LkEdgeData, LkNodeData, LkProperty} from '@linkurious/rest-client';
 import {
   Edge,
   EdgeExtremity,
@@ -8,10 +8,12 @@ import {
   EdgeType,
   PixelSize,
   StyleRule,
-  Transformation
+  Transformation,
+  EdgeList
 } from '@linkurious/ogma';
 
 import {LKOgma} from '../index';
+import {Tools} from '../../tools/tools';
 
 const DEFAULT_EDGE_GROUP_STYLE: {
   color: string;
@@ -31,9 +33,27 @@ const DEFAULT_EDGE_GROUP_STYLE: {
   width: 1.5
 };
 
+export interface GroupedEdgesProperties {
+  [propertyKey: string]: {
+    type: string;
+    values: LkProperty[];
+  };
+}
+
+export interface GroupedEdgesPropertiesTypes {
+  [propertyKey: string]: {
+    type: string;
+  };
+}
+export interface GroupedEdges {
+  [type: string]: {
+    transformation: boolean;
+    properties?: GroupedEdgesPropertiesTypes;
+  };
+}
 export class TransformationsViz {
   private _ogma: LKOgma;
-  public groupedEdges: GenericObject<boolean>;
+  public groupedEdges: GroupedEdges;
   public edgeGroupStyle!: IEdgeGroupStyle;
   public transformation!: Transformation<LkNodeData, LkEdgeData>;
   public edgeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
@@ -51,14 +71,15 @@ export class TransformationsViz {
       this.transformation = this._ogma.transformations.addEdgeGrouping({
         separateEdgesByDirection: true,
         selector: (edge) => {
-          return this.groupedEdges[edge.getData('type')];
+          return this.groupedEdges[edge.getData('type')].transformation;
         },
         groupIdFunction: (edge) => edge.getData('type'),
         generator: (edges) => {
           return {
             data: {
               properties: {
-                originalType: edges.getData('type')[0]
+                originalType: edges.getData('type')[0],
+                ...this.getGroupedEdgesProperties(edges)
               }
             }
           };
@@ -67,6 +88,49 @@ export class TransformationsViz {
     } else {
       await this.transformation.refresh();
     }
+  }
+
+  private getGroupedEdgesProperties(
+    edges: EdgeList<LkEdgeData, LkNodeData>
+  ): Record<string, LkProperty> {
+    const propsMap: GroupedEdgesProperties = {} as GroupedEdgesProperties;
+    if (this.groupedEdges[edges.getData('type')[0]].properties) {
+      edges.getData('properties').forEach((properties) => {
+        Object.keys(properties).forEach((key) => {
+          const property = this.groupedEdges[edges.getData('type')[0]].properties![key];
+          // check if property does not exist  in propsMap
+          if (!propsMap[key]) {
+            propsMap[key] = {
+              values: [properties[key]],
+              type: property.type
+            };
+          } else {
+            propsMap[key].values.push(properties[key]);
+          }
+        });
+      });
+    }
+    const properties: Record<string, LkProperty> = {};
+    if (propsMap) {
+      Object.keys(propsMap).forEach((key) => {
+        if (propsMap[key].type === 'number') {
+          properties[`${key}_Sum`] = this.generateSum(propsMap[key].values);
+          // Other operators for numbers
+        }
+      });
+    }
+    return properties;
+  }
+
+  // to be moved to helpers during implementation
+  public generateSum(values: LkProperty[]): number {
+    let result = 0;
+    values.forEach((value) => {
+      if (Tools.isNumber(value)) {
+        result += Number(value);
+      }
+    });
+    return result;
   }
 
   /**
