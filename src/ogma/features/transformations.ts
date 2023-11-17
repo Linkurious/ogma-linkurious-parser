@@ -94,10 +94,11 @@ export class TransformationsViz {
     edges: EdgeList<LkEdgeData, LkNodeData>
   ): Record<string, LkProperty> {
     const propsMap: GroupedEdgesProperties = {} as GroupedEdgesProperties;
-    if (this.groupedEdges[edges.getData('type')[0]].properties) {
+    const groupedEdgesProperties = this.groupedEdges[edges.getData('type')[0]].properties;
+    if (groupedEdgesProperties && Object.keys(groupedEdgesProperties).length > 0) {
       edges.getData('properties').forEach((properties) => {
         Object.keys(properties).forEach((key) => {
-          const property = this.groupedEdges[edges.getData('type')[0]].properties![key];
+          const property = groupedEdgesProperties[key];
           // check if property does not exist  in propsMap
           if (!propsMap[key]) {
             propsMap[key] = {
