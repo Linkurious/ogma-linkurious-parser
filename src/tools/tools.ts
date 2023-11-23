@@ -398,13 +398,28 @@ export class Tools {
           options.symbol !== undefined ? options.symbol + ' ' : ''
         }${Tools.formatNumberToCurrency(value, ',', '.')}`;
 
+      case CurrencyFormat.SYMBOL_COMMAS:
+        return `${sign}${
+          options.symbol !== undefined ? options.symbol + ' ' : ''
+        }${Tools.formatNumberToCurrency(value, ',')}`;
+
       case CurrencyFormat.DOTS_COMMA_SYMBOL:
         return `${sign}${Tools.formatNumberToCurrency(value, '.', ',')}${
           options.symbol !== undefined ? ' ' + options.symbol : ''
         }`;
 
-      case CurrencyFormat.SPACES_COMMA_DOT:
+      case CurrencyFormat.DOTS_SYMBOL:
+        return `${sign}${Tools.formatNumberToCurrency(value, '.')}${
+          options.symbol !== undefined ? ' ' + options.symbol : ''
+        }`;
+
+      case CurrencyFormat.SPACES_COMMA_SYMBOL:
         return `${sign}${Tools.formatNumberToCurrency(value, ' ', ',')}${
+          options.symbol !== undefined ? ' ' + options.symbol : ''
+        }`;
+
+      case CurrencyFormat.SPACES_SYMBOL:
+        return `${sign}${Tools.formatNumberToCurrency(value, ' ')}${
           options.symbol !== undefined ? ' ' + options.symbol : ''
         }`;
 
@@ -416,16 +431,16 @@ export class Tools {
   private static formatNumberToCurrency(
     value: number,
     thousandSeparator: string,
-    decimalSeparator: string
+    decimalSeparator?: string
   ): string {
     if (!Number.isFinite(value)) {
       return value.toString();
     }
 
-    const [integerPart, fractionalPart] = Math.abs(value).toFixed(2).split('.');
+    const [integerPart, fractionalPart] = decimalSeparator ? Math.abs(value).toFixed(2).split('.') : [Math.abs(value).toFixed(0), undefined];
 
     let i = -1;
-    const thousands = integerPart
+    const formattedIntegerPart = integerPart
       .split('')
       .reverse()
       .map((digit) => {
@@ -435,6 +450,6 @@ export class Tools {
       .reverse()
       .join('');
 
-    return thousands + decimalSeparator + fractionalPart;
+    return decimalSeparator ? formattedIntegerPart + decimalSeparator + fractionalPart: formattedIntegerPart;
   }
 }
