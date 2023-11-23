@@ -437,7 +437,9 @@ export class Tools {
       return value.toString();
     }
 
-    const [integerPart, fractionalPart] = decimalSeparator ? Math.abs(value).toFixed(2).split('.') : [Math.abs(value).toFixed(0), undefined];
+    const [integerPart, fractionalPart] = decimalSeparator
+      ? Math.abs(value).toFixed(2).split('.')
+      : [Math.abs(value).toFixed(0), undefined];
 
     let i = -1;
     const formattedIntegerPart = integerPart
@@ -450,6 +452,8 @@ export class Tools {
       .reverse()
       .join('');
 
-    return decimalSeparator ? formattedIntegerPart + decimalSeparator + fractionalPart: formattedIntegerPart;
+    return decimalSeparator
+      ? formattedIntegerPart + decimalSeparator + fractionalPart
+      : formattedIntegerPart;
   }
 }
