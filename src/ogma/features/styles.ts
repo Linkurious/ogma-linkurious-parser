@@ -175,7 +175,7 @@ export class StylesViz {
             this._defaultConfiguration.node.text !== undefined &&
             this._defaultConfiguration.node.text.backgroundColor !== undefined
               ? this._defaultConfiguration.node.text.backgroundColor
-              : 'null',
+              : undefined,
           font:
             this._defaultConfiguration.node.text !== undefined &&
             this._defaultConfiguration.node.text.font !== undefined
@@ -235,7 +235,7 @@ export class StylesViz {
             this._defaultConfiguration.edge.text !== undefined &&
             this._defaultConfiguration.edge.text.backgroundColor !== undefined
               ? this._defaultConfiguration.edge.text.backgroundColor
-              : null,
+              : undefined,
           font:
             this._defaultConfiguration.edge.text !== undefined &&
             this._defaultConfiguration.edge.text.font !== undefined
