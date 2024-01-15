@@ -7,7 +7,7 @@ import {CurrencyFormat, ICurrencyOptions, LkNodeData, LkProperty} from '@linkuri
 
 export {sortBy};
 const URL_PATTERN = /([a-zA-Z][a-zA-Z0-9\+\-\.]*:\/\/[^\s]+)/i;
-const IMAGE_PATTERN = /\S+\.(gif|jpe?g|tiff|png|bmp|svg)$/i;
+const IMAGE_PATTERN = /\S+\.(gif|jpe?g|tiff|png|bmp|svg)\S+$/i;
 export const CAPTION_HEURISTIC: string[] = [
   'label',
   'Label',

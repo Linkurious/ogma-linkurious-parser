@@ -140,7 +140,6 @@ export class NodeAttributes extends ItemAttributes<INodeStyle> {
           };
         } else if ('image' in style && typeof style.image === 'object') {
           const urlType = Tools.getType(style.image.url as string);
-          console.log('urlType', urlType);
           result = {
             image: {
               url:
