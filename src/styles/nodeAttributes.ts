@@ -112,9 +112,7 @@ export class NodeAttributes extends ItemAttributes<INodeStyle> {
   /**
    * Generate icon for a given node
    */
-  public icon(
-    itemData: LkNodeData
-  ): {
+  public icon(itemData: LkNodeData): {
     icon?: IStyleIcon;
     image?: OgmaImage | null;
   } {
@@ -141,11 +139,12 @@ export class NodeAttributes extends ItemAttributes<INodeStyle> {
             }
           };
         } else if ('image' in style && typeof style.image === 'object') {
+          const urlType = Tools.getType(style.image.url as string);
+          console.log('urlType', urlType);
           result = {
             image: {
               url:
-                Tools.getType(style.image.url as string) === 'imageUrl' ||
-                Tools.getType(style.image.url as string) === 'image'
+                urlType === 'imageUrl' || urlType === 'image'
                   ? style.image.url
                   : Tools.getIn(itemData, (style.image.url as IImageDataValue).path),
               scale: style.image.scale,
@@ -235,9 +234,7 @@ export class NodeAttributes extends ItemAttributes<INodeStyle> {
   /**
    * Return an object containing all node attributes needed by Ogma to style a node
    */
-  public all(
-    itemData: LkNodeData
-  ): {
+  public all(itemData: LkNodeData): {
     radius?: number | undefined;
     color: Color | Array<Color>;
     shape?: OgmaNodeShape | undefined;
