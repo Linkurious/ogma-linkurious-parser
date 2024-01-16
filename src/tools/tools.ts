@@ -349,7 +349,7 @@ export class Tools {
   private static isURLImage(value: string): boolean {
     if (Tools.isUrl(value)) {
       const url = new URL(value);
-      return IMAGE_PATTERN.test(url.pathname);
+      return Tools.isImage(url.pathname);
     }
     return false;
   }
