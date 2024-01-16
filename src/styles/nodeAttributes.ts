@@ -112,7 +112,9 @@ export class NodeAttributes extends ItemAttributes<INodeStyle> {
   /**
    * Generate icon for a given node
    */
-  public icon(itemData: LkNodeData): {
+  public icon(
+    itemData: LkNodeData
+  ): {
     icon?: IStyleIcon;
     image?: OgmaImage | null;
   } {
@@ -232,7 +234,9 @@ export class NodeAttributes extends ItemAttributes<INodeStyle> {
   /**
    * Return an object containing all node attributes needed by Ogma to style a node
    */
-  public all(itemData: LkNodeData): {
+  public all(
+    itemData: LkNodeData
+  ): {
     radius?: number | undefined;
     color: Color | Array<Color>;
     shape?: OgmaNodeShape | undefined;

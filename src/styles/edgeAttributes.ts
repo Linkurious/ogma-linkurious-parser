@@ -131,7 +131,9 @@ export class EdgeAttributes extends ItemAttributes<IEdgeStyle> {
   /**
    * Return an object containing all node attributes needed by Ogma to style a node
    */
-  public all(data: LkEdgeData): {
+  public all(
+    data: LkEdgeData
+  ): {
     color: Color;
     shape: OgmaEdgeShape | undefined;
     width: string | undefined | number;
