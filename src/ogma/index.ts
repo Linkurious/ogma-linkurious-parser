@@ -29,6 +29,7 @@ import {TransformationsViz} from './features/transformations';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
+import {NodeGroupingTransformation} from './features/nodeGrouping';
 
 export {default as Ogma} from '@linkurious/ogma';
 export const ANIMATION_DURATION = 750;
@@ -47,6 +48,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   // Trigger an event with edge type changes
   public edgeTypeWatcher!: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   public store!: OgmaStore;
+  // Node Grouping transformation instance
+  public LkNodeGroupingTransformation!: NodeGroupingTransformation;
   private _reactive!: RxViz;
 
   constructor(private _configuration: IOgmaConfig) {
@@ -91,6 +94,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.initSelection();
     this.setConfigOgma(this._configuration, init);
     this.LKTransformation = new TransformationsViz(this);
+    this.LkNodeGroupingTransformation = new NodeGroupingTransformation(this);
 
     this.LKStyles.setNodesDefaultHalo();
     this.LKStyles.setEdgesDefaultHalo();
@@ -252,9 +256,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding nodes then adding edges to the graph
    */
-  public async addGraphAfterValidation(
-    graph: RawGraph<LkNodeData, LkEdgeData>
-  ): Promise<{
+  public async addGraphAfterValidation(graph: RawGraph<LkNodeData, LkEdgeData>): Promise<{
     nodes: NodeList<LkNodeData>;
     edges: EdgeList<LkEdgeData>;
   }> {
@@ -282,16 +284,19 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public getNonFilteredNodes(items?: Array<any>): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
       ? this.getNodes(items).filter((i) => !i.hasClass('filtered'))
-      : this.getNodes().filter((i) => !i.hasClass('filtered'));
+      : this.getNodes('raw').filter((i) => !i.hasClass('filtered'));
   }
 
   /**
    * Return the list of filtered nodes
    */
-  public getFilteredNodes(items?: Array<any>): NodeList<LkNodeData, LkEdgeData> {
+  public getFilteredNodes(
+    items?: Array<any>,
+    filter: 'visible' | 'raw' | 'all' = 'raw'
+  ): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
       ? this.getNodes(items).filter((i) => i.hasClass('filtered'))
-      : this.getNodes().filter((i) => i.hasClass('filtered'));
+      : this.getNodes(filter).filter((i) => i.hasClass('filtered'));
   }
 
   /**

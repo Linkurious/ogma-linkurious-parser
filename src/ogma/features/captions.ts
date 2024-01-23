@@ -73,7 +73,7 @@ export class CaptionsViz {
         nodeAttributes: {
           text: {
             content: (node: Ogma.Node | undefined) => {
-              if (node === undefined) {
+              if (node === undefined || node.getData() === undefined) {
                 return ``;
               }
               const value = Captions.getText(
@@ -87,6 +87,8 @@ export class CaptionsViz {
             }
           }
         },
+        // We ignore virtual nodes as they have the proper caption
+        nodeSelector: (node) => !node.isVirtual(),
         nodeDependencies: {self: {data: true}}
       });
     } else {
@@ -120,7 +122,7 @@ export class CaptionsViz {
             }
           }
         },
-        edgeSelector: (edge) => !edge.isVirtual() && edge.isVisible(),
+        edgeSelector: (edge) => !edge.isVirtual(),
         // ogma will trigger the rendering if data change or the shape change (to trigger the rendering when edges are grouped)
         edgeDependencies: {self: {data: true, attributes: ['shape.style']}}
       });
