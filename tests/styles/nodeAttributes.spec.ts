@@ -449,6 +449,37 @@ describe('NodeAttributes', function () {
           minVisibleSize: 0
         }
       });
+
+      expect(
+        new NodeAttributes(
+          new StyleRules([
+            {
+              index: 0,
+              type: SelectorType.ANY,
+              itemType: undefined,
+              input: undefined,
+              style: {
+                image: {
+                  url:
+                    'https://i0.wp.com/yumetwinsblog.wpcomstaging.com/wp-content/uploads/pheal.png?fit=640%2C640&ssl=1',
+                  scale: 1,
+                  fit: false,
+                  tile: false
+                }
+              }
+            }
+          ])
+        ).icon(node_1_category.getData())
+      ).to.eql({
+        image: {
+          url:
+            'https://i0.wp.com/yumetwinsblog.wpcomstaging.com/wp-content/uploads/pheal.png?fit=640%2C640&ssl=1',
+          scale: 1,
+          fit: false,
+          tile: false,
+          minVisibleSize: 0
+        }
+      });
     });
 
     it('should return an image for 1 property', () => {
