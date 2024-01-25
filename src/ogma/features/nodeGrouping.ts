@@ -1,5 +1,6 @@
 import {StyleRule, Transformation, Node, NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
+import {Subject} from 'rxjs';
 
 import {LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
@@ -9,6 +10,9 @@ export class NodeGroupingTransformation {
   public nodeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
   private _ogma: LKOgma;
   private groupRule: {ruleName: string; type: string; property: string} | undefined;
+  private runLayout$: Subject<NodeList<LkNodeData, LkEdgeData>> = new Subject<
+    NodeList<LkNodeData, LkEdgeData>
+  >();
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
@@ -32,8 +36,10 @@ export class NodeGroupingTransformation {
   public async initTransformation(): Promise<void> {
     console.log('init node grouping transformation');
     if (this.transformation === undefined) {
+      this.subscribeToRunLayout();
       this.transformation = this._ogma.transformations.addNodeGrouping({
         groupIdFunction: (node) => {
+          console.log('groupIdFunction');
           if (
             this.groupRule === undefined ||
             !Tools.isDefined(node.getData(['properties', this.groupRule.property]))
@@ -47,6 +53,12 @@ export class NodeGroupingTransformation {
           }
         },
         nodeGenerator: (nodes) => {
+          console.log('nodeGenerator');
+          // TODO: check with Ogma team if there is a better solution to avoid running the layout on all the virtual nodes
+          // It also run when you add or remove a node that is not part of any group
+          // TODO: Another way to do it is to keep a map of each group with it's id and run layout only on the one that changed
+          // we can do that in groupIdFunction
+          this.runLayout$.next(nodes);
           return {
             data: {
               categories: [this.groupRule?.type],
@@ -57,10 +69,6 @@ export class NodeGroupingTransformation {
           };
         },
         showContents: true,
-        onCreated: async (metaNode, visible, subNodes) => {
-          // TODO: onCreated is called on each group (can be used to see if a group was created or not)
-          await this.runSubNodesLayout(subNodes);
-        },
         duration: 300,
         padding: 10
       });
@@ -83,7 +91,6 @@ export class NodeGroupingTransformation {
    */
   public initNodeGroupingStyle(): void {
     // TODO check if you can use add node rule
-
     this.nodeGroupingStyleRule = this._ogma.styles.addRule({
       nodeAttributes: {
         // Any default style will go here
@@ -131,5 +138,16 @@ export class NodeGroupingTransformation {
       const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
       return `${this.groupRule?.ruleName} - ${size}`;
     }
+  }
+
+  /**
+   * Listen to when a new virtual node is created and run layout on its subnodes
+   */
+  private subscribeToRunLayout(): void {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.runLayout$.subscribe(async (nodes) => {
+      console.log('runLayout$');
+      await this.runSubNodesLayout(nodes);
+    });
   }
 }
