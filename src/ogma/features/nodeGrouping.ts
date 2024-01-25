@@ -8,7 +8,7 @@ export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public nodeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
   private _ogma: LKOgma;
-  private groupRule: {type: string; property: string; typeColor: string} | undefined;
+  private groupRule: {ruleName: string; type: string; property: string} | undefined;
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
@@ -16,13 +16,13 @@ export class NodeGroupingTransformation {
 
   /**
    * Set the grouping rule
+   * @param ruleName The nae of node grouping rule
    * @param type the type of the node
    * @param property the property name that will be used to group the nodes
-   * @param typeColor the color of the type that will be used to style the virtual node
    */
-  public setGroupingRule(type: string, property: string, typeColor: string): void {
-    console.log('set node grouping rule', type, property, typeColor);
-    this.groupRule = {type: type, property: property, typeColor: typeColor};
+  public setGroupingRule(ruleName: string, type: string, property: string): void {
+    console.log('set node grouping rule', type, property);
+    this.groupRule = {ruleName: ruleName, type: type, property: property};
   }
 
   /**
@@ -49,7 +49,7 @@ export class NodeGroupingTransformation {
         nodeGenerator: (nodes) => {
           return {
             data: {
-              categories: this.groupRule?.type,
+              categories: [this.groupRule?.type],
               properties: {
                 size: nodes.size
               }
@@ -80,7 +80,6 @@ export class NodeGroupingTransformation {
 
   /**
    * init node grouping style
-   * TODO check if it is needed to be done here or in node style service
    */
   public initNodeGroupingStyle(): void {
     // TODO check if you can use add node rule
@@ -89,13 +88,12 @@ export class NodeGroupingTransformation {
       nodeAttributes: {
         // Any default style will go here
         text: {
-          content: (node: Node<LkNodeData> | undefined) => {
+          content: (node: Node<LkNodeData> | undefined): string | undefined => {
             return this.getNodeGroupingCaption(node);
           },
           style: 'bold'
         },
-        opacity: 0.32,
-        color: () => this.groupRule?.typeColor
+        opacity: 0.32
       },
       nodeSelector: (node) => {
         return node.isVirtual();
@@ -131,7 +129,7 @@ export class NodeGroupingTransformation {
   private getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
     if (node !== undefined && node.isVirtual()) {
       const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
-      return `${node.getData(['properties', 'originalType'])} - ${size}`;
+      return `${this.groupRule?.ruleName} - ${size}`;
     }
   }
 }
