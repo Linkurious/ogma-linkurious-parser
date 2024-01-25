@@ -1,14 +1,14 @@
-import {StyleRule, Transformation, Node} from '@linkurious/ogma';
+import {StyleRule, Transformation, Node, NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
 
 export class NodeGroupingTransformation {
-  private _ogma: LKOgma;
-  public groupRule?: {type: string; property: string};
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public nodeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
+  private _ogma: LKOgma;
+  private groupRule: {type: string; property: string; typeColor: string} | undefined;
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
@@ -16,17 +16,21 @@ export class NodeGroupingTransformation {
 
   /**
    * Set the grouping rule
+   * @param type the type of the node
+   * @param property the property name that will be used to group the nodes
+   * @param typeColor the color of the type that will be used to style the virtual node
    */
-  public setGroupingRule(type: string, property: string): void {
-    console.log('setGroupingRule');
-    this.groupRule = {type: type, property: property};
+  public setGroupingRule(type: string, property: string, typeColor: string): void {
+    console.log('set node grouping rule', type, property, typeColor);
+    this.groupRule = {type: type, property: property, typeColor: typeColor};
   }
 
   /**
-   * create an edge grouping transformation by edge type
+   * create a node grouping transformation
+   * It uses groupRule to define the rule
    */
   public async initTransformation(): Promise<void> {
-    console.log('initTransformation');
+    console.log('init node grouping transformation');
     if (this.transformation === undefined) {
       this.transformation = this._ogma.transformations.addNodeGrouping({
         groupIdFunction: (node) => {
@@ -36,8 +40,7 @@ export class NodeGroupingTransformation {
           ) {
             return undefined;
           } else {
-            console.log(`${node.getData(['properties', this.groupRule.property])}`.trim());
-            return `${node.getData('categories')[0]}-${node.getData([
+            return `${this.groupRule.type}-${node.getData([
               'properties',
               this.groupRule.property
             ])}`.trim();
@@ -46,23 +49,18 @@ export class NodeGroupingTransformation {
         nodeGenerator: (nodes) => {
           return {
             data: {
-              categories: 'test',
+              categories: this.groupRule?.type,
               properties: {
-                originalType: nodes.get(0).getData('categories')[0]
+                size: nodes.size
               }
-            },
-            attributes: {
-              text: 'a group'
             }
           };
         },
         showContents: true,
-        /*onCreated: (metaNode, visible, subNodes, subEdges) => {
-          return this._ogma.layouts.force({
-            nodes: subNodes,
-            duration: 0
-          }) as unknown as Promise<void>;
-        },*/
+        onCreated: async (metaNode, visible, subNodes) => {
+          // TODO: onCreated is called on each group (can be used to see if a group was created or not)
+          await this.runSubNodesLayout(subNodes);
+        },
         duration: 300,
         padding: 10
       });
@@ -71,50 +69,69 @@ export class NodeGroupingTransformation {
     }
   }
 
+  /**
+   * refresh the transformation
+   * Called when there is a change in the rule
+   */
   public async refreshTransformation(): Promise<void> {
-    console.log('refreshTransformation', this.groupRule, this.transformation?.getId());
+    console.log('refresh node grouping transformation', this.groupRule);
     await this.transformation?.refresh();
   }
 
   /**
-   * init edge grouping style
+   * init node grouping style
+   * TODO check if it is needed to be done here or in node style service
    */
   public initNodeGroupingStyle(): void {
     // TODO check if you can use add node rule
-    console.log('initNodeGroupingStyle');
+
     this.nodeGroupingStyleRule = this._ogma.styles.addRule({
       nodeAttributes: {
         // Any default style will go here
         text: {
           content: (node: Node<LkNodeData> | undefined) => {
-            if (node !== undefined && node.isVirtual()) {
-              const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
-              return `${node.getData(['properties', 'originalType'])} - ${size}`;
-            }
+            return this.getNodeGroupingCaption(node);
           },
           style: 'bold'
         },
-        opacity: () => 0.32,
-        color: '#f63636'
+        opacity: 0.32,
+        color: () => this.groupRule?.typeColor
       },
       nodeSelector: (node) => {
-        console.log(
-          node.isVirtual() &&
-            node.getSubNodes() &&
-            node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size > 0
-        );
-        return (
-          node.isVirtual() &&
-          node.getSubNodes() &&
-          node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size > 0
-        );
+        return node.isVirtual();
       },
       nodeDependencies: {self: {data: true}}
     });
   }
 
   public refreshNodeGroupingStyle(): void {
-    console.log('refreshNodeGroupingStyle');
     this.nodeGroupingStyleRule?.refresh();
+  }
+
+  /**
+   * Run the layout on the subnodes of the virtual node
+   * @param subNodes nodes part of a virtual node
+   */
+  private async runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
+    await this._ogma.layouts.force({
+      steps: 40,
+      alignSiblings: true,
+      charge: 5,
+      gravity: 0.05,
+      theta: 0.34,
+      nodes: subNodes,
+      duration: 0
+    });
+  }
+
+  /**
+   * Return the caption of a virtual node
+   * @param node reference to the virtual node
+   */
+  private getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
+    if (node !== undefined && node.isVirtual()) {
+      const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
+      return `${node.getData(['properties', 'originalType'])} - ${size}`;
+    }
   }
 }
