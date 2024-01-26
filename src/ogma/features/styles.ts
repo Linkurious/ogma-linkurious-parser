@@ -658,7 +658,7 @@ export class StylesViz {
             }
           },
           image: (node: o.Node | undefined) => {
-            if (node !== undefined) {
+            if (node !== undefined && !node.isVirtual()) {
               return this._nodeAttributes.icon(node.getData()).image;
             }
           }
@@ -706,7 +706,7 @@ export class StylesViz {
       this._ogmaNodeShape = this._ogma.styles.addRule({
         nodeAttributes: {
           shape: (node: o.Node | undefined) => {
-            if (node !== undefined) {
+            if (node !== undefined && !node.isVirtual()) {
               return this._nodeAttributes.shape(node.getData());
             }
           }

@@ -9,7 +9,8 @@ export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public nodeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
   private _ogma: LKOgma;
-  private groupRule: {ruleName: string; type: string; property: string} | undefined;
+  // TODO set it to private after
+  public groupRule: {ruleName: string; type: string; property: string} | undefined;
   private runLayout$: Subject<NodeList<LkNodeData, LkEdgeData>> = new Subject<
     NodeList<LkNodeData, LkEdgeData>
   >();
@@ -46,10 +47,9 @@ export class NodeGroupingTransformation {
           ) {
             return undefined;
           } else {
-            return `${this.groupRule.type}-${node.getData([
-              'properties',
-              this.groupRule.property
-            ])}`.trim();
+            return `${this.groupRule.type}-${node.getData(['properties', this.groupRule.property])}`
+              .toLowerCase()
+              .trim();
           }
         },
         nodeGenerator: (nodes) => {
@@ -58,7 +58,7 @@ export class NodeGroupingTransformation {
           // It also run when you add or remove a node that is not part of any group
           // TODO: Another way to do it is to keep a map of each group with it's id and run layout only on the one that changed
           // we can do that in groupIdFunction
-          this.runLayout$.next(nodes);
+          // this.runLayout$.next(nodes);
           return {
             data: {
               categories: [this.groupRule?.type],
@@ -72,6 +72,7 @@ export class NodeGroupingTransformation {
         duration: 300,
         padding: 10
       });
+      // await this.runLayoutOnAllSubeNodes();
     } else {
       await this.refreshTransformation();
     }
@@ -84,6 +85,7 @@ export class NodeGroupingTransformation {
   public async refreshTransformation(): Promise<void> {
     console.log('refresh node grouping transformation', this.groupRule);
     await this.transformation?.refresh();
+    await this.runLayoutOnAllSubeNodes();
   }
 
   /**
@@ -118,6 +120,19 @@ export class NodeGroupingTransformation {
    * @param subNodes nodes part of a virtual node
    */
   private async runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
+    if (subNodes.size === 0) {
+      return;
+    }
+    // TODO run Circle-packing layout new when there are no edges
+    // groupNodes.getAdjacentEdges({ bothExtremities: true }).size === 0
+    /* const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
+    console.log('runSubNodesLayout', noEdges, subNodes.toJSON());
+    await this._ogma.algorithms.circlePack({
+      nodes: subNodes,
+      margin: 10,
+      sort: 'asc'
+    });*/
+
     await this._ogma.layouts.force({
       steps: 40,
       alignSiblings: true,
@@ -149,5 +164,19 @@ export class NodeGroupingTransformation {
       console.log('runLayout$');
       await this.runSubNodesLayout(nodes);
     });
+  }
+
+  public async runLayoutOnAllSubeNodes(): Promise<void> {
+    // @ts-ignore getContext exists on the transformation but not in the type
+    const virtualNodes = this.transformation.getContext().virtualNodes;
+    const rawNodesList = virtualNodes.getSubNodes();
+    for (let i = 0; i < rawNodesList.length; i++) {
+      const subNodes = rawNodesList[i];
+      if (subNodes !== undefined) {
+        await this.runSubNodesLayout(subNodes);
+      }
+    }
+    await this.runSubNodesLayout(virtualNodes);
+    console.log('runLayoutOnAllSubeNodes');
   }
 }
