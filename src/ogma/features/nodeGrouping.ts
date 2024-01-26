@@ -1,9 +1,10 @@
 import {StyleRule, Transformation, Node, NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
-import {Subject} from 'rxjs';
 
 import {LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
+
+export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
 
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
@@ -11,9 +12,6 @@ export class NodeGroupingTransformation {
   private _ogma: LKOgma;
   // TODO set it to private after
   public groupRule: {ruleName: string; type: string; property: string} | undefined;
-  private runLayout$: Subject<NodeList<LkNodeData, LkEdgeData>> = new Subject<
-    NodeList<LkNodeData, LkEdgeData>
-  >();
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
@@ -26,7 +24,6 @@ export class NodeGroupingTransformation {
    * @param property the property name that will be used to group the nodes
    */
   public setGroupingRule(ruleName: string, type: string, property: string): void {
-    console.log('set node grouping rule', type, property);
     this.groupRule = {ruleName: ruleName, type: type, property: property};
   }
 
@@ -37,7 +34,6 @@ export class NodeGroupingTransformation {
   public async initTransformation(): Promise<void> {
     console.log('init node grouping transformation');
     if (this.transformation === undefined) {
-      this.subscribeToRunLayout();
       this.transformation = this._ogma.transformations.addNodeGrouping({
         groupIdFunction: (node) => {
           console.log('groupIdFunction');
@@ -53,18 +49,19 @@ export class NodeGroupingTransformation {
           }
         },
         nodeGenerator: (nodes) => {
-          console.log('nodeGenerator');
-          // TODO: check with Ogma team if there is a better solution to avoid running the layout on all the virtual nodes
-          // It also run when you add or remove a node that is not part of any group
-          // TODO: Another way to do it is to keep a map of each group with it's id and run layout only on the one that changed
-          // we can do that in groupIdFunction
-          // this.runLayout$.next(nodes);
           return {
             data: {
               categories: [this.groupRule?.type],
               properties: {
                 size: nodes.size
               }
+            }
+          };
+        },
+        edgeGenerator: () => {
+          return {
+            data: {
+              type: 'LKE_NODE_GROUPING_EDGE'
             }
           };
         },
@@ -83,7 +80,6 @@ export class NodeGroupingTransformation {
    * Called when there is a change in the rule
    */
   public async refreshTransformation(): Promise<void> {
-    console.log('refresh node grouping transformation', this.groupRule);
     await this.transformation?.refresh();
     await this.runLayoutOnAllSubeNodes();
   }
@@ -153,17 +149,6 @@ export class NodeGroupingTransformation {
       const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
       return `${this.groupRule?.ruleName} - ${size}`;
     }
-  }
-
-  /**
-   * Listen to when a new virtual node is created and run layout on its subnodes
-   */
-  private subscribeToRunLayout(): void {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    this.runLayout$.subscribe(async (nodes) => {
-      console.log('runLayout$');
-      await this.runSubNodesLayout(nodes);
-    });
   }
 
   public async runLayoutOnAllSubeNodes(): Promise<void> {
