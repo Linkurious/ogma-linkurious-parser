@@ -36,7 +36,6 @@ export class NodeGroupingTransformation {
     if (this.transformation === undefined) {
       this.transformation = this._ogma.transformations.addNodeGrouping({
         groupIdFunction: (node) => {
-          console.log('groupIdFunction');
           if (
             this.groupRule === undefined ||
             !Tools.isDefined(node.getData(['properties', this.groupRule.property]))

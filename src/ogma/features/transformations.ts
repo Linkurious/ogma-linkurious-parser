@@ -13,6 +13,8 @@ import {
 
 import {LKOgma} from '../index';
 
+import {LKE_NODE_GROUPING_EDGE} from './nodeGrouping';
+
 const DEFAULT_EDGE_GROUP_STYLE: {
   color: string;
   shape: {
@@ -79,7 +81,12 @@ export class TransformationsViz {
         ...(this.edgeGroupStyle as any),
         text: {
           content: (edge: Edge<LkEdgeData> | undefined) => {
-            if (edge !== undefined && edge.getSubEdges() !== null) {
+            // check it the edge is virtual and was not created by node grouping
+            if (
+              edge !== undefined &&
+              edge.getSubEdges() !== null &&
+              edge.getData('type') !== LKE_NODE_GROUPING_EDGE
+            ) {
               const size = edge.getSubEdges()!.filter((e) => !e.hasClass('filtered')).size;
               return `${edge.getData(['properties', 'originalType'])} - ${size}`;
             }

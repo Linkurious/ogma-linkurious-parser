@@ -375,7 +375,7 @@ export class StylesViz {
       name: 'filtered',
       nodeAttributes: {
         opacity: FILTER_OPACITY,
-        layer: -1,
+        layer: 1,
         detectable: false,
         badges: {
           topRight: {
