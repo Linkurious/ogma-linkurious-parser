@@ -1,5 +1,5 @@
 import {StyleRule, Transformation, Node, NodeList} from '@linkurious/ogma';
-import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
+import {ConflictValue, LkEdgeData, LkNodeData, MissingValue} from '@linkurious/rest-client';
 
 import {LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
@@ -32,19 +32,24 @@ export class NodeGroupingTransformation {
    * It uses groupRule to define the rule
    */
   public async initTransformation(): Promise<void> {
-    console.log('init node grouping transformation');
     if (this.transformation === undefined) {
       this.transformation = this._ogma.transformations.addNodeGrouping({
         groupIdFunction: (node) => {
+          const propertyValue = node.getData(['properties', this.groupRule?.property ?? '']);
           if (
             this.groupRule === undefined ||
-            !Tools.isDefined(node.getData(['properties', this.groupRule.property]))
+            !node.getData('categories').includes(this.groupRule.type) ||
+            !Tools.isDefined(propertyValue) ||
+            (typeof propertyValue === 'object' &&
+              (propertyValue as MissingValue).status === 'missing')
           ) {
             return undefined;
           } else {
-            return `${this.groupRule.type}-${node.getData(['properties', this.groupRule.property])}`
-              .toLowerCase()
-              .trim();
+            const originalValue =
+              typeof propertyValue === 'object'
+                ? (propertyValue as ConflictValue).original
+                : propertyValue;
+            return `${this.groupRule.type}-${originalValue}`.toLowerCase().trim();
           }
         },
         nodeGenerator: (nodes) => {
