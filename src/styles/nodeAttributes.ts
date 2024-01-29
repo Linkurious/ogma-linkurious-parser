@@ -139,20 +139,18 @@ export class NodeAttributes extends ItemAttributes<INodeStyle> {
             }
           };
         } else if ('image' in style && typeof style.image === 'object') {
-          const urlType = Tools.getType(style.image.url as string);
-          console.log('urlType', urlType);
-          result = {
-            image: {
-              url:
-                urlType === 'imageUrl' || urlType === 'image'
-                  ? style.image.url
-                  : Tools.getIn(itemData, (style.image.url as IImageDataValue).path),
-              scale: style.image.scale,
-              fit: style.image.fit,
-              tile: style.image.tile,
-              minVisibleSize: 0
-            }
-          };
+          const imageUrlValue = NodeAttributes.getImageUrlFromStyleRule(style.image.url, itemData);
+          if (imageUrlValue !== undefined) {
+            result = {
+              image: {
+                url: imageUrlValue,
+                scale: style.image.scale,
+                fit: style.image.fit,
+                tile: style.image.tile,
+                minVisibleSize: 0
+              }
+            };
+          }
         }
         break;
       }
@@ -254,5 +252,21 @@ export class NodeAttributes extends ItemAttributes<INodeStyle> {
       icon: generatedIcon.icon,
       image: generatedIcon.image
     };
+  }
+
+  /**
+   * Return the value of the image url from a style rule or undefined
+   * @param value
+   * @param itemData
+   */
+  public static getImageUrlFromStyleRule(
+    value: string | IImageDataValue | undefined,
+    itemData: LkNodeData
+  ): string | undefined {
+    if (typeof value === 'string' && ['imageUrl', 'image'].includes(Tools.getType(value)!)) {
+      return value;
+    } else if (typeof value === 'object') {
+      return Tools.getIn(itemData, value.path);
+    }
   }
 }
