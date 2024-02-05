@@ -287,11 +287,14 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public getNonFilteredNodes(items?: Array<NodeId>): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
       ? this.getNodes(items).filter((i) => !i.hasClass('filtered'))
-      : this.getNodes('raw').filter((i) => !i.hasClass('filtered'));
+      : // take only none virtual nodes
+        this.getNodes('raw').filter((i) => !i.hasClass('filtered'));
   }
 
   /**
    * Return the list of filtered nodes
+   * @param items items to check if they are filtered
+   * @param filter type of nodes to check if they are filtered ( nodes that are visible, raw nodes (none virtual) or all nodes)
    */
   public getFilteredNodes(
     items?: Array<NodeId>,

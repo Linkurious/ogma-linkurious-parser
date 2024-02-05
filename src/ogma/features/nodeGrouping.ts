@@ -18,7 +18,7 @@ export class NodeGroupingTransformation {
 
   /**
    * Set the grouping rule
-   * @param ruleName The nae of node grouping rule
+   * @param ruleName The name of node grouping rule
    * @param type the type of the node
    * @param property the property name that will be used to group the nodes
    */
@@ -39,18 +39,21 @@ export class NodeGroupingTransformation {
             return undefined;
           } else {
             const propertyValue = node.getData(['properties', this.groupRule?.property ?? '']);
+            // if the property value is of type conflict or invalid value we use the original value
             const originalValue =
               typeof propertyValue === 'object'
                 ? (propertyValue as ConflictValue).original
                 : propertyValue;
             // groupRule is defined if not we returned undefined
+            // node with same value will be part of the same group
             return `${this.groupRule!.type}-${originalValue}`.toLowerCase().trim();
           }
         },
         nodeGenerator: (nodes) => {
           return {
             data: {
-              categories: [this.groupRule?.type],
+              // groupRule is defined as a virtual node only exist if the rule is defined
+              categories: [this.groupRule!.type],
               properties: {
                 size: nodes.size
               }
@@ -79,7 +82,11 @@ export class NodeGroupingTransformation {
    * Called when there is a change in the rule
    */
   public async refreshTransformation(): Promise<void> {
-    await this.transformation?.refresh();
+    if (this.transformation !== undefined) {
+      await this.transformation.refresh();
+    } else {
+      await this.initTransformation();
+    }
   }
 
   /**
@@ -108,7 +115,7 @@ export class NodeGroupingTransformation {
   /**
    * run layout on all subnodes of virtual nodes
    */
-  public async runLayoutOnAllSubeNodes(): Promise<void> {
+  public async runLayoutOnAllSubNodes(): Promise<void> {
     // @ts-ignore getContext exists on the transformation but hidden by the types
     const virtualNodes = this.transformation.getContext().virtualNodes;
     const rawNodesList = virtualNodes.getSubNodes();
@@ -119,8 +126,8 @@ export class NodeGroupingTransformation {
         promisesList.push(this._runSubNodesLayout(subNodes));
       }
     }
-    promisesList.push(this._runSubNodesLayout(virtualNodes));
     await Promise.all(promisesList);
+    await this._runForceLayout(virtualNodes);
   }
 
   /**
@@ -159,7 +166,7 @@ export class NodeGroupingTransformation {
       ['transformationEnabled', 'transformationRefresh'],
       async (transformations) => {
         if (transformations.target.getId() === this.transformation?.getId()) {
-          await this.runLayoutOnAllSubeNodes();
+          await this.runLayoutOnAllSubNodes();
         }
       }
     );
