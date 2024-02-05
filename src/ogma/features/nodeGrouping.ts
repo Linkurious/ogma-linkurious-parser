@@ -1,4 +1,4 @@
-import {StyleRule, Transformation, Node, NodeList} from '@linkurious/ogma';
+import {Transformation, Node, NodeList} from '@linkurious/ogma';
 import {ConflictValue, LkEdgeData, LkNodeData, MissingValue} from '@linkurious/rest-client';
 
 import {LKOgma} from '../index';
@@ -8,7 +8,6 @@ export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
 
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
-  public nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   public groupRule?: {ruleName: string; type: string; property: string};
   private _ogma: LKOgma;
 
@@ -93,7 +92,7 @@ export class NodeGroupingTransformation {
    * init node grouping style
    */
   public initNodeGroupingStyle(): void {
-    this.nodeGroupingStyleRule = this._ogma.styles.addRule({
+    this._ogma.styles.addRule({
       nodeAttributes: {
         // Any default style will go here
         text: {
