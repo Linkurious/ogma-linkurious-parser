@@ -283,7 +283,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Return the list of non filtered nodes
    */
-  public getNonFilteredNodes(items?: Array<NodeId[] | Filter | Node$1<ND, ED>[] | NodeList$1<ND, ED>>): NodeList<LkNodeData, LkEdgeData> {
+  public getNonFilteredNodes(items?: Array<NodeId>): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
       ? this.getNodes(items).filter((i) => !i.hasClass('filtered'))
       : this.getNodes('raw').filter((i) => !i.hasClass('filtered'));
@@ -293,7 +293,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Return the list of filtered nodes
    */
   public getFilteredNodes(
-    items?: Array<any>,
+    items?: Array<NodeId>,
     filter: 'visible' | 'raw' | 'all' = 'raw'
   ): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
