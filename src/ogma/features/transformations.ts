@@ -2,14 +2,15 @@
 
 import {GenericObject, IEdgeGroupStyle, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 import {
-  Edge, EdgeAttributesValue,
+  Edge,
+  EdgeAttributesValue,
   EdgeExtremity,
   EdgeStyle,
   EdgeType,
   PixelSize,
   StyleRule,
   Transformation
-} from "@linkurious/ogma";
+} from '@linkurious/ogma';
 
 import {LKOgma} from '../index';
 

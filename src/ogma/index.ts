@@ -20,7 +20,7 @@ import Ogma, {
   RawEdge,
   RawGraph,
   RawNode
-} from "@linkurious/ogma";
+} from '@linkurious/ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
