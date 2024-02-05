@@ -706,11 +706,12 @@ export class StylesViz {
       this._ogmaNodeShape = this._ogma.styles.addRule({
         nodeAttributes: {
           shape: (node: o.Node | undefined) => {
-            if (node !== undefined && !node.isVirtual()) {
+            if (node !== undefined) {
               return this._nodeAttributes.shape(node.getData());
             }
           }
         },
+        nodeSelector: (node: o.Node | undefined) => node !== undefined && !node.isVirtual(),
         nodeDependencies: {self: {data: true}}
       });
     } else {
