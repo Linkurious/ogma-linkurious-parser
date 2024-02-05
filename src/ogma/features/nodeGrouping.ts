@@ -95,6 +95,7 @@ export class NodeGroupingTransformation {
           },
           style: 'bold'
         },
+        layer: -1,
         opacity: 0.32
       },
       nodeSelector: (node) => {
