@@ -10,9 +10,10 @@ import {
   VizNode
 } from '@linkurious/rest-client';
 import Ogma, {
-  EdgeList, Filter,
+  EdgeList,
   ForceLayoutOptions,
-  HierarchicalLayoutOptions, NodeId,
+  HierarchicalLayoutOptions,
+  NodeId,
   NodeList,
   NonObjectPropertyWatcher,
   RadialLayoutOptions,
