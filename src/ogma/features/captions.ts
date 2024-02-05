@@ -73,7 +73,7 @@ export class CaptionsViz {
         nodeAttributes: {
           text: {
             content: (node: Ogma.Node | undefined) => {
-              if (node === undefined || node.getData() === undefined) {
+              if (node === undefined) {
                 return ``;
               }
               const value = Captions.getText(
