@@ -8,10 +8,9 @@ export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
 
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
-  public nodeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
+  public nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
+  public groupRule?: {ruleName: string; type: string; property: string};
   private _ogma: LKOgma;
-  // TODO set it to private after
-  public groupRule: {ruleName: string; type: string; property: string} | undefined;
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
@@ -30,26 +29,22 @@ export class NodeGroupingTransformation {
   /**
    * create a node grouping transformation
    * It uses groupRule to define the rule
+   * Group the nodes based on a category type and a property value
    */
   public async initTransformation(): Promise<void> {
     if (this.transformation === undefined) {
       this.transformation = this._ogma.transformations.addNodeGrouping({
         groupIdFunction: (node) => {
-          const propertyValue = node.getData(['properties', this.groupRule?.property ?? '']);
-          if (
-            this.groupRule === undefined ||
-            !node.getData('categories').includes(this.groupRule.type) ||
-            !Tools.isDefined(propertyValue) ||
-            (typeof propertyValue === 'object' &&
-              (propertyValue as MissingValue).status === 'missing')
-          ) {
+          if (this._isRuleNotApplicableToNode(node)) {
             return undefined;
           } else {
+            const propertyValue = node.getData(['properties', this.groupRule?.property ?? '']);
             const originalValue =
               typeof propertyValue === 'object'
                 ? (propertyValue as ConflictValue).original
                 : propertyValue;
-            return `${this.groupRule.type}-${originalValue}`.toLowerCase().trim();
+            // groupRule is defined if not we returned undefined
+            return `${this.groupRule!.type}-${originalValue}`.toLowerCase().trim();
           }
         },
         nodeGenerator: (nodes) => {
@@ -65,7 +60,7 @@ export class NodeGroupingTransformation {
         edgeGenerator: () => {
           return {
             data: {
-              type: 'LKE_NODE_GROUPING_EDGE'
+              type: LKE_NODE_GROUPING_EDGE
             }
           };
         },
@@ -73,7 +68,7 @@ export class NodeGroupingTransformation {
         duration: 300,
         padding: 10
       });
-      // await this.runLayoutOnAllSubeNodes();
+      this._listenToTransformationEvents();
     } else {
       await this.refreshTransformation();
     }
@@ -85,20 +80,18 @@ export class NodeGroupingTransformation {
    */
   public async refreshTransformation(): Promise<void> {
     await this.transformation?.refresh();
-    await this.runLayoutOnAllSubeNodes();
   }
 
   /**
    * init node grouping style
    */
   public initNodeGroupingStyle(): void {
-    // TODO check if you can use add node rule
     this.nodeGroupingStyleRule = this._ogma.styles.addRule({
       nodeAttributes: {
         // Any default style will go here
         text: {
           content: (node: Node<LkNodeData> | undefined): string | undefined => {
-            return this.getNodeGroupingCaption(node);
+            return this._getNodeGroupingCaption(node);
           },
           style: 'bold'
         },
@@ -111,28 +104,78 @@ export class NodeGroupingTransformation {
     });
   }
 
-  public refreshNodeGroupingStyle(): void {
-    this.nodeGroupingStyleRule?.refresh();
+  /**
+   * run layout on all subnodes of virtual nodes
+   */
+  public async runLayoutOnAllSubeNodes(): Promise<void> {
+    // @ts-ignore getContext exists on the transformation but hidden by the types
+    const virtualNodes = this.transformation.getContext().virtualNodes;
+    const rawNodesList = virtualNodes.getSubNodes();
+    for (let i = 0; i < rawNodesList.length; i++) {
+      const subNodes = rawNodesList[i];
+      if (subNodes !== undefined) {
+        // TODO use promise all
+        await this._runSubNodesLayout(subNodes);
+      }
+    }
+    await this._runSubNodesLayout(virtualNodes);
   }
 
   /**
    * Run the layout on the subnodes of the virtual node
    * @param subNodes nodes part of a virtual node
    */
-  private async runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
+  private async _runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     if (subNodes.size === 0) {
       return;
     }
-    // TODO run Circle-packing layout new when there are no edges
-    // groupNodes.getAdjacentEdges({ bothExtremities: true }).size === 0
-    /* const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
-    console.log('runSubNodesLayout', noEdges, subNodes.toJSON());
+
+    const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
+    if (noEdges) {
+      await this._runCirclePack(subNodes);
+    } else {
+      await this._runForceLayout(subNodes);
+    }
+  }
+
+  /**
+   * Return the caption of a virtual node
+   * @param node reference to the virtual node
+   */
+  private _getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
+    if (node !== undefined && node.isVirtual()) {
+      const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
+      return `${this.groupRule?.ruleName} - ${size}`;
+    }
+  }
+
+  /**
+   * Listen to transformationEnabled and transformationRefresh events to run the layout on the subnodes
+   */
+  private _listenToTransformationEvents(): void {
+    this._ogma.events.on(
+      ['transformationEnabled', 'transformationRefresh'],
+      async (transformations) => {
+        if (transformations.target.getId() === this.transformation?.getId()) {
+          await this.runLayoutOnAllSubeNodes();
+        }
+      }
+    );
+  }
+
+  /**
+   * Run the circle pack layout on the subnodes
+   * @param subNodes
+   */
+  private async _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     await this._ogma.algorithms.circlePack({
       nodes: subNodes,
       margin: 10,
       sort: 'asc'
-    });*/
+    });
+  }
 
+  private async _runForceLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     await this._ogma.layouts.force({
       steps: 40,
       alignSiblings: true,
@@ -144,28 +187,17 @@ export class NodeGroupingTransformation {
     });
   }
 
-  /**
-   * Return the caption of a virtual node
-   * @param node reference to the virtual node
-   */
-  private getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
-    if (node !== undefined && node.isVirtual()) {
-      const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
-      return `${this.groupRule?.ruleName} - ${size}`;
-    }
-  }
-
-  public async runLayoutOnAllSubeNodes(): Promise<void> {
-    // @ts-ignore getContext exists on the transformation but not in the type
-    const virtualNodes = this.transformation.getContext().virtualNodes;
-    const rawNodesList = virtualNodes.getSubNodes();
-    for (let i = 0; i < rawNodesList.length; i++) {
-      const subNodes = rawNodesList[i];
-      if (subNodes !== undefined) {
-        await this.runSubNodesLayout(subNodes);
-      }
-    }
-    await this.runSubNodesLayout(virtualNodes);
-    console.log('runLayoutOnAllSubeNodes');
+  private _isRuleNotApplicableToNode(node: Node<LkNodeData>): boolean {
+    const propertyValue = node.getData(['properties', this.groupRule?.property ?? '']);
+    return (
+      // if the group rule is not defined
+      this.groupRule === undefined ||
+      // if rule is applied to a different category
+      !node.getData('categories').includes(this.groupRule.type) ||
+      // if the property value is not defined
+      !Tools.isDefined(propertyValue) ||
+      // if the property value is missing
+      (typeof propertyValue === 'object' && (propertyValue as MissingValue).status === 'missing')
+    );
   }
 }
