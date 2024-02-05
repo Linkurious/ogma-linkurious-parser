@@ -111,14 +111,15 @@ export class NodeGroupingTransformation {
     // @ts-ignore getContext exists on the transformation but hidden by the types
     const virtualNodes = this.transformation.getContext().virtualNodes;
     const rawNodesList = virtualNodes.getSubNodes();
+    const promisesList: Promise<void>[] = [];
     for (let i = 0; i < rawNodesList.length; i++) {
       const subNodes = rawNodesList[i];
       if (subNodes !== undefined) {
-        // TODO use promise all
-        await this._runSubNodesLayout(subNodes);
+        promisesList.push(this._runSubNodesLayout(subNodes));
       }
     }
-    await this._runSubNodesLayout(virtualNodes);
+    promisesList.push(this._runSubNodesLayout(virtualNodes));
+    await Promise.all(promisesList);
   }
 
   /**
