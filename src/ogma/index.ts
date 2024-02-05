@@ -10,16 +10,16 @@ import {
   VizNode
 } from '@linkurious/rest-client';
 import Ogma, {
-  EdgeList,
+  EdgeList, Filter,
   ForceLayoutOptions,
-  HierarchicalLayoutOptions,
+  HierarchicalLayoutOptions, NodeId,
   NodeList,
   NonObjectPropertyWatcher,
   RadialLayoutOptions,
   RawEdge,
   RawGraph,
   RawNode
-} from '@linkurious/ogma';
+} from "@linkurious/ogma";
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
@@ -283,7 +283,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Return the list of non filtered nodes
    */
-  public getNonFilteredNodes(items?: Array<any>): NodeList<LkNodeData, LkEdgeData> {
+  public getNonFilteredNodes(items?: Array<NodeId[] | Filter | Node$1<ND, ED>[] | NodeList$1<ND, ED>>): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
       ? this.getNodes(items).filter((i) => !i.hasClass('filtered'))
       : this.getNodes('raw').filter((i) => !i.hasClass('filtered'));

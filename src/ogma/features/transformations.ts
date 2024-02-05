@@ -2,14 +2,14 @@
 
 import {GenericObject, IEdgeGroupStyle, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 import {
-  Edge,
+  Edge, EdgeAttributesValue,
   EdgeExtremity,
   EdgeStyle,
   EdgeType,
   PixelSize,
   StyleRule,
   Transformation
-} from '@linkurious/ogma';
+} from "@linkurious/ogma";
 
 import {LKOgma} from '../index';
 
@@ -78,9 +78,9 @@ export class TransformationsViz {
     this.edgeGroupingStyleRule = this._ogma.styles.addRule({
       edgeAttributes: {
         ...DEFAULT_EDGE_GROUP_STYLE,
-        ...(this.edgeGroupStyle as any),
+        ...(this.edgeGroupStyle as EdgeAttributesValue<LkEdgeData, LkNodeData>),
         text: {
-          content: (edge: Edge<LkEdgeData> | undefined) => {
+          content: (edge: Edge<LkEdgeData> | undefined): string | undefined => {
             // check it the edge is virtual and was not created by node grouping
             if (
               edge !== undefined &&
