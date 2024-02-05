@@ -1,7 +1,7 @@
 import {Transformation, Node, NodeList} from '@linkurious/ogma';
 import {ConflictValue, LkEdgeData, LkNodeData, MissingValue} from '@linkurious/rest-client';
 
-import {LKOgma} from '../index';
+import { FORCE_LAYOUT_CONFIG, LKOgma } from "../index";
 import {Tools} from '../../tools/tools';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
@@ -107,6 +107,7 @@ export class NodeGroupingTransformation {
       nodeSelector: (node) => {
         return node.isVirtual();
       },
+      // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
     });
   }
@@ -185,13 +186,8 @@ export class NodeGroupingTransformation {
 
   private async _runForceLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     await this._ogma.layouts.force({
-      steps: 40,
-      alignSiblings: true,
-      charge: 5,
-      gravity: 0.05,
-      theta: 0.34,
       nodes: subNodes,
-      duration: 0
+      ...FORCE_LAYOUT_CONFIG
     });
   }
 
