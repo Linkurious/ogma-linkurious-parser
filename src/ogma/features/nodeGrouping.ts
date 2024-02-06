@@ -1,7 +1,7 @@
 import {Transformation, Node, NodeList} from '@linkurious/ogma';
 import {ConflictValue, LkEdgeData, LkNodeData, MissingValue} from '@linkurious/rest-client';
 
-import { FORCE_LAYOUT_CONFIG, LKOgma } from "../index";
+import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
