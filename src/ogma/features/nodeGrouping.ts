@@ -17,12 +17,13 @@ export class NodeGroupingTransformation {
 
   /**
    * Set the grouping rule
-   * @param ruleName The name of node grouping rule
-   * @param type the type of the node
-   * @param property the property name that will be used to group the nodes
+   * @param params
+   *  ruleName The name of node grouping rule
+   *  type the type of the node
+   *  property the property name that will be used to group the nodes
    */
-  public setGroupingRule(ruleName: string, type: string, property: string): void {
-    this.groupRule = {ruleName: ruleName, type: type, property: property};
+  public setGroupingRule(params?: {ruleName: string; type: string; property: string}): void {
+    this.groupRule = params;
   }
 
   /**
