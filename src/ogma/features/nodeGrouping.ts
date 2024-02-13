@@ -38,6 +38,7 @@ export class NodeGroupingTransformation {
           if (this._isRuleNotApplicableToNode(node)) {
             return undefined;
           } else {
+            this._unpinNode(node);
             const propertyValue = node.getData(['properties', this.groupRule?.property ?? '']);
             // if the property value is of type conflict or invalid value we use the original value
             const originalValue =
@@ -204,5 +205,9 @@ export class NodeGroupingTransformation {
       // if the property value is missing
       (typeof propertyValue === 'object' && (propertyValue as MissingValue).status === 'missing')
     );
+  }
+
+  private _unpinNode(node: Node<LkNodeData, LkEdgeData>): void {
+    void node.setAttribute('layoutable', true);
   }
 }
