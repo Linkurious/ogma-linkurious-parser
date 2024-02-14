@@ -6,7 +6,6 @@ import {Node, NodeList} from '@linkurious/ogma';
 import {CurrencyFormat, ICurrencyOptions, LkNodeData, LkProperty} from '@linkurious/rest-client';
 
 export {sortBy};
-const URL_PATTERN = /([a-zA-Z][a-zA-Z0-9\+\-\.]*:\/\/[^\s]+)/i;
 const IMAGE_PATTERN = /\S+\.(gif|jpe?g|tiff|png|bmp|svg)$/i;
 export const CAPTION_HEURISTIC: string[] = [
   'label',
@@ -301,7 +300,7 @@ export class Tools {
    * @return {"image" | "url"}
    */
   public static getType(value: string): 'image' | 'url' | 'imageUrl' | undefined {
-    if (Tools.isImage(value) && Tools.isUrl(value)) {
+    if (Tools.isURLImage(value)) {
       return 'imageUrl';
     }
 
@@ -323,7 +322,22 @@ export class Tools {
    * @return {boolean}
    */
   private static isUrl(value: string): boolean {
-    return URL_PATTERN.test(value);
+    try {
+      new URL(value);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * Return true if the given string is an image extension
+   *
+   * @param {string}  value
+   * @return {boolean}
+   */
+  private static isImage(value: string): boolean {
+    return IMAGE_PATTERN.test(value);
   }
 
   /**
@@ -332,8 +346,12 @@ export class Tools {
    * @param {string}  value
    * @return {boolean}
    */
-  private static isImage(value: string): boolean {
-    return IMAGE_PATTERN.test(value);
+  private static isURLImage(value: string): boolean {
+    if (Tools.isUrl(value)) {
+      const url = new URL(value);
+      return Tools.isImage(url.pathname);
+    }
+    return false;
   }
 
   /**
