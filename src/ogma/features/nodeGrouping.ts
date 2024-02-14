@@ -1,5 +1,11 @@
 import {Transformation, Node, NodeList} from '@linkurious/ogma';
-import {ConflictValue, LkEdgeData, LkNodeData, MissingValue} from '@linkurious/rest-client';
+import {
+  ConflictValue,
+  LkEdgeData,
+  LkNodeData,
+  MissingValue,
+  NodeGroupingRule
+} from '@linkurious/rest-client';
 
 import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
@@ -8,7 +14,7 @@ export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
 
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
-  public groupRule?: {ruleName: string; type: string; property: string};
+  public groupRule?: NodeGroupingRule;
   private _ogma: LKOgma;
 
   constructor(ogma: LKOgma) {
@@ -17,13 +23,10 @@ export class NodeGroupingTransformation {
 
   /**
    * Set the grouping rule
-   * @param params
-   *  ruleName The name of node grouping rule
-   *  type the type of the node
-   *  property the property name that will be used to group the nodes
+   * @param rule of grouping
    */
-  public setGroupingRule(params?: {ruleName: string; type: string; property: string}): void {
-    this.groupRule = params;
+  public setGroupingRule(rule: NodeGroupingRule | undefined): void {
+    this.groupRule = rule;
   }
 
   /**
@@ -39,7 +42,10 @@ export class NodeGroupingTransformation {
             return undefined;
           } else {
             this._unpinNode(node);
-            const propertyValue = node.getData(['properties', this.groupRule?.property ?? '']);
+            const propertyValue = node.getData([
+              'properties',
+              this.groupRule?.groupingOptions.propertyKey ?? ''
+            ]);
             // if the property value is of type conflict or invalid value we use the original value
             const originalValue =
               typeof propertyValue === 'object'
@@ -47,14 +53,16 @@ export class NodeGroupingTransformation {
                 : propertyValue;
             // groupRule is defined if not we returned undefined
             // node with same value will be part of the same group
-            return `${this.groupRule!.type}-${originalValue}`.toLowerCase().trim();
+            return `${this.groupRule?.groupingOptions.itemType}-${originalValue}`
+              .toLowerCase()
+              .trim();
           }
         },
         nodeGenerator: (nodes) => {
           return {
             data: {
               // groupRule is defined as a virtual node only exist if the rule is defined
-              categories: [this.groupRule!.type],
+              categories: [this.groupRule?.groupingOptions.itemType],
               properties: {
                 size: nodes.size
               }
@@ -156,7 +164,7 @@ export class NodeGroupingTransformation {
   private _getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
     if (node !== undefined && node.isVirtual()) {
       const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
-      return `${this.groupRule?.ruleName} - ${size}`;
+      return `${this.groupRule?.name} - ${size}`;
     }
   }
 
@@ -194,12 +202,15 @@ export class NodeGroupingTransformation {
   }
 
   private _isRuleNotApplicableToNode(node: Node<LkNodeData>): boolean {
-    const propertyValue = node.getData(['properties', this.groupRule?.property ?? '']);
+    const propertyValue = node.getData([
+      'properties',
+      this.groupRule?.groupingOptions.propertyKey ?? ''
+    ]);
     return (
       // if the group rule is not defined
       this.groupRule === undefined ||
       // if rule is applied to a different category
-      !node.getData('categories').includes(this.groupRule.type) ||
+      !node.getData('categories').includes(this.groupRule.groupingOptions.itemType) ||
       // if the property value is not defined
       !Tools.isDefined(propertyValue) ||
       // if the property value is missing
