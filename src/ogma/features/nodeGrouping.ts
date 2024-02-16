@@ -41,7 +41,6 @@ export class NodeGroupingTransformation {
           if (this._isRuleNotApplicableToNode(node)) {
             return undefined;
           } else {
-            this._unpinNode(node);
             const propertyValue = node.getData([
               'properties',
               this.groupRule?.groupingOptions.propertyKey ?? ''
@@ -126,18 +125,17 @@ export class NodeGroupingTransformation {
    * run layout on all subnodes of virtual nodes
    */
   public async runLayoutOnAllSubNodes(): Promise<void> {
-    // @ts-ignore getContext exists on the transformation but hidden by the types
-    const virtualNodes = this.transformation.getContext().virtualNodes;
-    const rawNodesList = virtualNodes.getSubNodes();
+    const rawNodesList = this._getAllTransformationRawNodes();
     const promisesList: Promise<void>[] = [];
     for (let i = 0; i < rawNodesList.length; i++) {
-      const subNodes = rawNodesList[i];
+      // rawNodesList[i] is not null because each group has at least one node
+      const subNodes = rawNodesList[i]!;
       if (subNodes !== undefined) {
         promisesList.push(this._runSubNodesLayout(subNodes));
       }
     }
     await Promise.all(promisesList);
-    await this._runForceLayout(virtualNodes);
+    await this._runForceLayout(this._getVirtualNodesOfTransformation());
   }
 
   /**
@@ -176,6 +174,7 @@ export class NodeGroupingTransformation {
       ['transformationEnabled', 'transformationRefresh'],
       async (transformations) => {
         if (transformations.target.getId() === this.transformation?.getId()) {
+          this._unpinNode(this._getAllTransformationRawNodes());
           await this.runLayoutOnAllSubNodes();
         }
       }
@@ -218,7 +217,29 @@ export class NodeGroupingTransformation {
     );
   }
 
-  private _unpinNode(node: Node<LkNodeData, LkEdgeData>): void {
-    void node.setAttribute('layoutable', true);
+  private _unpinNode(nodes: Array<NodeList | null>): void {
+    nodes.forEach((nodeList) => {
+      if (nodeList !== null) {
+        void nodeList.setAttribute('layoutable', true);
+      }
+    });
+  }
+
+  /**
+   * Get all the raw nodes part of the transformation
+   * @private
+   */
+  private _getAllTransformationRawNodes(): Array<NodeList | null> {
+    const virtualNodes = this._getVirtualNodesOfTransformation();
+    return virtualNodes.getSubNodes();
+  }
+
+  /**
+   * Get the virtual nodes of the transformation
+   * @private
+   */
+  private _getVirtualNodesOfTransformation(): NodeList<LkNodeData, LkEdgeData> {
+    // @ts-ignore getContext exists on the transformation but hidden by the types
+    return this.transformation.getContext().virtualNodes;
   }
 }
