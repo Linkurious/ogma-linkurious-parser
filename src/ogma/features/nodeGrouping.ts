@@ -221,13 +221,13 @@ export class NodeGroupingTransformation {
    * @private
    */
   private async _unpinNodes(nodes: Array<NodeList | null>): Promise<void> {
-    const promiseList: Array<Promise<NodeList>> = [];
-    nodes.forEach((nodeList) => {
-      if (nodeList !== null) {
-        promiseList.push(nodeList.setAttribute('layoutable', true));
-      }
-    });
-    await Promise.all(promiseList);
+    await Promise.all(
+      nodes.map((nodeList) => {
+        if (nodeList !== null) {
+          return nodeList.setAttribute('layoutable', true);
+        }
+      })
+    );
   }
 
   /**
