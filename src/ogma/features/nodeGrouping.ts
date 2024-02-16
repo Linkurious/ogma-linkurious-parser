@@ -130,9 +130,7 @@ export class NodeGroupingTransformation {
     for (let i = 0; i < rawNodesList.length; i++) {
       // rawNodesList[i] is not null because each group has at least one node
       const subNodes = rawNodesList[i]!;
-      if (subNodes !== undefined) {
-        promisesList.push(this._runSubNodesLayout(subNodes));
-      }
+      promisesList.push(this._runSubNodesLayout(subNodes));
     }
     await Promise.all(promisesList);
     await this._runForceLayout(this._getVirtualNodesOfTransformation());
@@ -174,7 +172,7 @@ export class NodeGroupingTransformation {
       ['transformationEnabled', 'transformationRefresh'],
       async (transformations) => {
         if (transformations.target.getId() === this.transformation?.getId()) {
-          this._unpinNode(this._getAllTransformationRawNodes());
+          this._unpinNodes(this._getAllTransformationRawNodes());
           await this.runLayoutOnAllSubNodes();
         }
       }
@@ -217,12 +215,19 @@ export class NodeGroupingTransformation {
     );
   }
 
-  private _unpinNode(nodes: Array<NodeList | null>): void {
+  /**
+   * Unpin list of nodes
+   * @param nodes
+   * @private
+   */
+  private async _unpinNodes(nodes: Array<NodeList | null>): Promise<void> {
+    const promiseList: Array<Promise<NodeList>> = [];
     nodes.forEach((nodeList) => {
       if (nodeList !== null) {
-        void nodeList.setAttribute('layoutable', true);
+        promiseList.push(nodeList.setAttribute('layoutable', true));
       }
     });
+    await Promise.all(promiseList);
   }
 
   /**
