@@ -79,6 +79,10 @@ export class NodeGroupingTransformation {
         duration: 300,
         padding: 10
       });
+      // TODO remove setTimeout when LKE-10453 is fixed
+      setTimeout(() => {
+        this.transformation!.refresh();
+      }, 200);
       this._listenToTransformationEvents();
     } else {
       await this.refreshTransformation();
@@ -175,6 +179,7 @@ export class NodeGroupingTransformation {
     this._ogma.events.on(
       ['transformationEnabled', 'transformationRefresh'],
       async (transformations) => {
+        console.log('transformationEnabled or transformationRefresh');
         if (transformations.target.getId() === this.transformation?.getId()) {
           this._unpinNodes(this._getAllTransformationRawNodes());
           await this.runLayoutOnAllSubNodes();
