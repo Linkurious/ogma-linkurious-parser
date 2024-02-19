@@ -111,7 +111,11 @@ export class NodeGroupingTransformation {
           style: 'bold'
         },
         layer: -1,
-        opacity: 0.32
+        opacity: 0.32,
+        innerStroke: {
+          color: 'white',
+          width: 4
+        }
       },
       nodeSelector: (node) => {
         return node.isVirtual();
