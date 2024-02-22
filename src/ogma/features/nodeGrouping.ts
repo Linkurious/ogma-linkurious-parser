@@ -79,6 +79,10 @@ export class NodeGroupingTransformation {
         duration: 300,
         padding: 10
       });
+      // TODO remove setTimeout when LKE-10453 is fixed
+      setTimeout(() => {
+        this.transformation!.refresh();
+      }, 200);
       this._listenToTransformationEvents();
     } else {
       await this.refreshTransformation();
@@ -111,7 +115,11 @@ export class NodeGroupingTransformation {
           style: 'bold'
         },
         layer: -1,
-        opacity: 0.32
+        opacity: 0.32,
+        innerStroke: {
+          color: 'white',
+          width: 4
+        }
       },
       nodeSelector: (node) => {
         return node.isVirtual();
