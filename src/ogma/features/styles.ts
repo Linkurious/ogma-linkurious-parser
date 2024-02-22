@@ -244,8 +244,7 @@ export class StylesViz {
               ? this._defaultConfiguration.edge.text.font
               : "'roboto', sans-serif",
           color:
-            this._defaultConfiguration.edge !== undefined &&
-            this._defaultConfiguration.edge.text !== undefined &&
+            this._defaultConfiguration.edge?.text !== undefined &&
             this._defaultConfiguration.edge.text.color !== undefined
               ? this._defaultConfiguration.edge.text.color
               : 'black',
@@ -613,7 +612,7 @@ export class StylesViz {
     this.refreshNodeIcons(nodeIconsRules);
   }
 
-  public initNodesSizes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+  public initNodesSizes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>): void {
     const nodeSizeRules = this.getStyleRule(nodeRules, StyleType.SIZE) as LKStyleRule<INodeStyle>[];
     this.refreshNodeSize(nodeSizeRules);
   }
@@ -642,7 +641,7 @@ export class StylesViz {
     this.refreshEdgeShape(edgesShapeRules);
   }
 
-  public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+  public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>):void {
     const edgesColorRules = this.getStyleRule(
       edgeRules,
       StyleType.COLOR
