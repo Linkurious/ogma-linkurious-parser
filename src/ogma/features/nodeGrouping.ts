@@ -179,7 +179,6 @@ export class NodeGroupingTransformation {
     this._ogma.events.on(
       ['transformationEnabled', 'transformationRefresh'],
       async (transformations) => {
-        console.log('transformationEnabled or transformationRefresh');
         if (transformations.target.getId() === this.transformation?.getId()) {
           this._unpinNodes(this._getAllTransformationRawNodes());
           await this.runLayoutOnAllSubNodes();
