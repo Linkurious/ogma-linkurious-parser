@@ -12,6 +12,7 @@ import {
   GenericObject,
   IEdgeStyle,
   INodeStyle,
+  IStyleIcon,
   IStyleRule,
   LkEdgeData,
   LkNodeData,
@@ -31,6 +32,7 @@ import {
   StyleType
 } from '../..';
 import {Tools} from '../../tools/tools';
+import {OgmaImage} from '../../styles/nodeAttributes';
 
 export interface StylesConfig {
   nodeColorStyleRules: Array<LKStyleRule>;
@@ -375,7 +377,7 @@ export class StylesViz {
       name: 'filtered',
       nodeAttributes: {
         opacity: FILTER_OPACITY,
-        layer: (node) => {
+        layer: (node): number => {
           // if the node is part of a virtual node, it should be on top
           if (node.getMetaNode() !== undefined) {
             return 1;
@@ -658,12 +660,12 @@ export class StylesViz {
       this._nodeAttributes.refresh({icon: iconStyleRules});
       this._ogmaNodeIcon = this._ogma.styles.addRule({
         nodeAttributes: {
-          icon: (node: o.Node | undefined) => {
+          icon: (node: o.Node | undefined): IStyleIcon | undefined => {
             if (node !== undefined) {
               return this._nodeAttributes.icon(node.getData()).icon;
             }
           },
-          image: (node: o.Node | undefined) => {
+          image: (node: o.Node | undefined): OgmaImage | null | undefined => {
             if (node !== undefined && !node.isVirtual()) {
               return this._nodeAttributes.icon(node.getData()).image;
             }
@@ -673,7 +675,7 @@ export class StylesViz {
       });
     } else {
       this._nodeAttributes.refresh({icon: iconStyleRules});
-      this._ogmaNodeIcon.refresh();
+      void this._ogmaNodeIcon.refresh();
     }
   }
 
