@@ -375,7 +375,13 @@ export class StylesViz {
       name: 'filtered',
       nodeAttributes: {
         opacity: FILTER_OPACITY,
-        layer: 0,
+        layer: (node) => {
+          // if the node is part of a virtual node, it should be on top
+          if (node.getMetaNode() !== undefined) {
+            return 1;
+          }
+          return -1;
+        },
         detectable: false,
         badges: {
           topRight: {
