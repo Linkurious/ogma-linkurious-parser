@@ -265,7 +265,9 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding nodes then adding edges to the graph
    */
-  public async addGraphAfterValidation(graph: RawGraph<LkNodeData, LkEdgeData>): Promise<{
+  public async addGraphAfterValidation(
+    graph: RawGraph<LkNodeData, LkEdgeData>
+  ): Promise<{
     nodes: NodeList<LkNodeData>;
     edges: EdgeList<LkEdgeData>;
   }> {

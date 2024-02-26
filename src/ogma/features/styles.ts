@@ -641,7 +641,7 @@ export class StylesViz {
     this.refreshEdgeShape(edgesShapeRules);
   }
 
-  public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>):void {
+  public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>): void {
     const edgesColorRules = this.getStyleRule(
       edgeRules,
       StyleType.COLOR
