@@ -83,7 +83,6 @@ export class NodeGroupingTransformation {
       setTimeout(() => {
         this.transformation!.refresh();
       }, 200);
-      this._listenToTransformationEvents();
     } else {
       await this.refreshTransformation();
     }
@@ -96,6 +95,7 @@ export class NodeGroupingTransformation {
   public async refreshTransformation(): Promise<void> {
     if (this.transformation !== undefined) {
       await this.transformation.refresh();
+      await this._unpinNodes(this._getAllTransformationRawNodes());
     } else {
       await this.initTransformation();
     }
@@ -133,6 +133,7 @@ export class NodeGroupingTransformation {
    * run layout on all subnodes of virtual nodes
    */
   public async runLayoutOnAllSubNodes(): Promise<void> {
+    await this._ogma.transformations.afterNextUpdate();
     const rawNodesList = this._getAllTransformationRawNodes();
     const promisesList: Promise<void>[] = [];
     for (let i = 0; i < rawNodesList.length; i++) {
@@ -141,7 +142,6 @@ export class NodeGroupingTransformation {
       promisesList.push(this._runSubNodesLayout(subNodes));
     }
     await Promise.all(promisesList);
-    await this._runForceLayout(this._getVirtualNodesOfTransformation());
   }
 
   /**
@@ -170,21 +170,6 @@ export class NodeGroupingTransformation {
       const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
       return `${this.groupRule?.name} - ${size}`;
     }
-  }
-
-  /**
-   * Listen to transformationEnabled and transformationRefresh events to run the layout on the subnodes
-   */
-  private _listenToTransformationEvents(): void {
-    this._ogma.events.on(
-      ['transformationEnabled', 'transformationRefresh'],
-      async (transformations) => {
-        if (transformations.target.getId() === this.transformation?.getId()) {
-          this._unpinNodes(this._getAllTransformationRawNodes());
-          await this.runLayoutOnAllSubNodes();
-        }
-      }
-    );
   }
 
   /**

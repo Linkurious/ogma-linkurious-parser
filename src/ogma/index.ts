@@ -44,9 +44,8 @@ export const FORCE_LAYOUT_CONFIG = {
   steps: 40,
   alignSiblings: true,
   charge: 5,
-  gravity: 0.05,
   theta: 0.34,
-  duration: 0
+  duration: ANIMATION_DURATION
 };
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
@@ -266,9 +265,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding nodes then adding edges to the graph
    */
-  public async addGraphAfterValidation(
-    graph: RawGraph<LkNodeData, LkEdgeData>
-  ): Promise<{
+  public async addGraphAfterValidation(graph: RawGraph<LkNodeData, LkEdgeData>): Promise<{
     nodes: NodeList<LkNodeData>;
     edges: EdgeList<LkEdgeData>;
   }> {
