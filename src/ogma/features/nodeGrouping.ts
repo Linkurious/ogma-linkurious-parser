@@ -11,6 +11,7 @@ import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
+export const LKE_NODE_GROUPING_NODE = 'LKE_NODE_GROUPING_NODE';
 
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
@@ -61,7 +62,7 @@ export class NodeGroupingTransformation {
           return {
             data: {
               // groupRule is defined as a virtual node only exist if the rule is defined
-              categories: [this.groupRule?.groupingOptions.itemType],
+              categories: [LKE_NODE_GROUPING_NODE],
               properties: {
                 size: nodes.size
               }
@@ -115,10 +116,10 @@ export class NodeGroupingTransformation {
           style: 'bold'
         },
         layer: -1,
-        opacity: 0.32,
+        color: 'rgba(240, 240, 240)',
         innerStroke: {
-          color: 'white',
-          width: 4
+          color: '#7f7f7f',
+          width: 2
         }
       },
       nodeSelector: (node) => {
