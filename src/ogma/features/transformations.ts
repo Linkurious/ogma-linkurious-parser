@@ -98,8 +98,8 @@ export class TransformationsViz {
       edgeSelector: (edge) =>
         edge.isVirtual() &&
         edge.getSubEdges() &&
-        (edge.getSubEdges()!.filter((e) => !e.hasClass('filtered')).size > 0 ||
-          edge.getData('type') === LKE_NODE_GROUPING_EDGE),
+        edge.getSubEdges()!.filter((e) => !e.hasClass('filtered')).size > 0 &&
+        edge.getData('type') !== LKE_NODE_GROUPING_EDGE,
       edgeDependencies: {self: {data: true}}
     });
   }
