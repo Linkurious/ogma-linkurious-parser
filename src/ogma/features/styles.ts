@@ -407,11 +407,10 @@ export class StylesViz {
       edgeAttributes: {
         opacity: FILTER_OPACITY,
         layer: (edge): number => {
-          const isEdgeInsideNodeGroup =
-            edge
-              .getExtremities()
-              .getMetaNode()
-              .filter((node) => node !== null).length > 0;
+          const isEdgeInsideNodeGroup = edge
+            .getExtremities()
+            .getMetaNode()
+            .some((node) => node !== null);
           // if the edge is part of a virtual node, it should be on top
           if (!edge.isVirtual() && isEdgeInsideNodeGroup) {
             return 1;
