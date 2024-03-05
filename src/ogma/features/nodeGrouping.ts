@@ -168,8 +168,13 @@ export class NodeGroupingTransformation {
    */
   private _getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
     if (node !== undefined && node.isVirtual()) {
+      // get the property value of the first node of the group (all nodes share the same property value)
+      const propertyValue = node
+        .getSubNodes()!
+        .get(0)
+        .getData(['properties', this.groupRule!.groupingOptions.propertyKey]);
       const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
-      return `${this.groupRule?.name} - ${size}`;
+      return `${propertyValue} (${size})`;
     }
   }
 

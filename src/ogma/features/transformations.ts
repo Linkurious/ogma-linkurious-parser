@@ -89,7 +89,7 @@ export class TransformationsViz {
               edge.getData('type') !== LKE_NODE_GROUPING_EDGE
             ) {
               const size = edge.getSubEdges()!.filter((e) => !e.hasClass('filtered')).size;
-              return `${edge.getData(['properties', 'originalType'])} - ${size}`;
+              return `${edge.getData(['properties', 'originalType'])} (${size})`;
             }
           },
           style: 'bold'
