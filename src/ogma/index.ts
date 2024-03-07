@@ -49,7 +49,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public store!: OgmaStore;
   private _reactive!: RxViz;
 
-  constructor(private _configuration: IOgmaConfig, private _baseUrl?: string) {
+  constructor(private _configuration: IOgmaConfig, _baseUrl?: string) {
     // set Ogma global configuration
     super(_configuration);
     Object.setPrototypeOf(this, new.target.prototype);
