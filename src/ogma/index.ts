@@ -59,7 +59,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Initialize the Ogma instance with the configuration and the base url
    * @param init used to know if the instance is initialized for the first time (used in setConfigOgma)
-   * @param baseUrl base url used for image urls
+   * @param baseUrl base url used for relative image urls
    * @private
    */
   private initOgmaLinkuriousParser(init?: boolean, baseUrl?: string): void {
