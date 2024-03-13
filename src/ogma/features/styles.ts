@@ -140,10 +140,12 @@ export class StylesViz {
         shape?: OgmaEdgeShape;
         text?: TextOptions;
       };
+      baseUrl?: string;
     }
   ) {
     this._ogma = ogma;
     this._defaultConfiguration = configuration;
+    this._nodeAttributes.setBaseUrl(configuration.baseUrl);
   }
 
   /**

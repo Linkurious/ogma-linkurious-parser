@@ -61,14 +61,20 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public LkNodeGroupingTransformation!: NodeGroupingTransformation;
   private _reactive!: RxViz;
 
-  constructor(private _configuration: IOgmaConfig) {
+  constructor(private _configuration: IOgmaConfig, _baseUrl?: string) {
     // set Ogma global configuration
     super(_configuration);
     Object.setPrototypeOf(this, new.target.prototype);
-    this.initOgmaLinkuriousParser(true);
+    this.initOgmaLinkuriousParser(true, _baseUrl);
   }
 
-  private initOgmaLinkuriousParser(init?: boolean): void {
+  /**
+   * Initialize the Ogma instance with the configuration and the base url
+   * @param init used to know if the instance is initialized for the first time (used in setConfigOgma)
+   * @param baseUrl base url used for relative image urls
+   * @private
+   */
+  private initOgmaLinkuriousParser(init?: boolean, baseUrl?: string): void {
     this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
       path: 'categories',
       unwindArrays: true,
@@ -101,7 +107,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this._reactive.listenToSelectionEvents();
     }
     this.initSelection();
-    this.setConfigOgma(this._configuration, init);
+    this.setConfigOgma(this._configuration, init, baseUrl);
     this.LKTransformation = new TransformationsViz(this);
     this.LkNodeGroupingTransformation = new NodeGroupingTransformation(this);
 
@@ -144,10 +150,11 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     });
   }
 
-  private setStyles(configuration: IOgmaConfig): void {
+  private setStyles(configuration: IOgmaConfig, baseUrl?: string): void {
     this.LKStyles = new StylesViz(this, {
       node: configuration?.options?.styles?.node || {},
-      edge: configuration?.options?.styles?.edge || {}
+      edge: configuration?.options?.styles?.edge || {},
+      baseUrl: baseUrl
     });
     this.LKStyles.setNodesDefaultStyles();
     this.LKStyles.setEdgesDefaultStyles();
@@ -358,7 +365,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Updates the Ogma config when config changes in LKE. If init, options were already set by the Ogma.reset()
    */
-  public setConfigOgma(configuration?: IOgmaConfig, init?: boolean): void {
+  public setConfigOgma(configuration?: IOgmaConfig, init?: boolean, baseUrl?: string): void {
     if (configuration) {
       // here we make sure that the internal config object is updated and we have the correct one when resetting
       this._configuration = configuration;
@@ -369,7 +376,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
         renderer: this._configuration.renderer
       });
     }
-    this.setStyles(this._configuration);
+    this.setStyles(this._configuration, baseUrl);
     this.setCaptions(this._configuration);
   }
 }
