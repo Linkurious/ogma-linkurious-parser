@@ -12,6 +12,7 @@ import {
   GenericObject,
   IEdgeStyle,
   INodeStyle,
+  IStyleIcon,
   IStyleRule,
   LkEdgeData,
   LkNodeData,
@@ -31,6 +32,7 @@ import {
   StyleType
 } from '../..';
 import {Tools} from '../../tools/tools';
+import {OgmaImage} from '../../styles/nodeAttributes';
 
 export interface StylesConfig {
   nodeColorStyleRules: Array<LKStyleRule>;
@@ -244,8 +246,7 @@ export class StylesViz {
               ? this._defaultConfiguration.edge.text.font
               : "'roboto', sans-serif",
           color:
-            this._defaultConfiguration.edge !== undefined &&
-            this._defaultConfiguration.edge.text !== undefined &&
+            this._defaultConfiguration.edge?.text !== undefined &&
             this._defaultConfiguration.edge.text.color !== undefined
               ? this._defaultConfiguration.edge.text.color
               : 'black',
@@ -377,7 +378,13 @@ export class StylesViz {
       name: 'filtered',
       nodeAttributes: {
         opacity: FILTER_OPACITY,
-        layer: -1,
+        layer: (node): number => {
+          // if the node is part of a virtual node, it should be on top
+          if (node.getMetaNode() !== undefined) {
+            return 1;
+          }
+          return -1;
+        },
         detectable: false,
         badges: {
           topRight: {
@@ -401,7 +408,17 @@ export class StylesViz {
       },
       edgeAttributes: {
         opacity: FILTER_OPACITY,
-        layer: -1,
+        layer: (edge): number => {
+          const isEdgeInsideNodeGroup = edge
+            .getExtremities()
+            .getMetaNode()
+            .some((node) => node !== null);
+          // if the edge is part of a virtual node, it should be on top
+          if (!edge.isVirtual() && isEdgeInsideNodeGroup) {
+            return 1;
+          }
+          return -1;
+        },
         detectable: false,
         text: null,
         color: BASE_GREY,
@@ -607,7 +624,7 @@ export class StylesViz {
     this.refreshNodeIcons(nodeIconsRules);
   }
 
-  public initNodesSizes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+  public initNodesSizes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>): void {
     const nodeSizeRules = this.getStyleRule(nodeRules, StyleType.SIZE) as LKStyleRule<INodeStyle>[];
     this.refreshNodeSize(nodeSizeRules);
   }
@@ -636,7 +653,7 @@ export class StylesViz {
     this.refreshEdgeShape(edgesShapeRules);
   }
 
-  public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+  public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>): void {
     const edgesColorRules = this.getStyleRule(
       edgeRules,
       StyleType.COLOR
@@ -654,13 +671,13 @@ export class StylesViz {
       this._nodeAttributes.refresh({icon: iconStyleRules});
       this._ogmaNodeIcon = this._ogma.styles.addRule({
         nodeAttributes: {
-          icon: (node: o.Node | undefined) => {
+          icon: (node: o.Node | undefined): IStyleIcon | undefined => {
             if (node !== undefined) {
               return this._nodeAttributes.icon(node.getData()).icon;
             }
           },
-          image: (node: o.Node | undefined) => {
-            if (node !== undefined) {
+          image: (node: o.Node | undefined): OgmaImage | null | undefined => {
+            if (node !== undefined && !node.isVirtual()) {
               return this._nodeAttributes.icon(node.getData()).image;
             }
           }
@@ -669,7 +686,7 @@ export class StylesViz {
       });
     } else {
       this._nodeAttributes.refresh({icon: iconStyleRules});
-      this._ogmaNodeIcon.refresh();
+      void this._ogmaNodeIcon.refresh();
     }
   }
 
@@ -713,6 +730,7 @@ export class StylesViz {
             }
           }
         },
+        nodeSelector: (node: o.Node | undefined) => node !== undefined && !node.isVirtual(),
         nodeDependencies: {self: {data: true}}
       });
     } else {

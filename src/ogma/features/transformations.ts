@@ -3,6 +3,7 @@
 import {GenericObject, IEdgeGroupStyle, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 import {
   Edge,
+  EdgeAttributesValue,
   EdgeExtremity,
   EdgeStyle,
   EdgeType,
@@ -12,6 +13,8 @@ import {
 } from '@linkurious/ogma';
 
 import {LKOgma} from '../index';
+
+import {LKE_NODE_GROUPING_EDGE} from './nodeGrouping';
 
 const DEFAULT_EDGE_GROUP_STYLE: {
   color: string;
@@ -76,12 +79,17 @@ export class TransformationsViz {
     this.edgeGroupingStyleRule = this._ogma.styles.addRule({
       edgeAttributes: {
         ...DEFAULT_EDGE_GROUP_STYLE,
-        ...(this.edgeGroupStyle as any),
+        ...(this.edgeGroupStyle as EdgeAttributesValue<LkEdgeData, LkNodeData>),
         text: {
-          content: (edge: Edge<LkEdgeData> | undefined) => {
-            if (edge !== undefined && edge.getSubEdges() !== null) {
+          content: (edge: Edge<LkEdgeData> | undefined): string | undefined => {
+            // check it the edge is virtual and was not created by node grouping
+            if (
+              edge !== undefined &&
+              edge.getSubEdges() !== null &&
+              edge.getData('type') !== LKE_NODE_GROUPING_EDGE
+            ) {
               const size = edge.getSubEdges()!.filter((e) => !e.hasClass('filtered')).size;
-              return `${edge.getData(['properties', 'originalType'])} - ${size}`;
+              return `${edge.getData(['properties', 'originalType'])} (${size})`;
             }
           },
           style: 'bold'
@@ -90,7 +98,8 @@ export class TransformationsViz {
       edgeSelector: (edge) =>
         edge.isVirtual() &&
         edge.getSubEdges() &&
-        edge.getSubEdges()!.filter((e) => !e.hasClass('filtered')).size > 0,
+        edge.getSubEdges()!.filter((e) => !e.hasClass('filtered')).size > 0 &&
+        edge.getData('type') !== LKE_NODE_GROUPING_EDGE,
       edgeDependencies: {self: {data: true}}
     });
   }

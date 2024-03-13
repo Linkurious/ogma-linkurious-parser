@@ -13,6 +13,7 @@ import Ogma, {
   EdgeList,
   ForceLayoutOptions,
   HierarchicalLayoutOptions,
+  NodeId,
   NodeList,
   NonObjectPropertyWatcher,
   RadialLayoutOptions,
@@ -29,6 +30,7 @@ import {TransformationsViz} from './features/transformations';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
+import {NodeGroupingTransformation} from './features/nodeGrouping';
 
 export {default as Ogma} from '@linkurious/ogma';
 export const ANIMATION_DURATION = 750;
@@ -37,6 +39,14 @@ interface AddItemOptions {
   batchSize?: number;
   virtual?: boolean;
 }
+
+export const FORCE_LAYOUT_CONFIG = {
+  steps: 40,
+  alignSiblings: true,
+  charge: 5,
+  theta: 0.34,
+  duration: ANIMATION_DURATION
+};
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public LKStyles!: StylesViz;
@@ -47,6 +57,8 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   // Trigger an event with edge type changes
   public edgeTypeWatcher!: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   public store!: OgmaStore;
+  // Node Grouping transformation instance
+  public LkNodeGroupingTransformation!: NodeGroupingTransformation;
   private _reactive!: RxViz;
 
   constructor(private _configuration: IOgmaConfig, _baseUrl?: string) {
@@ -97,6 +109,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.initSelection();
     this.setConfigOgma(this._configuration, init, baseUrl);
     this.LKTransformation = new TransformationsViz(this);
+    this.LkNodeGroupingTransformation = new NodeGroupingTransformation(this);
 
     this.LKStyles.setNodesDefaultHalo();
     this.LKStyles.setEdgesDefaultHalo();
@@ -286,19 +299,25 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Return the list of non filtered nodes
    */
-  public getNonFilteredNodes(items?: Array<any>): NodeList<LkNodeData, LkEdgeData> {
+  public getNonFilteredNodes(items?: Array<NodeId>): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
       ? this.getNodes(items).filter((i) => !i.hasClass('filtered'))
-      : this.getNodes().filter((i) => !i.hasClass('filtered'));
+      : // take only none virtual nodes
+        this.getNodes('raw').filter((i) => !i.hasClass('filtered'));
   }
 
   /**
    * Return the list of filtered nodes
+   * @param items items to check if they are filtered
+   * @param filter type of nodes to check if they are filtered ( nodes that are visible, raw nodes (none virtual) or all nodes)
    */
-  public getFilteredNodes(items?: Array<any>): NodeList<LkNodeData, LkEdgeData> {
+  public getFilteredNodes(
+    items?: Array<NodeId>,
+    filter: 'visible' | 'raw' | 'all' = 'raw'
+  ): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
       ? this.getNodes(items).filter((i) => i.hasClass('filtered'))
-      : this.getNodes().filter((i) => i.hasClass('filtered'));
+      : this.getNodes(filter).filter((i) => i.hasClass('filtered'));
   }
 
   /**
