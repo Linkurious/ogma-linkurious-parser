@@ -81,7 +81,7 @@ export class ItemAttributes<T extends INodeStyle | IEdgeStyle> {
   /**
    * Return the color for a node when style color is auto
    */
-  public static autoColor(value: string, ignoreCase?: boolean): string {
+  public static autoColor(value: string | undefined, ignoreCase?: boolean): string {
     if (!Tools.isDefined(value)) {
       return BASE_GREY;
     }
