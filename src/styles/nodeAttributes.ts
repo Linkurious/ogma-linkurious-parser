@@ -28,6 +28,9 @@ export enum NodeSizeExtrema {
 }
 
 export class NodeAttributes extends ItemAttributes<INodeStyle> {
+  // Base url, used for image urls
+  private _baseUrl?: string;
+
   constructor(rulesMap: {
     color?: Array<StyleRule<INodeStyle>>;
     icon?: Array<StyleRule<INodeStyle>>;
@@ -141,7 +144,11 @@ export class NodeAttributes extends ItemAttributes<INodeStyle> {
             }
           };
         } else if ('image' in style && typeof style.image === 'object') {
-          const imageUrlValue = NodeAttributes.getImageUrlFromStyleRule(style.image.url, itemData);
+          const imageUrlValue = NodeAttributes.getImageUrlFromStyleRule(
+            style.image.url,
+            itemData,
+            this._baseUrl
+          );
           if (imageUrlValue !== undefined) {
             result = {
               image: {
@@ -262,15 +269,32 @@ export class NodeAttributes extends ItemAttributes<INodeStyle> {
    * Return the value of the image url from a style rule or undefined
    * @param value
    * @param itemData
+   * @param baseUrl
    */
   public static getImageUrlFromStyleRule(
     value: string | IImageDataValue | undefined,
-    itemData: LkNodeData
+    itemData: LkNodeData,
+    baseUrl?: string
   ): string | undefined {
+    let imageUrl: string | undefined;
     if (typeof value === 'string' && ['imageUrl', 'image'].includes(Tools.getType(value)!)) {
-      return value;
+      imageUrl = value;
     } else if (typeof value === 'object') {
-      return Tools.getIn(itemData, value.path);
+      imageUrl = Tools.getIn(itemData, value.path);
     }
+
+    // if base url is defined, we need to create a new URL to get the absolute path
+    if (imageUrl !== undefined && baseUrl !== undefined) {
+      return new URL(imageUrl, baseUrl).href;
+    }
+    return imageUrl;
+  }
+
+  /**
+   * Set the base url (it will be used for image url while styling nodes)
+   * @param baseUrl bse url
+   */
+  public setBaseUrl(baseUrl?: string): void {
+    this._baseUrl = baseUrl;
   }
 }
