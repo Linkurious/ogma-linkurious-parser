@@ -13,6 +13,7 @@ import Ogma, {
   EdgeList,
   ForceLayoutOptions,
   HierarchicalLayoutOptions,
+  NodeId,
   NodeList,
   NonObjectPropertyWatcher,
   RadialLayoutOptions,
@@ -29,6 +30,7 @@ import {TransformationsViz} from './features/transformations';
 import {CaptionsViz} from './features/captions';
 import {RxViz} from './features/reactive';
 import {OgmaStore} from './features/OgmaStore';
+import {NodeGroupingTransformation} from './features/nodeGrouping';
 
 export {default as Ogma} from '@linkurious/ogma';
 export const ANIMATION_DURATION = 750;
@@ -37,6 +39,14 @@ interface AddItemOptions {
   batchSize?: number;
   virtual?: boolean;
 }
+
+export const FORCE_LAYOUT_CONFIG = {
+  steps: 40,
+  alignSiblings: true,
+  charge: 5,
+  theta: 0.34,
+  duration: ANIMATION_DURATION
+};
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public LKStyles!: StylesViz;
@@ -47,16 +57,24 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   // Trigger an event with edge type changes
   public edgeTypeWatcher!: NonObjectPropertyWatcher<LkNodeData, LkEdgeData>;
   public store!: OgmaStore;
+  // Node Grouping transformation instance
+  public LkNodeGroupingTransformation!: NodeGroupingTransformation;
   private _reactive!: RxViz;
 
-  constructor(private _configuration: IOgmaConfig) {
+  constructor(private _configuration: IOgmaConfig, _baseUrl?: string) {
     // set Ogma global configuration
     super(_configuration);
     Object.setPrototypeOf(this, new.target.prototype);
-    this.initOgmaLinkuriousParser(true);
+    this.initOgmaLinkuriousParser(true, _baseUrl);
   }
 
-  private initOgmaLinkuriousParser(init?: boolean): void {
+  /**
+   * Initialize the Ogma instance with the configuration and the base url
+   * @param init used to know if the instance is initialized for the first time (used in setConfigOgma)
+   * @param baseUrl base url used for relative image urls
+   * @private
+   */
+  private initOgmaLinkuriousParser(init?: boolean, baseUrl?: string): void {
     this.nodeCategoriesWatcher = this.schema.watchNodeNonObjectProperty({
       path: 'categories',
       unwindArrays: true,
@@ -89,8 +107,9 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
       this._reactive.listenToSelectionEvents();
     }
     this.initSelection();
-    this.setConfigOgma(this._configuration, init);
+    this.setConfigOgma(this._configuration, init, baseUrl);
     this.LKTransformation = new TransformationsViz(this);
+    this.LkNodeGroupingTransformation = new NodeGroupingTransformation(this);
 
     this.LKStyles.setNodesDefaultHalo();
     this.LKStyles.setEdgesDefaultHalo();
@@ -131,10 +150,11 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     });
   }
 
-  private setStyles(configuration: IOgmaConfig): void {
+  private setStyles(configuration: IOgmaConfig, baseUrl?: string): void {
     this.LKStyles = new StylesViz(this, {
       node: configuration?.options?.styles?.node || {},
-      edge: configuration?.options?.styles?.edge || {}
+      edge: configuration?.options?.styles?.edge || {},
+      baseUrl: baseUrl
     });
     this.LKStyles.setNodesDefaultStyles();
     this.LKStyles.setEdgesDefaultStyles();
@@ -279,19 +299,25 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Return the list of non filtered nodes
    */
-  public getNonFilteredNodes(items?: Array<any>): NodeList<LkNodeData, LkEdgeData> {
+  public getNonFilteredNodes(items?: Array<NodeId>): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
       ? this.getNodes(items).filter((i) => !i.hasClass('filtered'))
-      : this.getNodes().filter((i) => !i.hasClass('filtered'));
+      : // take only none virtual nodes
+        this.getNodes('raw').filter((i) => !i.hasClass('filtered'));
   }
 
   /**
    * Return the list of filtered nodes
+   * @param items items to check if they are filtered
+   * @param filter type of nodes to check if they are filtered ( nodes that are visible, raw nodes (none virtual) or all nodes)
    */
-  public getFilteredNodes(items?: Array<any>): NodeList<LkNodeData, LkEdgeData> {
+  public getFilteredNodes(
+    items?: Array<NodeId>,
+    filter: 'visible' | 'raw' | 'all' = 'raw'
+  ): NodeList<LkNodeData, LkEdgeData> {
     return Tools.isDefined(items)
       ? this.getNodes(items).filter((i) => i.hasClass('filtered'))
-      : this.getNodes().filter((i) => i.hasClass('filtered'));
+      : this.getNodes(filter).filter((i) => i.hasClass('filtered'));
   }
 
   /**
@@ -339,7 +365,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Updates the Ogma config when config changes in LKE. If init, options were already set by the Ogma.reset()
    */
-  public setConfigOgma(configuration?: IOgmaConfig, init?: boolean): void {
+  public setConfigOgma(configuration?: IOgmaConfig, init?: boolean, baseUrl?: string): void {
     if (configuration) {
       // here we make sure that the internal config object is updated and we have the correct one when resetting
       this._configuration = configuration;
@@ -350,7 +376,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
         renderer: this._configuration.renderer
       });
     }
-    this.setStyles(this._configuration);
+    this.setStyles(this._configuration, baseUrl);
     this.setCaptions(this._configuration);
   }
 }
