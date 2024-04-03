@@ -123,6 +123,8 @@ export class NodeGroupingTransformation {
         }
       },
       nodeSelector: (node) => {
+        // TODO: Tools.isDefined(node.getSubNodes()) is a work around for an ogma issue visible when using image export plugin with Node grouping
+        // remove when updating to Ogma v5.1.x
         return node.isVirtual() && Tools.isDefined(node.getSubNodes());
       },
       // the style will be updated when data object is updated
