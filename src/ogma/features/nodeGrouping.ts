@@ -123,7 +123,7 @@ export class NodeGroupingTransformation {
         }
       },
       nodeSelector: (node) => {
-        return node.isVirtual();
+        return node.isVirtual() && Tools.isDefined(node.getSubNodes());
       },
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
