@@ -142,7 +142,7 @@ export class NodeGroupingTransformation {
     for (let i = 0; i < rawNodesList.length; i++) {
       // rawNodesList[i] is not null because each group has at least one node
       const subNodes = rawNodesList[i]!;
-      promisesList.push(this._runSubNodesLayout(subNodes));
+      promisesList.push(this.runSubNodesLayout(subNodes));
     }
     await Promise.all(promisesList);
   }
@@ -151,7 +151,7 @@ export class NodeGroupingTransformation {
    * Run the layout on the subnodes of the virtual node
    * @param subNodes nodes part of a virtual node
    */
-  private async _runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
+  public async runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     if (subNodes.size === 0) {
       return;
     }
