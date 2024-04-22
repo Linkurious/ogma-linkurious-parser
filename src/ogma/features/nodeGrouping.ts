@@ -6,6 +6,7 @@ import {
   MissingValue,
   NodeGroupingRule
 } from '@linkurious/rest-client';
+import sha1 from 'sha1';
 
 import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
@@ -42,30 +43,25 @@ export class NodeGroupingTransformation {
           if (this._isRuleNotApplicableToNode(node)) {
             return undefined;
           } else {
-            const propertyValue = node.getData([
-              'properties',
-              this.groupRule?.groupingOptions.propertyKey ?? ''
-            ]);
-            // if the property value is of type conflict or invalid value we use the original value
-            const originalValue =
-              typeof propertyValue === 'object'
-                ? (propertyValue as ConflictValue).original
-                : propertyValue;
+            const propertyValue = this._findGroupingPropertyValue(node);
             // groupRule is defined if not we returned undefined
             // node with same value will be part of the same group
-            return `${this.groupRule?.groupingOptions.itemType}-${originalValue}`
+            return `${this.groupRule?.groupingOptions.itemType}-${propertyValue}`
               .toLowerCase()
               .trim();
           }
         },
         nodeGenerator: (nodes) => {
+          const propertyValue = this._findGroupingPropertyValue(nodes.get(0));
+          const nodeGroupId = sha1(
+            `${this.groupRule?.name}-${this.groupRule?.groupingOptions.itemType}-${propertyValue}`
+          );
           return {
             data: {
               // groupRule is defined as a virtual node only exist if the rule is defined
               categories: [LKE_NODE_GROUPING_NODE],
-              properties: {
-                size: nodes.size
-              }
+              properties: {},
+              nodeGroupId: sha1(nodeGroupId)
             }
           };
         },
@@ -247,5 +243,16 @@ export class NodeGroupingTransformation {
   private _getVirtualNodesOfTransformation(): NodeList<LkNodeData, LkEdgeData> {
     // @ts-ignore getContext exists on the transformation but hidden by the types
     return this.transformation.getContext().virtualNodes;
+  }
+
+  private _findGroupingPropertyValue(node: Node<LkNodeData>): string {
+    const propertyValue = node.getData([
+      'properties',
+      this.groupRule?.groupingOptions.propertyKey ?? ''
+    ]);
+    // if the property value is of type conflict or invalid value we use the original value
+    return typeof propertyValue === 'object'
+      ? (propertyValue as ConflictValue).original
+      : `${propertyValue}`;
   }
 }
