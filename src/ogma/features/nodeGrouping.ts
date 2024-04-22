@@ -161,6 +161,15 @@ export class NodeGroupingTransformation {
   }
 
   /**
+   * Get the virtual nodes of the transformation
+   * @private
+   */
+  public getVirtualNodesOfTransformation(): NodeList<LkNodeData, LkEdgeData> {
+    // @ts-ignore getContext exists on the transformation but hidden by the types
+    return this.transformation.getContext().virtualNodes;
+  }
+
+  /**
    * Return the caption of a virtual node
    * @param node reference to the virtual node
    */
@@ -232,17 +241,8 @@ export class NodeGroupingTransformation {
    * @private
    */
   private _getAllTransformationRawNodes(): Array<NodeList | null> {
-    const virtualNodes = this._getVirtualNodesOfTransformation();
+    const virtualNodes = this.getVirtualNodesOfTransformation();
     return virtualNodes.getSubNodes();
-  }
-
-  /**
-   * Get the virtual nodes of the transformation
-   * @private
-   */
-  private _getVirtualNodesOfTransformation(): NodeList<LkNodeData, LkEdgeData> {
-    // @ts-ignore getContext exists on the transformation but hidden by the types
-    return this.transformation.getContext().virtualNodes;
   }
 
   private _findGroupingPropertyValue(node: Node<LkNodeData>): string {
