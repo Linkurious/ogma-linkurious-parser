@@ -523,9 +523,14 @@ export class StylesViz {
               const textColor = OgmaTools.isBright(nodeColor as o.Color)
                 ? DARK_FONT_COLOR
                 : CLEAR_FONT_COLOR;
+              const MAX = 5;
+              const defaultRatio = 1 / 5;
+              const radius = node.getAttribute('radius') as number;
+              const scale = radius * defaultRatio > MAX ? MAX/radius : defaultRatio;
               return {
                 color: 'inherit',
                 minVisibleSize: 20,
+                scale: scale,
                 stroke: {
                   width: 0,
                   color: null
