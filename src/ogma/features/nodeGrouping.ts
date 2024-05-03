@@ -52,16 +52,11 @@ export class NodeGroupingTransformation {
           }
         },
         nodeGenerator: (nodes) => {
-          const propertyValue = this._findGroupingPropertyValue(nodes.get(0));
-          const nodeGroupId = sha1(
-            `${this.groupRule?.name}-${this.groupRule?.groupingOptions.itemType}-${propertyValue}`
-          );
           return {
             data: {
-              // groupRule is defined as a virtual node only exist if the rule is defined
               categories: [LKE_NODE_GROUPING_NODE],
               properties: {},
-              nodeGroupId: sha1(nodeGroupId)
+              nodeGroupId: this._findNodeGroupId(nodes)
             }
           };
         },
@@ -254,5 +249,15 @@ export class NodeGroupingTransformation {
     return typeof propertyValue === 'object'
       ? (propertyValue as ConflictValue).original
       : `${propertyValue}`;
+  }
+
+  /**
+   * Return a hashed string that represents the group id
+   */
+  private _findNodeGroupId(nodes: NodeList<LkNodeData, LkEdgeData>): string {
+    const propertyValue = this._findGroupingPropertyValue(nodes.get(0));
+    return sha1(
+      `${this.groupRule?.name}-${this.groupRule?.groupingOptions.itemType}-${propertyValue}`
+    );
   }
 }
