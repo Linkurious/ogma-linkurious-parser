@@ -816,6 +816,7 @@ export class StylesViz {
   /**
    * Get node radius
    * This is a workaround for an ogma issue where the radius of virtual nodes is always set to 5
+   * TODO: check if this is still needed after ogma release the new improvement for transformation v5.X
    */
   private _getNodeRadius(node: Node<LkNodeData, LkEdgeData>): number {
     if (!node.isVirtual()) {
