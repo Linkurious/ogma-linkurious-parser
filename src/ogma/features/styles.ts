@@ -4,6 +4,7 @@ import * as o from '@linkurious/ogma';
 import {
   Edge,
   EdgeAttributesValue,
+  Node,
   NodeAttributesValue,
   StyleClass,
   StyleRule
@@ -525,7 +526,7 @@ export class StylesViz {
                 : CLEAR_FONT_COLOR;
               const MAX = 5;
               const defaultRatio = 1 / 5;
-              const radius = node.getAttribute('radius') as number;
+              const radius = this._getNodeRadius(node);
               const scale = radius * defaultRatio > MAX ? MAX / radius : defaultRatio;
               return {
                 color: 'inherit',
@@ -813,6 +814,20 @@ export class StylesViz {
     } else {
       this._edgeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaEdgeShape.refresh();
+    }
+  }
+
+  /**
+   * Get node radius
+   * This is a workaround for an ogma issue where the radius of virtual nodes is always set to 5
+   */
+  private _getNodeRadius(node: Node<LkNodeData, LkEdgeData>): number {
+    if (!node.isVirtual()) {
+      return node.getAttribute('radius') as number;
+    } else {
+      return node.getSubNodes()!.reduce((radius: number, subNode) => {
+        return radius + (subNode.getAttribute('radius') as number);
+      }, 10);
     }
   }
 }
