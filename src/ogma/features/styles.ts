@@ -524,14 +524,10 @@ export class StylesViz {
               const textColor = OgmaTools.isBright(nodeColor as o.Color)
                 ? DARK_FONT_COLOR
                 : CLEAR_FONT_COLOR;
-              const MAX = 5;
-              const defaultRatio = 1 / 5;
-              const radius = this._getNodeRadius(node);
-              const scale = radius * defaultRatio > MAX ? MAX / radius : defaultRatio;
               return {
                 color: 'inherit',
                 minVisibleSize: 20,
-                scale: scale,
+                scale: this._findPinBadgeScale(node),
                 stroke: {
                   width: 0,
                   color: null
@@ -829,5 +825,18 @@ export class StylesViz {
         return radius + (subNode.getAttribute('radius') as number);
       }, 10);
     }
+  }
+
+  /**
+   * Calculate the scale of the pin badge related to the node radius
+   * This is useful when dealing wih huge nodes, and we don't want the badge to be big
+   * If the node is small enough, the badge will be 1/5 of the node radius
+   * Else it will be 5 / radius
+   */
+  private _findPinBadgeScale(node: Node<LkNodeData, LkEdgeData>): number {
+    const MAX = 5;
+    const defaultRatio = 0.46;
+    const radius = this._getNodeRadius(node);
+    return radius * defaultRatio > MAX ? MAX / radius : defaultRatio;
   }
 }
