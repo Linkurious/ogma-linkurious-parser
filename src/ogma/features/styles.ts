@@ -831,7 +831,7 @@ export class StylesViz {
   /**
    * Calculate the scale of the pin badge related to the node radius
    * This is useful when dealing wih huge nodes, and we don't want the badge to be big
-   * If the node is small enough, the badge will be 1/5 of the node radius
+   * If the node is small enough, the badge will be 0.46 of the node radius
    * Else it will be 5 / radius
    */
   private _findPinBadgeScale(node: Node<LkNodeData, LkEdgeData>): number {
