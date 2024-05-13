@@ -2,6 +2,7 @@
 
 import * as o from '@linkurious/ogma';
 import {
+  Badge,
   Edge,
   EdgeAttributesValue,
   Node,
@@ -516,7 +517,7 @@ export class StylesViz {
       name: 'pinnedIndicator',
       nodeAttributes: {
         badges: {
-          bottomRight: (node) => {
+          bottomRight: (node): Badge | undefined => {
             if (node !== undefined && !node.getAttribute('layoutable')) {
               return {
                 color: this._findPinBadgeBackgroundColor(node),
