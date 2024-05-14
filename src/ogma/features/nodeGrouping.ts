@@ -6,6 +6,7 @@ import {
   MissingValue,
   NodeGroupingRule
 } from '@linkurious/rest-client';
+import sha1 from 'sha1';
 
 import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
@@ -42,18 +43,10 @@ export class NodeGroupingTransformation {
           if (this._isRuleNotApplicableToNode(node)) {
             return undefined;
           } else {
-            const propertyValue = node.getData([
-              'properties',
-              this.groupRule?.groupingOptions.propertyKey ?? ''
-            ]);
-            // if the property value is of type conflict or invalid value we use the original value
-            const originalValue =
-              typeof propertyValue === 'object'
-                ? (propertyValue as ConflictValue).original
-                : propertyValue;
+            const propertyValue = this._findGroupingPropertyValue(node);
             // groupRule is defined if not we returned undefined
             // node with same value will be part of the same group
-            return `${this.groupRule?.groupingOptions.itemType}-${originalValue}`
+            return `${this.groupRule?.groupingOptions.itemType}-${propertyValue}`
               .toLowerCase()
               .trim();
           }
@@ -61,11 +54,9 @@ export class NodeGroupingTransformation {
         nodeGenerator: (nodes) => {
           return {
             data: {
-              // groupRule is defined as a virtual node only exist if the rule is defined
               categories: [LKE_NODE_GROUPING_NODE],
-              properties: {
-                size: nodes.size
-              }
+              properties: {},
+              nodeGroupId: this._findNodeGroupId(nodes)
             }
           };
         },
@@ -165,6 +156,15 @@ export class NodeGroupingTransformation {
   }
 
   /**
+   * Get the virtual nodes of the transformation
+   * @private
+   */
+  public getVirtualNodesOfTransformation(): NodeList<LkNodeData, LkEdgeData> {
+    // @ts-ignore getContext exists on the transformation but hidden by the types
+    return this.transformation.getContext().virtualNodes;
+  }
+
+  /**
    * Return the caption of a virtual node
    * @param node reference to the virtual node
    */
@@ -236,16 +236,28 @@ export class NodeGroupingTransformation {
    * @private
    */
   private _getAllTransformationRawNodes(): Array<NodeList | null> {
-    const virtualNodes = this._getVirtualNodesOfTransformation();
+    const virtualNodes = this.getVirtualNodesOfTransformation();
     return virtualNodes.getSubNodes();
   }
 
+  private _findGroupingPropertyValue(node: Node<LkNodeData>): string {
+    const propertyValue = node.getData([
+      'properties',
+      this.groupRule?.groupingOptions.propertyKey ?? ''
+    ]);
+    // if the property value is of type conflict or invalid value we use the original value
+    return typeof propertyValue === 'object'
+      ? (propertyValue as ConflictValue).original
+      : `${propertyValue}`;
+  }
+
   /**
-   * Get the virtual nodes of the transformation
-   * @private
+   * Return a hashed string that represents the group id
    */
-  private _getVirtualNodesOfTransformation(): NodeList<LkNodeData, LkEdgeData> {
-    // @ts-ignore getContext exists on the transformation but hidden by the types
-    return this.transformation.getContext().virtualNodes;
+  private _findNodeGroupId(nodes: NodeList<LkNodeData, LkEdgeData>): string {
+    const propertyValue = this._findGroupingPropertyValue(nodes.get(0));
+    return sha1(
+      `${this.groupRule?.name}-${this.groupRule?.groupingOptions.itemType}-${propertyValue}`
+    );
   }
 }
