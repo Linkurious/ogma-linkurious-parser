@@ -3,6 +3,7 @@
 lkeSubReleaseJob {
   // General
   projectName = "linkurious/ogma-linkurious-parser"
+  useReleaseBranches = true
 
   nextReleaseJobs = ["stitch"]
 }
