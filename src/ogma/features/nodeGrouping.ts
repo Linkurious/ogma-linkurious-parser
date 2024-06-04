@@ -46,7 +46,7 @@ export class NodeGroupingTransformation {
             const propertyValue = this._findGroupingPropertyValue(node);
             // groupRule is defined if not we returned undefined
             // node with same value will be part of the same group
-            return `${this.groupRule?.groupingOptions.itemType}-${propertyValue}`
+            return `${this.groupRule?.groupingOptions.itemTypes.join('-')}-${propertyValue}`
               .toLowerCase()
               .trim();
           }
@@ -208,7 +208,9 @@ export class NodeGroupingTransformation {
       // if the group rule is not defined
       this.groupRule === undefined ||
       // if rule is applied to a different category
-      !node.getData('categories').includes(this.groupRule.groupingOptions.itemType) ||
+      this.groupRule.groupingOptions.itemTypes.every(
+        (itemType) => !node.getData('categories').includes(itemType)
+      ) ||
       // if the property value is not defined
       !Tools.isDefined(propertyValue) ||
       // if the property value is missing
@@ -257,7 +259,9 @@ export class NodeGroupingTransformation {
   private _findNodeGroupId(nodes: NodeList<LkNodeData, LkEdgeData>): string {
     const propertyValue = this._findGroupingPropertyValue(nodes.get(0));
     return sha1(
-      `${this.groupRule?.name}-${this.groupRule?.groupingOptions.itemType}-${propertyValue}`
+      `${this.groupRule?.name}-${this.groupRule?.groupingOptions.itemTypes.join(
+        '-'
+      )}-${propertyValue}`
     );
   }
 }
