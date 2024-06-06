@@ -290,10 +290,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Adding edges to the graph after filtering disconnected ones
    */
   public addEdges(edges: Array<RawEdge<LkEdgeData>>, options?: AddItemOptions): Promise<EdgeList> {
-    const filteredEdges = edges.filter((edge) => {
-      return this.getNode(edge.source) !== undefined && this.getNode(edge.target) !== undefined;
-    });
-    return super.addEdges(filteredEdges, options);
+    return super.addEdges(edges, {...options, ignoreInvalid: true});
   }
 
   /**
