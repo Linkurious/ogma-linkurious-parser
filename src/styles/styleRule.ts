@@ -71,7 +71,7 @@ export class StyleRule<T extends INodeStyle | IEdgeStyle = INodeStyle | IEdgeSty
   public matchValues(
     itemType: string | undefined,
     input: Array<string> | undefined,
-    value: string
+    value: string | undefined
   ): boolean {
     if (Tools.isDefined(input)) {
       return (

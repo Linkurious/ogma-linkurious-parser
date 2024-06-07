@@ -1,6 +1,6 @@
 {
   "name": "@linkurious/ogma-linkurious-parser",
-  "version": "4.0.24",
+  "version": "4.1.0",
   "author": "Linkurious SAS",
   "description": "Parse and load a Linkurious visualization in Ogma with one line of code ",
   "files": [
@@ -13,7 +13,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {
-    "node": "18.19.1"
+    "node": "20.12.1"
   },
   "scripts": {
     "build": "tsc -b",
@@ -33,6 +33,7 @@
     "latest:master-maintenance": "npm install --save-exact @linkurious/rest-client@lk-master-maintenance",
     "latest:master-stable": "npm install --save-exact @linkurious/rest-client@lk-master-stable",
     "latest:master": "npm install --save-exact  @linkurious/rest-client@lk-master",
+    "latest:generic": "npm install --save-exact  @linkurious/rest-client@${npm_config_lk_tag}",
     "bump:patch": "bump2version patch && npm version --no-git-tag-version patch",
     "bump:minor": "bump2version minor && npm version --no-git-tag-version minor",
     "bump:major": "bump2version major && npm version --no-git-tag-version major"
@@ -49,11 +50,11 @@
     "sha1": "1.1.1"
   },
   "peerDependencies": {
-    "@linkurious/ogma": "4.5.5"
+    "@linkurious/ogma": "4.5.9"
   },
   "devDependencies": {
-    "@linkurious/ogma": "4.5.5",
-    "@linkurious/rest-client": "4.0.24",
+    "@linkurious/ogma": "4.5.9",
+    "@linkurious/rest-client": "4.1.0",
     "@rollup/plugin-buble": "0.21.3",
     "@rollup/plugin-commonjs": "17.0.0",
     "@rollup/plugin-json": "4.1.0",

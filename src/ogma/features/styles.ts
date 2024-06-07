@@ -2,8 +2,10 @@
 
 import * as o from '@linkurious/ogma';
 import {
+  Badge,
   Edge,
   EdgeAttributesValue,
+  Node,
   NodeAttributesValue,
   StyleClass,
   StyleRule
@@ -12,6 +14,7 @@ import {
   GenericObject,
   IEdgeStyle,
   INodeStyle,
+  IStyleIcon,
   IStyleRule,
   LkEdgeData,
   LkNodeData,
@@ -31,6 +34,7 @@ import {
   StyleType
 } from '../..';
 import {Tools} from '../../tools/tools';
+import {OgmaImage} from '../../styles/nodeAttributes';
 
 export interface StylesConfig {
   nodeColorStyleRules: Array<LKStyleRule>;
@@ -138,10 +142,12 @@ export class StylesViz {
         shape?: OgmaEdgeShape;
         text?: TextOptions;
       };
+      baseUrl?: string;
     }
   ) {
     this._ogma = ogma;
     this._defaultConfiguration = configuration;
+    this._nodeAttributes.setBaseUrl(configuration.baseUrl);
   }
 
   /**
@@ -242,8 +248,7 @@ export class StylesViz {
               ? this._defaultConfiguration.edge.text.font
               : "'roboto', sans-serif",
           color:
-            this._defaultConfiguration.edge !== undefined &&
-            this._defaultConfiguration.edge.text !== undefined &&
+            this._defaultConfiguration.edge?.text !== undefined &&
             this._defaultConfiguration.edge.text.color !== undefined
               ? this._defaultConfiguration.edge.text.color
               : 'black',
@@ -375,7 +380,13 @@ export class StylesViz {
       name: 'filtered',
       nodeAttributes: {
         opacity: FILTER_OPACITY,
-        layer: -1,
+        layer: (node): number => {
+          // if the node is part of a virtual node, it should be on top
+          if (node.getMetaNode() !== undefined) {
+            return 1;
+          }
+          return -1;
+        },
         detectable: false,
         badges: {
           topRight: {
@@ -399,7 +410,17 @@ export class StylesViz {
       },
       edgeAttributes: {
         opacity: FILTER_OPACITY,
-        layer: -1,
+        layer: (edge): number => {
+          const isEdgeInsideNodeGroup = edge
+            .getExtremities()
+            .getMetaNode()
+            .some((node) => node !== null);
+          // if the edge is part of a virtual node, it should be on top
+          if (!edge.isVirtual() && isEdgeInsideNodeGroup) {
+            return 1;
+          }
+          return -1;
+        },
         detectable: false,
         text: null,
         color: BASE_GREY,
@@ -496,17 +517,12 @@ export class StylesViz {
       name: 'pinnedIndicator',
       nodeAttributes: {
         badges: {
-          bottomRight: (node) => {
+          bottomRight: (node): Badge | undefined => {
             if (node !== undefined && !node.getAttribute('layoutable')) {
-              const nodeColor = Array.isArray(node.getAttribute('color'))
-                ? node.getAttribute('color')![0]
-                : node.getAttribute('color');
-              const textColor = OgmaTools.isBright(nodeColor as o.Color)
-                ? DARK_FONT_COLOR
-                : CLEAR_FONT_COLOR;
               return {
-                color: 'inherit',
+                color: this._findPinBadgeBackgroundColor(node),
                 minVisibleSize: 20,
+                scale: this._findPinBadgeScale(node),
                 stroke: {
                   width: 0,
                   color: null
@@ -514,7 +530,7 @@ export class StylesViz {
                 text: {
                   font: 'FontAwesome',
                   scale: 0.4,
-                  color: textColor,
+                  color: this._findPinBadgeTextColor(node),
                   content: node.getAttribute('layoutable') ? null : '\uf08d'
                 }
               };
@@ -605,7 +621,7 @@ export class StylesViz {
     this.refreshNodeIcons(nodeIconsRules);
   }
 
-  public initNodesSizes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+  public initNodesSizes(nodeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>): void {
     const nodeSizeRules = this.getStyleRule(nodeRules, StyleType.SIZE) as LKStyleRule<INodeStyle>[];
     this.refreshNodeSize(nodeSizeRules);
   }
@@ -634,7 +650,7 @@ export class StylesViz {
     this.refreshEdgeShape(edgesShapeRules);
   }
 
-  public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>) {
+  public initEdgesColor(edgeRules: Array<IStyleRule<INodeStyle | IEdgeStyle>>): void {
     const edgesColorRules = this.getStyleRule(
       edgeRules,
       StyleType.COLOR
@@ -652,13 +668,13 @@ export class StylesViz {
       this._nodeAttributes.refresh({icon: iconStyleRules});
       this._ogmaNodeIcon = this._ogma.styles.addRule({
         nodeAttributes: {
-          icon: (node: o.Node | undefined) => {
+          icon: (node: o.Node | undefined): IStyleIcon | undefined => {
             if (node !== undefined) {
               return this._nodeAttributes.icon(node.getData()).icon;
             }
           },
-          image: (node: o.Node | undefined) => {
-            if (node !== undefined) {
+          image: (node: o.Node | undefined): OgmaImage | null | undefined => {
+            if (node !== undefined && !node.isVirtual()) {
               return this._nodeAttributes.icon(node.getData()).image;
             }
           }
@@ -667,7 +683,7 @@ export class StylesViz {
       });
     } else {
       this._nodeAttributes.refresh({icon: iconStyleRules});
-      this._ogmaNodeIcon.refresh();
+      void this._ogmaNodeIcon.refresh();
     }
   }
 
@@ -711,6 +727,7 @@ export class StylesViz {
             }
           }
         },
+        nodeSelector: (node: o.Node | undefined) => node !== undefined && !node.isVirtual(),
         nodeDependencies: {self: {data: true}}
       });
     } else {
@@ -789,5 +806,55 @@ export class StylesViz {
       this._edgeAttributes.refresh({shape: shapeStyleRules});
       this._ogmaEdgeShape.refresh();
     }
+  }
+
+  /**
+   * Get node radius
+   * This is a workaround for an ogma issue where the radius of virtual nodes is always set to 5
+   * TODO: check if this is still needed after ogma release the new improvement for transformation v5.X
+   */
+  private _getNodeRadius(node: Node<LkNodeData, LkEdgeData>): number {
+    if (!node.isVirtual()) {
+      return node.getAttribute('radius') as number;
+    } else {
+      // get the width and height of the box that contains the nodes inside the virtual node
+      const {width, height} = node.getSubNodes()?.getBoundingBox()!;
+      return Math.max(width, height);
+    }
+  }
+
+  /**
+   * Calculate the scale of the pin badge related to the node radius
+   * This is useful when dealing wih huge nodes, and we don't want the badge to be big
+   * If the node is small enough, the badge will be 0.46 of the node radius
+   * Else it will be 5 / radius
+   */
+  private _findPinBadgeScale(node: Node<LkNodeData, LkEdgeData>): number {
+    // the maximum radius for the badge
+    const MAX = 5;
+    const defaultRatio = 0.46;
+    const bigNodeRatio = 0.17;
+    const radius = this._getNodeRadius(node);
+    return radius * defaultRatio > MAX ? bigNodeRatio : defaultRatio;
+  }
+
+  /**
+   * Find the color of the pin badge text
+   */
+  private _findPinBadgeTextColor(node: Node<LkNodeData, LkEdgeData>): string {
+    if (node.isVirtual()) {
+      return CLEAR_FONT_COLOR;
+    }
+    const nodeColor = Array.isArray(node.getAttribute('color'))
+      ? node.getAttribute('color')![0]
+      : node.getAttribute('color');
+    return OgmaTools.isBright(nodeColor as o.Color) ? DARK_FONT_COLOR : CLEAR_FONT_COLOR;
+  }
+
+  /**
+   * Find the color of the pin badge background
+   */
+  private _findPinBadgeBackgroundColor(node: Node<LkNodeData, LkEdgeData>): string {
+    return node.isVirtual() ? BASE_GREY : 'inherit';
   }
 }
