@@ -1,11 +1,5 @@
 import {Transformation, Node, NodeList} from '@linkurious/ogma';
-import {
-  ConflictValue,
-  LkEdgeData,
-  LkNodeData,
-  MissingValue,
-  NodeGroupingRule
-} from '@linkurious/rest-client';
+import {LkEdgeData, LkNodeData, MissingValue, NodeGroupingRule} from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
 import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
@@ -171,10 +165,11 @@ export class NodeGroupingTransformation {
   private _getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
     if (node !== undefined && node.isVirtual()) {
       // get the property value of the first node of the group (all nodes share the same property value)
-      const propertyValue = node
+      const lkPropertyValue = node
         .getSubNodes()!
         .get(0)
         .getData(['properties', this.groupRule!.groupingOptions.propertyKey]);
+      const propertyValue = Tools.getValueFromLkProperty(lkPropertyValue);
       const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
       return `${propertyValue} (${size})`;
     }
@@ -247,10 +242,7 @@ export class NodeGroupingTransformation {
       'properties',
       this.groupRule?.groupingOptions.propertyKey ?? ''
     ]);
-    // if the property value is of type conflict or invalid value we use the original value
-    return typeof propertyValue === 'object'
-      ? (propertyValue as ConflictValue).original
-      : `${propertyValue}`;
+    return `${Tools.getValueFromLkProperty(propertyValue)}`;
   }
 
   /**
