@@ -38,9 +38,10 @@ export class RxViz {
    */
   public listenToSelectionEvents(): void {
     let currentAnimationEnd = Date.now();
-    const isCurrentlyAnimating = false;
+    let isCurrentlyAnimating = false;
     this._ogma.events.on('animate', (e: {duration: number}) => {
       if (!isCurrentlyAnimating) {
+        isCurrentlyAnimating = true;
         this._store.dispatch((state) => ({...state, animation: true}));
       }
       const nextAnimationEnd = Math.max(currentAnimationEnd, Date.now() + e.duration);
