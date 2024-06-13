@@ -37,16 +37,23 @@ export class RxViz {
    * Listen to ogma events and update the state
    */
   public listenToSelectionEvents(): void {
-    let count = 0;
+    let currentAnimationEnd = Date.now();
+    const isCurrentlyAnimating = false;
     this._ogma.events.on('animate', (e: {duration: number}) => {
-      const animationEnd = ++count;
-      this._store.dispatch((state) => ({...state, animation: true}));
+      if (!isCurrentlyAnimating) {
+        this._store.dispatch((state) => ({...state, animation: true}));
+      }
+      const nextAnimationEnd = Math.max(currentAnimationEnd, Date.now() + e.duration);
+      if (nextAnimationEnd === currentAnimationEnd) {
+        return;
+      }
+      currentAnimationEnd = nextAnimationEnd;
+      const safeAnimationTimeoutMs = currentAnimationEnd - Date.now() + 16; // animation duration + duration of a single frame at 60 fps = 16ms
       clearTimeout(this._animationThrottle);
       this._animationThrottle = setTimeout(() => {
-        if (count === animationEnd) {
-          this._store.dispatch((state) => ({...state, animation: false}));
-        }
-      }, e.duration + ANIMATION_DURATION + 100);
+        isCurrentlyAnimating = false;
+        this._store.dispatch((state) => ({...state, animation: false}));
+      }, safeAnimationTimeoutMs);
     });
 
     this._ogma.events.on('dragStart', () => {
