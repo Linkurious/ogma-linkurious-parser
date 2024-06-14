@@ -39,7 +39,11 @@ export class RxViz {
   public listenToSelectionEvents(): void {
     let currentAnimationEnd = Date.now();
     let isCurrentlyAnimating = false;
-    this._ogma.events.on('animate', (e: {duration: number}) => {
+    this._ogma.events.on('animate', (e: {duration: number; updatesPositions: boolean}) => {
+      if (e.updatesPositions === false) {
+        // ignore animations that don't chnage the node/edge positions, e.g: Hoover
+        return;
+      }
       if (!isCurrentlyAnimating) {
         isCurrentlyAnimating = true;
         this._store.dispatch((state) => ({...state, animation: true}));
