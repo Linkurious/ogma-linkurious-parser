@@ -41,7 +41,7 @@ export class RxViz {
     let isCurrentlyAnimating = false;
     this._ogma.events.on('animate', (e: {duration: number; updatesPositions: boolean}) => {
       if (e.updatesPositions === false) {
-        // ignore animations that don't chnage the node/edge positions, e.g: Hoover
+        // ignore animations that don't change the node/edge positions, e.g: Hoover
         return;
       }
       if (!isCurrentlyAnimating) {
