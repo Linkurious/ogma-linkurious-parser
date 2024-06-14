@@ -11,6 +11,9 @@ export interface OgmaState {
   selection: NodeList<LkNodeData, LkEdgeData> | EdgeList<LkEdgeData, LkNodeData>;
   items: {node: Array<string | number>; edge: Array<string | number>};
   changes: {entityType: 'node' | 'edge'; input: string | string[] | null; value: any} | undefined;
+  /**
+   * Indicates whether the positions of nodes or edges are currently transitioning.
+   */
   animation: boolean;
 }
 
