@@ -50,6 +50,9 @@ export class RxViz {
       }
       const nextAnimationEnd = Math.max(currentAnimationEnd, Date.now() + e.duration);
       if (nextAnimationEnd === currentAnimationEnd) {
+        // Say animation 2 fires after animation 1 but has a much shorter duration
+        // In such a way that animation 1 will still complete after animation 2
+        // In that case we can safely ignore animation 2
         return;
       }
       currentAnimationEnd = nextAnimationEnd;
