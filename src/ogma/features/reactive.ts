@@ -3,7 +3,7 @@
 import Ogma, {NodeList, EdgeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
-import {ANIMATION_DURATION, LKOgma} from '../index';
+import {LKOgma} from '../index';
 
 import {OgmaStore} from './OgmaStore';
 
