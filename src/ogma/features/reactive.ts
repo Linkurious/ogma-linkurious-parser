@@ -3,7 +3,7 @@
 import Ogma, {NodeList, EdgeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
-import {ANIMATION_DURATION, LKOgma} from '../index';
+import {LKOgma} from '../index';
 
 import {OgmaStore} from './OgmaStore';
 
@@ -11,6 +11,9 @@ export interface OgmaState {
   selection: NodeList<LkNodeData, LkEdgeData> | EdgeList<LkEdgeData, LkNodeData>;
   items: {node: Array<string | number>; edge: Array<string | number>};
   changes: {entityType: 'node' | 'edge'; input: string | string[] | null; value: any} | undefined;
+  /**
+   * Indicates whether the positions of nodes or edges are currently transitioning.
+   */
   animation: boolean;
 }
 
@@ -37,16 +40,31 @@ export class RxViz {
    * Listen to ogma events and update the state
    */
   public listenToSelectionEvents(): void {
-    let count = 0;
-    this._ogma.events.on('animate', (e: {duration: number}) => {
-      const animationEnd = ++count;
-      this._store.dispatch((state) => ({...state, animation: true}));
+    let currentAnimationEnd = Date.now();
+    let isCurrentlyAnimating = false;
+    this._ogma.events.on('animate', (e: {duration: number; updatesPositions: boolean}) => {
+      if (e.updatesPositions === false) {
+        // ignore animations that don't change the node/edge positions, e.g: Hover
+        return;
+      }
+      if (!isCurrentlyAnimating) {
+        isCurrentlyAnimating = true;
+        this._store.dispatch((state) => ({...state, animation: true}));
+      }
+      const nextAnimationEnd = Math.max(currentAnimationEnd, Date.now() + e.duration);
+      if (nextAnimationEnd === currentAnimationEnd) {
+        // Say animation 2 fires after animation 1 but has a much shorter duration
+        // In such a way that animation 1 will still complete after animation 2
+        // In that case we can safely ignore animation 2
+        return;
+      }
+      currentAnimationEnd = nextAnimationEnd;
+      const safeAnimationTimeoutMs = currentAnimationEnd - Date.now() + 16; // animation duration + duration of a single frame at 60 fps = 16ms
       clearTimeout(this._animationThrottle);
       this._animationThrottle = setTimeout(() => {
-        if (count === animationEnd) {
-          this._store.dispatch((state) => ({...state, animation: false}));
-        }
-      }, e.duration + ANIMATION_DURATION + 100);
+        isCurrentlyAnimating = false;
+        this._store.dispatch((state) => ({...state, animation: false}));
+      }, safeAnimationTimeoutMs);
     });
 
     this._ogma.events.on('dragStart', () => {
