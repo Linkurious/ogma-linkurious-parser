@@ -77,7 +77,7 @@ export class CaptionsViz {
                 return ``;
               }
               const value = Captions.getText(
-                node.getData(),
+                node?.getData(),
                 this._captionSchema.node,
                 this._graphSchema.node
               );
@@ -88,7 +88,7 @@ export class CaptionsViz {
           }
         },
         // We ignore virtual nodes as they have their proper caption
-        // nodeSelector: (node) => !node.isVirtual(),
+        nodeSelector: (node) => !node.isVirtual(),
         nodeDependencies: {self: {data: true}}
       });
     } else {
