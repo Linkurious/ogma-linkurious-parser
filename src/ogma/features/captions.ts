@@ -76,11 +76,11 @@ export class CaptionsViz {
               if (node === undefined) {
                 return ``;
               }
-              const value = Captions.getText(
-                node?.getData(),
+              const value = node.getData() ? Captions.getText(
+                node.getData(),
                 this._captionSchema.node,
                 this._graphSchema.node
-              );
+              ) : null;
               return Tools.isDefined(this._nodeMaxTextLength)
                 ? Tools.truncate(value, 'middle', this._nodeMaxTextLength)
                 : value;
