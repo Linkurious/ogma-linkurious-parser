@@ -50,14 +50,18 @@ export class NodeGroupingTransformation {
             data: {
               categories: [LKE_NODE_GROUPING_NODE],
               properties: {},
-              nodeGroupId: this._findNodeGroupId(nodes)
+              nodeGroupId: this._findNodeGroupId(nodes),
+              // TODO LKE-11445: Remove isVirtual once there is no need for this workaround
+              isVirtual: true
             }
           };
         },
         edgeGenerator: () => {
           return {
             data: {
-              type: LKE_NODE_GROUPING_EDGE
+              type: LKE_NODE_GROUPING_EDGE,
+              // TODO LKE-11445: Remove isVirtual once there is no need for this workaround
+              isVirtual: true,
             }
           };
         },
@@ -154,7 +158,6 @@ export class NodeGroupingTransformation {
    * @private
    */
   public getVirtualNodesOfTransformation(): NodeList<LkNodeData, LkEdgeData> {
-    // @ts-ignore getContext exists on the transformation but hidden by the types
     return this.transformation.getContext().metaNodes;
   }
 
