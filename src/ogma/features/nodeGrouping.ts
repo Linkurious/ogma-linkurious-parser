@@ -69,10 +69,6 @@ export class NodeGroupingTransformation {
         duration: 300,
         padding: 10
       });
-      // TODO remove setTimeout when LKE-10453 is fixed
-      setTimeout(() => {
-        this.transformation!.refresh();
-      }, 200);
     } else {
       await this.refreshTransformation();
     }
