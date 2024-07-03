@@ -64,7 +64,7 @@ export class TransformationsViz {
                 originalType: edges.getData('type')[0]
               },
               // TODO LKE-11445: Remove isVirtual once there is no need for this workaround
-              isVirtual: true,
+              isVirtual: true
             }
           };
         }

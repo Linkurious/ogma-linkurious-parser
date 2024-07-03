@@ -61,7 +61,7 @@ export class NodeGroupingTransformation {
             data: {
               type: LKE_NODE_GROUPING_EDGE,
               // TODO LKE-11445: Remove isVirtual once there is no need for this workaround
-              isVirtual: true,
+              isVirtual: true
             }
           };
         },
