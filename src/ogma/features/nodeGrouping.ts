@@ -158,6 +158,7 @@ export class NodeGroupingTransformation {
    * @private
    */
   public getVirtualNodesOfTransformation(): NodeList<LkNodeData, LkEdgeData> {
+    // @ts-ignore getContext exists on the transformation but hidden by the types
     return this.transformation.getContext().metaNodes;
   }
 
