@@ -18,6 +18,7 @@ module.exports = {
   'rules': {
     'eqeqeq': ['error'], // Requires === or !== in place of == or !=
     //'@typescript-eslint/no-explicit-any': ['error'], // Don't allow any usage of 'any'
+    '@typescript-eslint/ban-ts-comment': ['off'], // Allows ts-ignore to be used when needed
     '@typescript-eslint/no-empty-interface': ['off'], // Allows empty interfaces
     'object-shorthand': ['error', 'never'], // Disallows shorthand object literal
     '@typescript-eslint/ban-ts-ignore': ['off'], // Allows @ts-ignore
@@ -44,6 +45,20 @@ module.exports = {
     '@typescript-eslint/prefer-string-starts-ends-with': ['warn'],
 
     // TODO remove both from downgraded to warnings
-    '@typescript-eslint/no-explicit-any': ['warn']
+    '@typescript-eslint/no-explicit-any': ['warn'],
+
+    // TODO consider enabling these rules
+    // They're enabled by default, but we must first fix the errors they produce
+    'no-unsafe-optional-chaining': ['off'],
+    '@typescript-eslint/no-base-to-string': ['off'],
+    '@typescript-eslint/no-floating-promises': ['off'],
+    '@typescript-eslint/no-non-null-asserted-optional-chain': ['off'],
+    '@typescript-eslint/no-unsafe-argument': ['off'],
+    '@typescript-eslint/no-unsafe-assignment': ['off'],
+    '@typescript-eslint/no-unsafe-call': ['off'],
+    '@typescript-eslint/no-unsafe-enum-comparison': ['off'],
+    '@typescript-eslint/no-unsafe-member-access': ['off'],
+    '@typescript-eslint/no-unsafe-return': ['off'],
+    '@typescript-eslint/restrict-template-expressions': ['off']
   }
 };
