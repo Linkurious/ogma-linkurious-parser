@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-'use strict';
-
 import {expect} from 'chai';
 import 'mocha';
 import Ogma, {Node} from '@linkurious/ogma';
