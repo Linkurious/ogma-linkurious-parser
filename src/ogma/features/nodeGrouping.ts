@@ -11,7 +11,7 @@ export const LKE_NODE_GROUPING_NODE = 'LKE_NODE_GROUPING_NODE';
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public groupRule?: NodeGroupingRule;
-  public nodeGroupingStyleRule!: StyleRule<LkNodeData, LkEdgeData>;
+  public nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   private _ogma: LKOgma;
 
   constructor(ogma: LKOgma) {
@@ -115,7 +115,7 @@ export class NodeGroupingTransformation {
   }
 
   public async refreshNodeGroupingStyle(): Promise<void> {
-    await this.nodeGroupingStyleRule.refresh();
+    await this.nodeGroupingStyleRule?.refresh();
   }
 
   /**
