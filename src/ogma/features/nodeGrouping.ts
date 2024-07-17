@@ -1,4 +1,4 @@
-import {Transformation, Node, NodeList} from '@linkurious/ogma';
+import {Transformation, Node, NodeList, StyleRule} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData, MissingValue, NodeGroupingRule} from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
@@ -11,6 +11,7 @@ export const LKE_NODE_GROUPING_NODE = 'LKE_NODE_GROUPING_NODE';
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public groupRule?: NodeGroupingRule;
+  public nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   private _ogma: LKOgma;
 
   constructor(ogma: LKOgma) {
@@ -40,7 +41,7 @@ export class NodeGroupingTransformation {
             const propertyValue = this._findGroupingPropertyValue(node);
             // groupRule is defined if not we returned undefined
             // node with same value will be part of the same group
-            return `${this.groupRule?.groupingOptions.itemType}-${propertyValue}`
+            return `${this.groupRule?.groupingOptions.itemTypes.join('-')}-${propertyValue}`
               .toLowerCase()
               .trim();
           }
@@ -65,10 +66,6 @@ export class NodeGroupingTransformation {
         duration: 300,
         padding: 10
       });
-      // TODO remove setTimeout when LKE-10453 is fixed
-      setTimeout(() => {
-        this.transformation!.refresh();
-      }, 200);
     } else {
       await this.refreshTransformation();
     }
@@ -91,7 +88,7 @@ export class NodeGroupingTransformation {
    * init node grouping style
    */
   public initNodeGroupingStyle(): void {
-    this._ogma.styles.addRule({
+    this.nodeGroupingStyleRule = this._ogma.styles.addRule({
       nodeAttributes: {
         // Any default style will go here
         text: {
@@ -115,6 +112,10 @@ export class NodeGroupingTransformation {
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
     });
+  }
+
+  public async refreshNodeGroupingStyle(): Promise<void> {
+    await this.nodeGroupingStyleRule?.refresh();
   }
 
   /**
@@ -203,7 +204,9 @@ export class NodeGroupingTransformation {
       // if the group rule is not defined
       this.groupRule === undefined ||
       // if rule is applied to a different category
-      !node.getData('categories').includes(this.groupRule.groupingOptions.itemType) ||
+      this.groupRule.groupingOptions.itemTypes.every(
+        (itemType) => !node.getData('categories').includes(itemType)
+      ) ||
       // if the property value is not defined
       !Tools.isDefined(propertyValue) ||
       // if the property value is missing
@@ -249,7 +252,9 @@ export class NodeGroupingTransformation {
   private _findNodeGroupId(nodes: NodeList<LkNodeData, LkEdgeData>): string {
     const propertyValue = this._findGroupingPropertyValue(nodes.get(0));
     return sha1(
-      `${this.groupRule?.name}-${this.groupRule?.groupingOptions.itemType}-${propertyValue}`
+      `${this.groupRule?.name}-${this.groupRule?.groupingOptions.itemTypes.join(
+        '-'
+      )}-${propertyValue}`
     );
   }
 }
