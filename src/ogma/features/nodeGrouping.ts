@@ -62,7 +62,6 @@ export class NodeGroupingTransformation {
           };
         },
         showContents: true,
-        duration: 300,
         padding: 10
       });
     } else {
