@@ -73,9 +73,8 @@ export class OgmaTools {
       return true;
     }
 
-    const [r, g, b] = rgb
-      .replace(/\s/g, '')
-      .match(/rgba?\((\d{1,3}),(\d{1,3}),(\d{1,3})(,\d{1,3})?\)/)!
+    const [r, g, b] = /rgba?\((\d{1,3}),(\d{1,3}),(\d{1,3})(,\d{1,3})?\)/
+      .exec(rgb.replace(/\s/g, ''))!
       .slice(1, 4);
 
     if (!Tools.isDefined(r) || !Tools.isDefined(g) || !Tools.isDefined(b)) {
