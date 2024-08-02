@@ -12,6 +12,4 @@ nodeJob {
   runBookeeping = true
 
   runNpmPublish = true
-
-  qualityGates = []
 }
