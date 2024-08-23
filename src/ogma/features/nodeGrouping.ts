@@ -63,7 +63,6 @@ export class NodeGroupingTransformation {
           };
         },
         showContents: true,
-        duration: 300,
         padding: 10
       });
     } else {
@@ -138,7 +137,7 @@ export class NodeGroupingTransformation {
    * @param subNodes nodes part of a virtual node
    */
   public async runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
-    if (subNodes.size === 0) {
+    if (subNodes.size === 0 || subNodes.size === 1) {
       return;
     }
 
@@ -156,7 +155,7 @@ export class NodeGroupingTransformation {
    */
   public getVirtualNodesOfTransformation(): NodeList<LkNodeData, LkEdgeData> {
     // @ts-ignore getContext exists on the transformation but hidden by the types
-    return this.transformation.getContext().virtualNodes;
+    return this.transformation.getContext().metaNodes;
   }
 
   /**
