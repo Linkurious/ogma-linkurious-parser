@@ -53,6 +53,7 @@
     "@linkurious/ogma": "5.1.1"
   },
   "devDependencies": {
+    "@linkurious/git-merge-driver": "^0.1.0-PR-12.1",
     "@linkurious/ogma": "5.1.1",
     "@linkurious/rest-client": "4.1.2-develop-stable.199",
     "@rollup/plugin-buble": "0.21.3",
