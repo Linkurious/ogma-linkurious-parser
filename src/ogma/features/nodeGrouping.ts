@@ -137,7 +137,7 @@ export class NodeGroupingTransformation {
    * @param subNodes nodes part of a virtual node
    */
   public async runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
-    if (subNodes.size === 0) {
+    if (subNodes.size === 0 || subNodes.size === 1) {
       return;
     }
 
