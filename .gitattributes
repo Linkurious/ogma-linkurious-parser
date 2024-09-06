@@ -1,0 +1,3 @@
+package.json merge=@linkurious/git-merge-driver/package-json
+package-lock.json merge=@linkurious/git-merge-driver/package-lock
+Dockerfile merge=@linkurious/git-merge-driver/Dockerfile
