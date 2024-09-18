@@ -382,7 +382,7 @@ export class StylesViz {
         opacity: FILTER_OPACITY,
         layer: (node): number => {
           // if the node is part of a virtual node, it should be on top
-          if (node.getMetaNode() !== undefined) {
+          if (node.getMetaNode() !== null) {
             return 1;
           }
           return -1;
