@@ -406,7 +406,7 @@ export class StylesViz {
         shape: 'circle',
         image: null,
         icon: null,
-        radius: '100%'
+        radius: '50%'
       },
       edgeAttributes: {
         opacity: FILTER_OPACITY,
