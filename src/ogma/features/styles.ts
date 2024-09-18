@@ -1,6 +1,6 @@
 'use strict';
 
-import * as o from '@linkurious/ogma';
+import Ogma, * as o from '@linkurious/ogma';
 import {
   Badge,
   Edge,
@@ -380,10 +380,10 @@ export class StylesViz {
       name: 'filtered',
       nodeAttributes: {
         opacity: FILTER_OPACITY,
-        layer: (node): number | undefined => {
+        layer: (node): number => {
           // if the node is part of a virtual node, it should be on top
           if (node.getMetaNode() !== null) {
-            return undefined;
+            return 1;
           }
           return -1;
         },
