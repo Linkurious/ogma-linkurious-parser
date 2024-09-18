@@ -380,10 +380,10 @@ export class StylesViz {
       name: 'filtered',
       nodeAttributes: {
         opacity: FILTER_OPACITY,
-        layer: (node): number => {
+        layer: (node): number | undefined => {
           // if the node is part of a virtual node, it should be on top
-          if (node.getMetaNode() !== undefined) {
-            return 1;
+          if (node.getMetaNode() !== null) {
+            return undefined;
           }
           return -1;
         },

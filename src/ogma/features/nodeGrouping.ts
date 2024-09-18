@@ -97,6 +97,11 @@ export class NodeGroupingTransformation {
           style: 'bold'
         },
         layer: -1,
+        detectable: (item): boolean => {
+          const subNodes = item.getSubNodes();
+          // if all subnodes are filtered, the virtual node is not detectable
+          return subNodes!.toArray().some((node) => !node.hasClass('filtered'));
+        },
         color: 'rgba(240, 240, 240)',
         innerStroke: {
           color: '#7f7f7f',
