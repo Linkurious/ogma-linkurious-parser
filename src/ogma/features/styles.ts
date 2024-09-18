@@ -1,6 +1,6 @@
 'use strict';
 
-import Ogma, * as o from '@linkurious/ogma';
+import * as o from '@linkurious/ogma';
 import {
   Badge,
   Edge,
