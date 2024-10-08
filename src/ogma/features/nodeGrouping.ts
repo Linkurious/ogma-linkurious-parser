@@ -163,7 +163,7 @@ export class NodeGroupingTransformation {
    * @param node reference to the virtual node
    */
   private _getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
-    if (node !== undefined && node.isVirtual()) {
+    if (node !== undefined && node.isVirtual() && node.getSubNodes()?.get(0) !== undefined) {
       // get the property value of the first node of the group (all nodes share the same property value)
       const lkPropertyValue = node
         .getSubNodes()!
