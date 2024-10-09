@@ -163,7 +163,9 @@ export class NodeGroupingTransformation {
    * @param node reference to the virtual node
    */
   private _getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
-    if (node !== undefined && node.isVirtual()) {
+    // TODO: Normally there is no need to check if getSubNodes return a value, Ogma issue
+    //https://github.com/Linkurious/ogma/issues/3876
+    if (node !== undefined && node.isVirtual() && node.getSubNodes()?.get(0) !== undefined) {
       // get the property value of the first node of the group (all nodes share the same property value)
       const lkPropertyValue = node
         .getSubNodes()!
