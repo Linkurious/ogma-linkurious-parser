@@ -147,12 +147,28 @@ export class NodeGroupingTransformation {
       return;
     }
 
-    const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
-    if (noEdges) {
-      await this._runCirclePack(subNodes);
-    } else {
-      await this._runForceLayout(subNodes);
+    // 2 nodes
+    if (subNodes.size === 2) {
+      const radii = subNodes.getAttribute('radius').map(Number);
+      const positions = subNodes.getPosition();
+      const gap = Math.min(...radii);
+      return subNodes.setAttributes([
+        positions[0],
+        { x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y }
+      ]);
     }
+
+    const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
+    if (noEdges) return await this._runCirclePack(subNodes);
+    } else {
+      // strings/chains
+      const degrees = subNodes.getDegree();
+      if (degrees.every(d => d <= 2)) {
+        return await this._ogma.layouts.grid({ nodes: subNodes, rows: 1 });
+      }
+    }
+  
+    return await this._runForceLayout(subNodes);
   }
 
   /**
