@@ -10,6 +10,7 @@ import sha1 from 'sha1';
 
 import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
+import {OgmaTools} from '../../tools/ogmaTool';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
 export const LKE_NODE_GROUPING_NODE = 'LKE_NODE_GROUPING_NODE';
@@ -152,22 +153,45 @@ export class NodeGroupingTransformation {
       const radii = subNodes.getAttribute('radius').map(Number);
       const positions = subNodes.getPosition();
       const gap = Math.min(...radii);
-      return subNodes.setAttributes([
+      await subNodes.setAttributes([
         positions[0],
-        { x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y }
+        {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}
       ]);
+      return;
     }
 
     const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
-    if (noEdges) return await this._runCirclePack(subNodes);
-    } else {
-      // strings/chains
-      const degrees = subNodes.getDegree();
-      if (degrees.every(d => d <= 2)) {
-        return await this._ogma.layouts.grid({ nodes: subNodes, rows: 1 });
-      }
+    if (noEdges) return this._runCirclePack(subNodes);
+    // stars
+    const center = OgmaTools.isStar(subNodes);
+    if (center) {
+      const satellites = subNodes.filter((n) => n !== center);
+      const positions = OgmaTools.circularLayout({
+        radii: satellites.getAttribute('radius'),
+        cx: center.getAttribute('x'),
+        cy: center.getAttribute('y'),
+        clockwise: false,
+        distanceRatio: 5
+      });
+      const list = center.toList().concat(satellites);
+      await list.setAttributes([center.getPosition(), ...positions]);
+      return;
     }
-  
+    // Chains: if al nodes have degree 1 or 2, place them in a line
+    const degrees = subNodes.getDegree();
+    if (degrees.every((d) => d > 0 && d <= 2)) {
+      // straighten the chain
+      const sortedNodes = this._ogma.getNodes(OgmaTools.topologicalSort(subNodes));
+      // we also need to sort the nodes so that they are following the chain
+      await this._ogma.layouts.grid({
+        nodes: sortedNodes,
+        // TODO: test that visually
+        colDistance: Math.max(...subNodes.getAttribute('radius').map(Number)) * 4,
+        rows: 1
+      });
+      return;
+    }
+
     return await this._runForceLayout(subNodes);
   }
 
