@@ -1,4 +1,4 @@
-import {Transformation, Node, NodeList, StyleRule} from '@linkurious/ogma';
+import {Transformation, Node, NodeList, StyleRule, PixelSize, Point} from '@linkurious/ogma';
 import {
   IVizNodeGroupInfo,
   LkEdgeData,
@@ -10,10 +10,19 @@ import sha1 from 'sha1';
 
 import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
-import {OgmaTools} from '../../tools/ogmaTool';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
 export const LKE_NODE_GROUPING_NODE = 'LKE_NODE_GROUPING_NODE';
+
+interface CircularLayoutOptions {
+  radii: PixelSize[] | number[];
+  cx?: number;
+  cy?: number;
+  startAngle?: number;
+  clockwise?: boolean;
+  getRadius?: (radius: PixelSize) => number;
+  distanceRatio?: number;
+}
 
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
@@ -163,10 +172,10 @@ export class NodeGroupingTransformation {
     const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
     if (noEdges) return this._runCirclePack(subNodes);
     // stars
-    const center = OgmaTools.isStar(subNodes);
+    const center = this.isStar(subNodes);
     if (center) {
       const satellites = subNodes.filter((n) => n !== center);
-      const positions = OgmaTools.circularLayout({
+      const positions = this._runCircularLayout({
         radii: satellites.getAttribute('radius'),
         cx: center.getAttribute('x'),
         cy: center.getAttribute('y'),
@@ -181,7 +190,7 @@ export class NodeGroupingTransformation {
     const degrees = subNodes.getDegree();
     if (degrees.every((d) => d > 0 && d <= 2)) {
       // straighten the chain
-      const sortedNodes = this._ogma.getNodes(OgmaTools.topologicalSort(subNodes));
+      const sortedNodes = this._ogma.getNodes(this.topologicalSort(subNodes));
       // we also need to sort the nodes so that they are following the chain
       await this._ogma.layouts.grid({
         nodes: sortedNodes,
@@ -321,5 +330,72 @@ export class NodeGroupingTransformation {
         '-'
       )}-${propertyValue}`
     );
+  }
+
+  public _runCircularLayout({
+    radii,
+    clockwise = true,
+    cx = 0,
+    cy = 0,
+    startAngle = (3 / 2) * Math.PI,
+    getRadius = (radius: PixelSize) => Number(radius),
+    distanceRatio = 0.0
+  }: CircularLayoutOptions): Point[] {
+    const N = radii.length;
+    // dummy checks
+    if (N === 0) return [];
+    if (N === 1) return [{x: cx, y: cy}];
+
+    // minDistance
+    const minDistance =
+      radii.map(getRadius).reduce((acc, r) => Math.max(acc, r), 0) * (2 + distanceRatio);
+
+    const sweep = 2 * Math.PI - (2 * Math.PI) / N;
+    const deltaAngle = sweep / Math.max(1, N - 1);
+
+    const dcos = Math.cos(deltaAngle) - Math.cos(0);
+    const dsin = Math.sin(deltaAngle) - Math.sin(0);
+
+    const rMin = Math.sqrt((minDistance * minDistance) / (dcos * dcos + dsin * dsin));
+    const r = Math.max(rMin, 0);
+
+    return radii.map((_, i) => {
+      const angle = startAngle + i * deltaAngle * (clockwise ? 1 : -1);
+
+      const rx = r * Math.cos(angle);
+      const ry = r * Math.sin(angle);
+      return {
+        x: cx + rx,
+        y: cy + ry
+      };
+    });
+  }
+
+  public topologicalSort(nodes: NodeList) {
+    const nodesArray = nodes.toArray();
+    let currentNode: Node | null = nodesArray.find((n) => n.getDegree() === 1)!;
+    const visited = new Set();
+    const stack: Node[] = [];
+    while (currentNode) {
+      stack.push(currentNode);
+      visited.add(currentNode);
+
+      const nextNode = currentNode
+        .getAdjacentNodes()
+        .filter((neighbor) => !visited.has(neighbor))
+        .get(0);
+      currentNode = nextNode === undefined ? null : nextNode;
+    }
+    return this._ogma.getNodes(stack.map((n) => n.getId()));
+  }
+
+  private isStar(nodes: NodeList) {
+    for (const id of nodes.getId()) {
+      const node = this._ogma.getNode(id)!;
+      const adjacent = node.getAdjacentNodes();
+      const isStar = node.getDegree() > 2 && adjacent.getDegree().every((d) => d === 1);
+      if (isStar && adjacent.size + 1 === nodes.size) return node;
+    }
+    return false;
   }
 }
