@@ -22,8 +22,8 @@
     "compile": "tsc -b",
     "tsc": "tsc -b",
     "build:bundle": "vite build",
-    "test": "mocha -r ts-node/register/transpile-only tests/**/*.spec.ts",
-    "test:unit": "nyc --reporter=text-summary --reporter=cobertura --report-dir=reports  mocha -r ts-node/register/transpile-only --reporter mocha-multi-reporters --reporter-options configFile=.test-reporters.json tests/**/*.spec.ts",
+    "test": "mocha -r tsx tests/**/*.spec.ts",
+    "test:unit": "nyc --reporter=text-summary --reporter=cobertura --report-dir=reports  mocha -r tsx --reporter mocha-multi-reporters --reporter-options configFile=.test-reporters.json tests/**/*.spec.ts",
     "clean": "rm -rf node_modules; rm -rf package-lock.json; rm -rf dist",
     "lint": "eslint --fix --ext .ts .",
     "lint:ci": "eslint -f checkstyle -o reports/checkstyle.xml --ext .ts .",
@@ -74,8 +74,8 @@
     "nyc": "15.1.0",
     "prettier": "3.3.3",
     "should": "11.1.0",
-    "ts-node": "10.9.1",
     "tslib": "2.8.0",
+    "tsx": "4.19.2",
     "typescript": "5.5.4",
     "vite": "5.4.10"
   }
