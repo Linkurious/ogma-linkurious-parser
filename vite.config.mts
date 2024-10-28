@@ -2,6 +2,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig({
   build: {
+    minify: true,
     emptyOutDir: false,
     // Set the output directory to 'dist'
     outDir: 'dist',
@@ -11,7 +12,7 @@ export default defineConfig({
       fileName: (format) => 'index.mjs'
     },
     rollupOptions: {
-      external: ['@linkurious/ogma']
+      external: ['@linkurious/ogma', 'lodash', 'rxjs']
     }
   }
 });
