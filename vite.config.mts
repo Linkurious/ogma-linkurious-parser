@@ -12,7 +12,7 @@ export default defineConfig({
       fileName: (format) => 'index.mjs'
     },
     rollupOptions: {
-      external: ['@linkurious/ogma', 'lodash', 'rxjs']
+      external: ['@linkurious/ogma', '@linkurious/rest-client', 'lodash', 'rxjs']
     }
   }
 });
