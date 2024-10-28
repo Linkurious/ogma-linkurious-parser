@@ -29,7 +29,7 @@ export {ItemAttributes, BASE_GREY, PALETTE} from './styles/itemAttributes';
 export {EdgeAttributes} from './styles/edgeAttributes';
 export {NodeAttributes} from './styles/nodeAttributes';
 export {StyleRule, StyleRuleType} from './styles/styleRule';
-export {StyleRules, StyleType, type Legend} from './styles/styleRules';
+export {type Legend, StyleRules, StyleType} from './styles/styleRules';
 export {StylesViz, type StylesConfig, FILTER_OPACITY} from './ogma/features/styles';
 export {TransformationsViz} from './ogma/features/transformations';
 export {CaptionsViz, type CaptionState} from './ogma/features/captions';
