@@ -1,5 +1,11 @@
 import {Transformation, Node, NodeList, StyleRule} from '@linkurious/ogma';
-import {LkEdgeData, LkNodeData, MissingValue, NodeGroupingRule} from '@linkurious/rest-client';
+import {
+  IVizNodeGroupInfo,
+  LkEdgeData,
+  LkNodeData,
+  MissingValue,
+  NodeGroupingRule
+} from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
 import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
@@ -156,6 +162,24 @@ export class NodeGroupingTransformation {
   public getVirtualNodesOfTransformation(): NodeList<LkNodeData, LkEdgeData> {
     // @ts-ignore getContext exists on the transformation but hidden by the types
     return this.transformation.getContext().metaNodes;
+  }
+
+  /**
+   * Set the node group pin
+   * @param nodeGroups object containing the node group id and the layoutable attribute
+   */
+  public async setNodeGroupPin(nodeGroups: IVizNodeGroupInfo[]): Promise<void> {
+    this._ogma
+      .getNodes()
+      .filter((node) => node.isVirtual())
+      .forEach((node) => {
+        const nodeGroupInfo = nodeGroups.find(
+          (nodeGroup) => nodeGroup.id === node.getData('nodeGroupId')
+        );
+        if (nodeGroupInfo !== undefined) {
+          void node.setAttribute('layoutable', nodeGroupInfo.attributes.layoutable ?? false);
+        }
+      });
   }
 
   /**
