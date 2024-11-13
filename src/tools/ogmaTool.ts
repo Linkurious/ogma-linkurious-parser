@@ -1,5 +1,5 @@
 'use strict';
-import {Color, NodeList, Node, EdgeList, Edge, Point, PixelSize, NodeId} from '@linkurious/ogma';
+import {Color, NodeList, Node, EdgeList, Edge, NodeId} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {Tools} from './tools';
