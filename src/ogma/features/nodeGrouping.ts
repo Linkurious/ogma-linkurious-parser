@@ -159,13 +159,7 @@ export class NodeGroupingTransformation {
 
     // 2 nodes
     if (subNodes.size === 2) {
-      const radii = subNodes.getAttribute('radius').map(Number);
-      const positions = subNodes.getPosition();
-      const gap = Math.min(...radii);
-      await subNodes.setAttributes([
-        positions[0],
-        {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}
-      ]);
+      await this._runTwoNodesLayout(subNodes);
       return;
     }
 
@@ -369,6 +363,16 @@ export class NodeGroupingTransformation {
         y: cy + ry
       };
     });
+  }
+
+  async _runTwoNodesLayout(nodes: NodeList<LkNodeData, LkEdgeData>) {
+    const radii = nodes.getAttribute('radius').map(Number);
+    const positions = nodes.getPosition();
+    const gap = Math.min(...radii);
+    await nodes.setAttributes([
+      positions[0],
+      {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}
+    ]);
   }
 
   public topologicalSort(nodes: NodeList) {
