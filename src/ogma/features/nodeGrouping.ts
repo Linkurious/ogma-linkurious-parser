@@ -10,6 +10,7 @@ import sha1 from 'sha1';
 
 import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
+import {OgmaTools} from '../../tools/ogmaTool';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
 export const LKE_NODE_GROUPING_NODE = 'LKE_NODE_GROUPING_NODE';
@@ -250,7 +251,7 @@ export class NodeGroupingTransformation {
 
   private async _runChainLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     // straighten the chain
-    const sortedNodes = this._ogma.getNodes(this.topologicalSort(subNodes));
+    const sortedNodes = this._ogma.getNodes(OgmaTools.topologicalSort(subNodes));
     // we also need to sort the nodes so that they are following the chain
     await this._ogma.layouts.grid({
       nodes: sortedNodes,
@@ -377,24 +378,6 @@ export class NodeGroupingTransformation {
       positions[0],
       {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}
     ]);
-  }
-
-  public topologicalSort(nodes: NodeList) {
-    const nodesArray = nodes.toArray();
-    let currentNode: Node | null = nodesArray.find((n) => n.getDegree() === 1)!;
-    const visited = new Set();
-    const stack: Node[] = [];
-    while (currentNode) {
-      stack.push(currentNode);
-      visited.add(currentNode);
-
-      const nextNode = currentNode
-        .getAdjacentNodes()
-        .filter((neighbor) => !visited.has(neighbor))
-        .get(0);
-      currentNode = nextNode === undefined ? null : nextNode;
-    }
-    return this._ogma.getNodes(stack.map((n) => n.getId()));
   }
 
   private isStar(nodes: NodeList) {
