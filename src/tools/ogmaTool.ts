@@ -5,16 +5,6 @@ import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 import {Tools} from './tools';
 import {HTML_COLORS} from './colorPalette';
 
-interface CircularLayoutOptions {
-  radii: PixelSize[] | number[];
-  cx?: number;
-  cy?: number;
-  startAngle?: number;
-  clockwise?: boolean;
-  getRadius?: (radius: PixelSize) => number;
-  distanceRatio?: number;
-}
-
 export class OgmaTools {
   /**
    * Get the amount of hidden neighbors from a list of nodes
@@ -104,45 +94,6 @@ export class OgmaTools {
     items: NodeList<LkNodeData, LkEdgeData> | EdgeList<LkEdgeData, LkNodeData>
   ): items is NodeList<LkNodeData, LkEdgeData> {
     return items.isNode;
-  }
-
-  public static circularLayout({
-    radii,
-    clockwise = true,
-    cx = 0,
-    cy = 0,
-    startAngle = (3 / 2) * Math.PI,
-    getRadius = (radius: PixelSize) => Number(radius),
-    distanceRatio = 0.0
-  }: CircularLayoutOptions): Point[] {
-    const N = radii.length;
-    // dummy checks
-    if (N === 0) return [];
-    if (N === 1) return [{x: cx, y: cy}];
-
-    // minDistance
-    const minDistance =
-      radii.map(getRadius).reduce((acc, r) => Math.max(acc, r), 0) * (2 + distanceRatio);
-
-    const sweep = 2 * Math.PI - (2 * Math.PI) / N;
-    const deltaAngle = sweep / Math.max(1, N - 1);
-
-    const dcos = Math.cos(deltaAngle) - Math.cos(0);
-    const dsin = Math.sin(deltaAngle) - Math.sin(0);
-
-    const rMin = Math.sqrt((minDistance * minDistance) / (dcos * dcos + dsin * dsin));
-    const r = Math.max(rMin, 0);
-
-    return radii.map((_, i) => {
-      const angle = startAngle + i * deltaAngle * (clockwise ? 1 : -1);
-
-      const rx = r * Math.cos(angle);
-      const ry = r * Math.sin(angle);
-      return {
-        x: cx + rx,
-        y: cy + ry
-      };
-    });
   }
 
   public static topologicalSort(nodes: NodeList): NodeId[] {
