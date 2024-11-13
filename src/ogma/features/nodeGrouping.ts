@@ -183,15 +183,7 @@ export class NodeGroupingTransformation {
     // Chains: if al nodes have degree 1 or 2, place them in a line
     const degrees = subNodes.getDegree();
     if (degrees.every((d) => d > 0 && d <= 2)) {
-      // straighten the chain
-      const sortedNodes = this._ogma.getNodes(this.topologicalSort(subNodes));
-      // we also need to sort the nodes so that they are following the chain
-      await this._ogma.layouts.grid({
-        nodes: sortedNodes,
-        // TODO: test that visually
-        colDistance: Math.max(...subNodes.getAttribute('radius').map(Number)) * 4,
-        rows: 1
-      });
+      await this._runChainLayout(subNodes);
       return;
     }
 
@@ -253,6 +245,18 @@ export class NodeGroupingTransformation {
       nodes: subNodes,
       margin: 10,
       sort: 'asc'
+    });
+  }
+
+  private async _runChainLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
+    // straighten the chain
+    const sortedNodes = this._ogma.getNodes(this.topologicalSort(subNodes));
+    // we also need to sort the nodes so that they are following the chain
+    await this._ogma.layouts.grid({
+      nodes: sortedNodes,
+      // TODO: test that visually
+      colDistance: Math.max(...subNodes.getAttribute('radius').map(Number)) * 4,
+      rows: 1
     });
   }
 
@@ -365,7 +369,7 @@ export class NodeGroupingTransformation {
     });
   }
 
-  async _runTwoNodesLayout(nodes: NodeList<LkNodeData, LkEdgeData>) {
+  private async _runTwoNodesLayout(nodes: NodeList<LkNodeData, LkEdgeData>) {
     const radii = nodes.getAttribute('radius').map(Number);
     const positions = nodes.getPosition();
     const gap = Math.min(...radii);
