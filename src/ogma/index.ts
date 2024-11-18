@@ -61,7 +61,10 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public LkNodeGroupingTransformation!: NodeGroupingTransformation;
   private _reactive!: RxViz;
 
-  constructor(private _configuration: IOgmaConfig, _baseUrl?: string) {
+  constructor(
+    private _configuration: IOgmaConfig,
+    _baseUrl?: string
+  ) {
     // set Ogma global configuration
     super(_configuration);
     Object.setPrototypeOf(this, new.target.prototype);
@@ -88,7 +91,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.setOptions({
       interactions: {
         zoom: {
-          maxValue: (params: any) => {
+          maxValue: (params) => {
             return 128 / params.smallestNodeSize;
           }
         },
@@ -272,9 +275,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Adding nodes then adding edges to the graph
    */
-  public async addGraphAfterValidation(
-    graph: RawGraph<LkNodeData, LkEdgeData>
-  ): Promise<{
+  public async addGraphAfterValidation(graph: RawGraph<LkNodeData, LkEdgeData>): Promise<{
     nodes: NodeList<LkNodeData>;
     edges: EdgeList<LkEdgeData>;
   }> {

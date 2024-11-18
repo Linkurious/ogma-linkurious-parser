@@ -19,7 +19,8 @@ export enum StyleRuleType {
 }
 
 export class StyleRule<T extends INodeStyle | IEdgeStyle = INodeStyle | IEdgeStyle>
-  implements IStyleRule<T> {
+  implements IStyleRule<T>
+{
   public type: SelectorType;
   public input: string[] | undefined;
   public index: number;

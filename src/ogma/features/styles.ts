@@ -349,8 +349,8 @@ export class StylesViz {
    *
    * @returns {number}
    */
-  private defaultNodeRadius(styles: any): number {
-    return this.defaultStylesHas(styles, ['nodeRadius']) ? styles.nodeRadius : 5;
+  private defaultNodeRadius(styles: {nodeRadius?: number}): number {
+    return this.defaultStylesHas(styles, ['nodeRadius']) ? styles.nodeRadius! : 5;
   }
 
   /**
@@ -358,8 +358,8 @@ export class StylesViz {
    *
    * @returns {number}
    */
-  private defaultEdgeWidth(styles: any): number {
-    return this.defaultStylesHas(styles, ['edgeWidth']) ? styles.edgeWidth : 1;
+  private defaultEdgeWidth(styles: {edgeWidth?: number}): number {
+    return this.defaultStylesHas(styles, ['edgeWidth']) ? styles.edgeWidth! : 1;
   }
 
   /**

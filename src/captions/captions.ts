@@ -125,7 +125,7 @@ export class Captions {
     const property = typeGraphSchema?.properties.find(
       (property) => property.propertyKey === propertyKey
     );
-    return ((property as unknown) as GraphSchemaPropertyWithAccess)?.propertyType;
+    return (property as unknown as GraphSchemaPropertyWithAccess)?.propertyType;
   }
 
   /**
