@@ -25,8 +25,7 @@
   },
   "scripts": {
     "build": "npm run compile && npm run build:bundle",
-    "compile": "tsc --emitDeclarationOnly && npm run tsc:rename",
-    "tsc:rename": "find dist -name '*.js' -exec sh -c 'mv \"$1\" \"${1%.js}.cjs\"' _ {} \\;",
+    "compile": "tsc --emitDeclarationOnly",
     "build:bundle": "vite build",
     "test": "mocha -r tsx tests/**/*.spec.ts",
     "test:unit": "nyc --reporter=text-summary --reporter=cobertura --report-dir=reports  mocha -r tsx --reporter mocha-multi-reporters --reporter-options configFile=.test-reporters.json tests/**/*.spec.ts",
