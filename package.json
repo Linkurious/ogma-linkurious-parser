@@ -11,16 +11,22 @@
   },
   "private": false,
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "engines": {
     "node": "20.18.0"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
-    "build": "tsc -b && npm run build:bundle",
-    "compile": "tsc -b",
-    "tsc": "tsc -b",
+    "build": "npm run compile && npm run build:bundle",
+    "compile": "tsc --emitDeclarationOnly && npm run tsc:rename",
+    "tsc:rename": "find dist -name '*.js' -exec sh -c 'mv \"$1\" \"${1%.js}.cjs\"' _ {} \\;",
     "build:bundle": "vite build",
     "test": "mocha -r tsx tests/**/*.spec.ts",
     "test:unit": "nyc --reporter=text-summary --reporter=cobertura --report-dir=reports  mocha -r tsx --reporter mocha-multi-reporters --reporter-options configFile=.test-reporters.json tests/**/*.spec.ts",
