@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "module": "commonjs",
+    "module": "CommonJS",
     "moduleResolution": "node",
-    "target": "ES6",
+    "target": "es6",
     "stripInternal": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -12,31 +12,17 @@
     "rootDir": "./src",
     "sourceMap": true,
     "inlineSources": true,
-    "lib": [
-      "ES5",
-      "ES6",
-      "ES2016",
-      "ES2017",
-      "ES2015",
-      "dom"
-    ],
+    "lib": ["ES5", "ES6", "ES2016", "ES2017", "ES2015", "dom"],
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noUnusedLocals": true,
     "noFallthroughCasesInSwitch": true,
     "allowUnreachableCode": false,
     "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
     "strict": true
   },
-  "typeRoots": [
-    "node_modules/@types"
-  ],
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist/**/*",
-    "tests/**/*.spec.ts"
-  ]
+  "typeRoots": ["node_modules/@types"],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist/**/*", "tests/**/*.spec.ts"]
 }

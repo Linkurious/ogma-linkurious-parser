@@ -1,5 +1,5 @@
 'use strict';
-import {Color, NodeList, Node, EdgeList, Edge} from '@linkurious/ogma';
+import {Color, NodeList, Node, EdgeList, Edge, NodeId} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {Tools} from './tools';
@@ -48,8 +48,10 @@ export class OgmaTools {
       return true;
     }
     const hexRegExp = /#[A-Fa-f0-9]{3,6}/;
-    const rgbRegExp = /^rgb\(\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*\)$/i;
-    const rgbaRegExp = /^rgba\(\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*(?:0|1|0?\.\d+)\s*\)$/i;
+    const rgbRegExp =
+      /^rgb\(\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*\)$/i;
+    const rgbaRegExp =
+      /^rgba\(\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*(?:0|1|0?\.\d+)\s*\)$/i;
     let rgb: string;
 
     if (hexRegExp.test(color)) {
@@ -94,5 +96,32 @@ export class OgmaTools {
     items: NodeList<LkNodeData, LkEdgeData> | EdgeList<LkEdgeData, LkNodeData>
   ): items is NodeList<LkNodeData, LkEdgeData> {
     return items.isNode;
+  }
+
+  public static topologicalSort(nodes: NodeList): NodeId[] {
+    const nodesArray = nodes.toArray();
+    let currentNode: Node | null = nodesArray.find((n) => n.getDegree() === 1)!;
+    const visited = new Set();
+    const stack: Node[] = [];
+    while (currentNode) {
+      stack.push(currentNode);
+      visited.add(currentNode);
+
+      const nextNode = currentNode
+        .getAdjacentNodes()
+        .filter((neighbor) => !visited.has(neighbor))
+        .get(0);
+      currentNode = nextNode === undefined ? null : nextNode;
+    }
+    return stack.map((n) => n.getId());
+  }
+
+  public static isStar(nodes: NodeList) {
+    for (const node of nodes.toArray()) {
+      const adjacent = node.getAdjacentNodes();
+      const isStar = node.getDegree() > 2 && adjacent.getDegree().every((d) => d === 1);
+      if (isStar && adjacent.size + 1 === nodes.size) return node;
+    }
+    return false;
   }
 }

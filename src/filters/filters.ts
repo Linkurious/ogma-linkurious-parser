@@ -175,7 +175,7 @@ export class Filters {
     }
   }
 
-  private static isNotANumber(value: any) {
+  private static isNotANumber(value: unknown) {
     return Tools.isDefined(value) && !Tools.isNumber(value);
   }
 
