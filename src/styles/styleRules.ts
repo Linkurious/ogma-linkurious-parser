@@ -17,7 +17,7 @@ import {
 import {sortBy, Tools} from '../tools/tools';
 
 import {StyleRule} from './styleRule';
-import {ItemAttributes} from './itemAttributes';
+import {BASE_GREY, ItemAttributes} from './itemAttributes';
 
 export enum StyleType {
   COLOR = 'color',
@@ -277,6 +277,33 @@ export class StyleRules {
    */
   public static getTypeLabel(type: string | undefined | null): string {
     return type === undefined ? 'All' : type === null ? 'Others' : type;
+  }
+
+  /**
+   * Return the color of item type from the list of styles
+   */
+  public getColorForType(type: string): string {
+    const colors = this.color
+      .map((rule) => rule.getTypeColor(type))
+      .filter((type) => Tools.isDefined(type));
+
+    return colors.length > 0 ? colors[colors.length - 1] : BASE_GREY;
+  }
+
+  /**
+   * Return the icon of item type from the list of styles
+   */
+  public getIconForType(type: string): string | number | undefined {
+    // icon is only used for nodes
+    const icons = (this.icon as StyleRule<INodeStyle>[])
+      .filter((rule) => !Tools.isDefined(rule.input) && rule.itemType === type)
+      .map((rule) => {
+        // rule.style.icon can be undefined as it is optional in INodeStyle interface
+        return (rule.style.icon as IStyleIcon)?.content;
+      })
+      .filter((type) => Tools.isDefined(type));
+
+    return icons.length > 0 ? icons[icons.length - 1] : undefined;
   }
 
   /**
