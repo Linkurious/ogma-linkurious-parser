@@ -8,7 +8,7 @@ import {
   IStyleImage
 } from '@linkurious/rest-client';
 
-import {StyleRules, StyleType} from '../../src';
+import {BASE_GREY, StyleRules, StyleType} from '../../src';
 
 describe('StyleRules', () => {
   describe('getLegendForStyle()', () => {
@@ -725,6 +725,133 @@ describe('StyleRules', () => {
 
     it('should return the type', () => {
       expect(StyleRules.getTypeLabel('test')).to.equal('test');
+    });
+  });
+
+  describe('getIconForType()', () => {
+    it('should return the correct icon for a given type', () => {
+      const styles = new StyleRules([
+        {
+          type: SelectorType.ANY,
+          itemType: 'CITY',
+          style: {icon: {content: '🏙️', font: 'Arial'}},
+          index: 0
+        },
+        {
+          type: SelectorType.ANY,
+          itemType: 'COMPANY',
+          style: {icon: {content: '🏢', font: 'Arial'}},
+          index: 1
+        }
+      ]);
+      expect(styles.getIconForType('CITY')).to.equal('🏙️');
+      expect(styles.getIconForType('COMPANY')).to.equal('🏢');
+    });
+
+    it('should return undefined if no icon is found for the given type', () => {
+      const styles = new StyleRules([
+        {
+          type: SelectorType.ANY,
+          itemType: 'CITY',
+          style: {icon: {content: '🏙️', font: 'Arial'}},
+          index: 0
+        }
+      ]);
+      expect(styles.getIconForType('COMPANY')).to.be.undefined;
+    });
+
+    it('should return the last matching icon if multiple rules match the given type', () => {
+      const styles = new StyleRules([
+        {
+          type: SelectorType.ANY,
+          itemType: 'CITY',
+          style: {icon: {content: '🏙️', font: 'Arial'}},
+          index: 0
+        },
+        {
+          type: SelectorType.ANY,
+          itemType: 'CITY',
+          style: {icon: {content: '🌆', font: 'Arial'}},
+          index: 1
+        }
+      ]);
+      expect(styles.getIconForType('CITY')).to.equal('🌆');
+    });
+
+    it('should return undefined if the icon content is not defined', () => {
+      const styles = new StyleRules([
+        {
+          type: SelectorType.ANY,
+          itemType: 'CITY',
+          style: {icon: {font: 'Arial'}},
+          index: 0
+        }
+      ]);
+      expect(styles.getIconForType('CITY')).to.be.undefined;
+    });
+
+    it('should return undefined if the icon is not defined', () => {
+      const styles = new StyleRules([
+        {
+          type: SelectorType.ANY,
+          itemType: 'CITY',
+          style: {},
+          index: 0
+        }
+      ]);
+      expect(styles.getIconForType('CITY')).to.be.undefined;
+    });
+  });
+
+  describe('getColorForType()', () => {
+    it('should return the correct color for a given type', () => {
+      const styles = new StyleRules([
+        {
+          type: SelectorType.ANY,
+          itemType: 'CITY',
+          style: {color: 'red'},
+          index: 0
+        },
+        {
+          type: SelectorType.ANY,
+          itemType: 'COMPANY',
+          style: {color: 'blue'},
+          index: 1
+        }
+      ]);
+      expect(styles.getColorForType('CITY')).to.equal('red');
+      expect(styles.getColorForType('COMPANY')).to.equal('blue');
+    });
+
+    it('should return the last matching color if multiple rules match the given type', () => {
+      const styles = new StyleRules([
+        {
+          type: SelectorType.ANY,
+          itemType: 'CITY',
+          style: {color: 'red'},
+          index: 0
+        },
+        {
+          type: SelectorType.ANY,
+          itemType: 'CITY',
+          style: {color: 'green'},
+          index: 1
+        }
+      ]);
+      expect(styles.getColorForType('CITY')).to.equal('green');
+    });
+
+    it('should return the base grey color if no color is found for the given type', () => {
+      const styles = new StyleRules([
+        {
+          type: SelectorType.ANY,
+          itemType: 'CITY',
+          style: {color: 'red'},
+          index: 0
+        }
+      ]);
+
+      expect(styles.getColorForType('COMPANY')).to.equal(BASE_GREY);
     });
   });
 
