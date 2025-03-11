@@ -29,7 +29,9 @@ export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public groupRule?: NodeGroupingRule;
   public nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
+  public hideGroupContents: Record<string, boolean> = {};
   private _ogma: LKOgma;
+  private _nodeGroupingCollapsedStyleRule: StyleRule<LkNodeData, LkEdgeData> | undefined;
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
@@ -79,7 +81,9 @@ export class NodeGroupingTransformation {
             }
           };
         },
-        showContents: true,
+        showContents: (metaNode) => {
+          return !this.hideGroupContents[metaNode.getId()];
+        },
         padding: 10
       });
     } else {
@@ -121,9 +125,26 @@ export class NodeGroupingTransformation {
         }
       },
       nodeSelector: (node) => {
-        // TODO: Tools.isDefined(node.getSubNodes()) is a work around for an ogma issue visible when using image export plugin with Node grouping
-        // remove when updating to Ogma v5.1.x
-        return node.isVirtual() && Tools.isDefined(node.getSubNodes());
+        return node.isVirtual() && !this.hideGroupContents[node.getId()];
+      },
+      // the style will be updated when data object is updated
+      nodeDependencies: {self: {data: true}}
+    });
+
+    this._nodeGroupingCollapsedStyleRule = this._ogma.styles.addRule({
+      nodeAttributes: {
+        text: {
+          content: (node: Node<LkNodeData> | undefined): string | undefined => {
+            return this._getNodeGroupingCaption(node);
+          },
+          style: 'bold'
+        },
+        halo: {
+          width: 10
+        }
+      },
+      nodeSelector: (node) => {
+        return node.isVirtual() && this.hideGroupContents[node.getId()];
       },
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
@@ -132,6 +153,7 @@ export class NodeGroupingTransformation {
 
   public async refreshNodeGroupingStyle(): Promise<void> {
     await this.nodeGroupingStyleRule?.refresh();
+    await this._nodeGroupingCollapsedStyleRule?.refresh();
   }
 
   /**
@@ -204,7 +226,7 @@ export class NodeGroupingTransformation {
    * Set the node group pin
    * @param nodeGroups object containing the node group id and the layoutable attribute
    */
-  public async setNodeGroupPin(nodeGroups: IVizNodeGroupInfo[]): Promise<void> {
+  public async setNodeGroupingAttributes(nodeGroups: IVizNodeGroupInfo[]): Promise<void> {
     this._ogma
       .getNodes()
       .filter((node) => node.isVirtual())
@@ -214,6 +236,7 @@ export class NodeGroupingTransformation {
         );
         if (nodeGroupInfo !== undefined) {
           void node.setAttribute('layoutable', nodeGroupInfo.attributes.layoutable ?? false);
+          this.hideGroupContents[node.getId()] = nodeGroupInfo.attributes.collapsed ?? false;
         }
       });
   }
