@@ -16,7 +16,6 @@ import {BASE_GREY} from '../../styles/itemAttributes';
 import {CLEAR_FONT_COLOR} from './styles';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
-export const LKE_NODE_GROUPING_NODE = 'LKE_NODE_GROUPING_NODE';
 
 interface CircularLayoutOptions {
   radii: PixelSize[] | number[];
@@ -32,7 +31,6 @@ export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public groupRule?: NodeGroupingRule;
   public nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
-  public hideGroupContents: Record<string, boolean> = {};
   private _ogma: LKOgma;
   private _nodeGroupingCollapsedStyleRule: StyleRule<LkNodeData, LkEdgeData> | undefined;
 
@@ -73,7 +71,9 @@ export class NodeGroupingTransformation {
           return {
             data: {
               categories: Array.from(categories),
-              properties: {},
+              properties: {
+                collapsed: false
+              },
               nodeGroupId: this._findNodeGroupId(nodes)
             }
           };
@@ -86,7 +86,7 @@ export class NodeGroupingTransformation {
           };
         },
         showContents: (metaNode) => {
-          return !this.hideGroupContents[metaNode.getId()];
+          return this._isGroupCollapsed(metaNode);
         },
         padding: 10
       });
@@ -129,7 +129,7 @@ export class NodeGroupingTransformation {
         }
       },
       nodeSelector: (node) => {
-        return node.isVirtual() && !this.hideGroupContents[node.getId()];
+        return node.isVirtual() && !this._isGroupCollapsed(node);
       },
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
@@ -177,7 +177,7 @@ export class NodeGroupingTransformation {
         }
       },
       nodeSelector: (node) => {
-        return node.isVirtual() && this.hideGroupContents[node.getId()];
+        return node.isVirtual() && this._isGroupCollapsed(node);
       },
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
@@ -269,9 +269,20 @@ export class NodeGroupingTransformation {
         );
         if (nodeGroupInfo !== undefined) {
           void node.setAttribute('layoutable', nodeGroupInfo.attributes.layoutable ?? false);
-          this.hideGroupContents[node.getId()] = nodeGroupInfo.attributes.collapsed ?? false;
+          this.setCollapsedProperty(node, nodeGroupInfo.attributes.collapsed ?? false);
         }
       });
+  }
+
+  public setCollapsedProperty(node: Node<LkNodeData>, collapsed: boolean): void {
+    node.setData(['properties', 'collapsed'], collapsed);
+  }
+
+  /**
+   * Return true if the group is collapsed
+   */
+  private _isGroupCollapsed(node: Node): boolean {
+    return node.getData(['properties', 'collapsed']) as boolean;
   }
 
   /**
