@@ -63,12 +63,11 @@ export class NodeGroupingTransformation {
                 .getAdjacentEdges()
                 .filter((edge) => edge.getData('type') === rule.groupingOptions.edgeType)
                 .get(0);
-              // TODO: make sure we handle the case where the node is the actual central node
               const centralNode =
                 rule.groupingOptions.centralNodeIs === 'source'
                   ? edge.getSource()
                   : edge.getTarget();
-              return centralNode.getData('id');
+              return centralNode.getId().toString();
             } else {
               // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
               const rule = this.groupRule as NodeGroupingRule<NodeGroupingType.PROPERTY_KEY>;
@@ -409,7 +408,7 @@ export class NodeGroupingTransformation {
         .get(0);
       const centralNode =
         rule.groupingOptions.centralNodeIs === 'source' ? edge.getSource() : edge.getTarget();
-      return sha1(`${this.groupRule?.name}-${centralNode.getData('id')}`);
+      return sha1(`${this.groupRule?.name}-${centralNode.getId()}`);
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const rule = this.groupRule as NodeGroupingRule<NodeGroupingType.PROPERTY_KEY>;
