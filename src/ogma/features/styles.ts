@@ -88,7 +88,7 @@ const EDGE_HALO_CONFIGURATION = {
 
 const DEFAULT_OGMA_FONT = "'roboto', sans-serif";
 const DARK_FONT_COLOR = '#000';
-const CLEAR_FONT_COLOR = '#FFF';
+export const CLEAR_FONT_COLOR = '#FFF';
 const ITEM_DEFAULT_COLOR = '#7f7f7f';
 export const FILTER_OPACITY = 0.2;
 
@@ -148,6 +148,10 @@ export class StylesViz {
     this._ogma = ogma;
     this._defaultConfiguration = configuration;
     this._nodeAttributes.setBaseUrl(configuration.baseUrl);
+  }
+
+  public get nodeAttributes(): NodeAttributes {
+    return this._nodeAttributes;
   }
 
   /**
@@ -212,7 +216,8 @@ export class StylesViz {
           width: 3
         },
         outline: false
-      }
+      },
+      nodeSelector: (node) => !node.isVirtual()
     });
   }
 
@@ -274,7 +279,7 @@ export class StylesViz {
   public setNodesDefaultHalo(): void {
     // setting default halo style
     this._nodeDefaultHaloRules = this._ogma.styles.addRule({
-      nodeSelector: (node) => node && !node.hasClass('filtered'),
+      nodeSelector: (node) => node && !node.hasClass('filtered') && !node.isVirtual(),
       nodeAttributes: {
         halo: (node) => {
           if (
@@ -585,7 +590,8 @@ export class StylesViz {
             }
           }
         },
-        nodeDependencies: {self: {data: true}}
+        nodeDependencies: {self: {data: true}},
+        nodeSelector: (node) => !node.isVirtual()
       });
     } else {
       this._nodeAttributes.refresh({color: colorStyleRules});
@@ -679,7 +685,8 @@ export class StylesViz {
             }
           }
         },
-        nodeDependencies: {self: {data: true}}
+        nodeDependencies: {self: {data: true}},
+        nodeSelector: (node) => !node.isVirtual()
       });
     } else {
       this._nodeAttributes.refresh({icon: iconStyleRules});
@@ -703,7 +710,8 @@ export class StylesViz {
             }
           }
         },
-        nodeDependencies: {self: {data: true}}
+        nodeDependencies: {self: {data: true}},
+        nodeSelector: (node) => !node.isVirtual()
       });
     } else {
       this._nodeAttributes.refresh({size: sizeStyleRules});

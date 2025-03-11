@@ -11,6 +11,9 @@ import sha1 from 'sha1';
 import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
 import {OgmaTools} from '../../tools/ogmaTool';
+import {BASE_GREY} from '../../styles/itemAttributes';
+
+import {CLEAR_FONT_COLOR} from './styles';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
 export const LKE_NODE_GROUPING_NODE = 'LKE_NODE_GROUPING_NODE';
@@ -66,9 +69,10 @@ export class NodeGroupingTransformation {
           }
         },
         nodeGenerator: (nodes) => {
+          const categories = new Set(nodes.getData('categories').flat());
           return {
             data: {
-              categories: [LKE_NODE_GROUPING_NODE],
+              categories: Array.from(categories),
               properties: {},
               nodeGroupId: this._findNodeGroupId(nodes)
             }
@@ -140,7 +144,36 @@ export class NodeGroupingTransformation {
           style: 'bold'
         },
         halo: {
-          width: 10
+          width: 20,
+          color: '#e4ebea',
+          strokeColor: '#ccc'
+        },
+        badges: {
+          bottomLeft: (node) => {
+            const numberOfSubNodes = node.getSubNodes()?.size;
+            if (!Tools.isDefined(numberOfSubNodes)) {
+              return;
+            }
+            return {
+              color: BASE_GREY,
+              minVisibleSize: 20,
+              stroke: {
+                width: 0,
+                color: null
+              },
+              text: {
+                font: 'FontAwesome',
+                scale: 0.4,
+                color: CLEAR_FONT_COLOR,
+                content: `x${numberOfSubNodes}`
+              }
+            };
+          }
+        },
+        color: (node: Node | undefined) => {
+          if (node !== undefined) {
+            return this._ogma.LKStyles.nodeAttributes.color(node.getData());
+          }
         }
       },
       nodeSelector: (node) => {
