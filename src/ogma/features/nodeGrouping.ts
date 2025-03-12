@@ -86,7 +86,7 @@ export class NodeGroupingTransformation {
           };
         },
         showContents: (metaNode) => {
-          return this._isGroupCollapsed(metaNode);
+          return OgmaTools.isGroupCollapsed(metaNode);
         },
         padding: 10
       });
@@ -129,7 +129,7 @@ export class NodeGroupingTransformation {
         }
       },
       nodeSelector: (node) => {
-        return node.isVirtual() && !this._isGroupCollapsed(node);
+        return node.isVirtual() && !OgmaTools.isGroupCollapsed(node);
       },
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
@@ -177,7 +177,7 @@ export class NodeGroupingTransformation {
         }
       },
       nodeSelector: (node) => {
-        return node.isVirtual() && this._isGroupCollapsed(node);
+        return node.isVirtual() && OgmaTools.isGroupCollapsed(node);
       },
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
@@ -269,20 +269,9 @@ export class NodeGroupingTransformation {
         );
         if (nodeGroupInfo !== undefined) {
           void node.setAttribute('layoutable', nodeGroupInfo.attributes.layoutable ?? false);
-          this.setCollapsedProperty(node, nodeGroupInfo.attributes.collapsed ?? false);
+          OgmaTools.setCollapsedGroupProperty(node, nodeGroupInfo.attributes.collapsed ?? false);
         }
       });
-  }
-
-  public setCollapsedProperty(node: Node<LkNodeData>, collapsed: boolean): void {
-    node.setData(['properties', 'collapsed'], collapsed);
-  }
-
-  /**
-   * Return true if the group is collapsed
-   */
-  private _isGroupCollapsed(node: Node): boolean {
-    return node.getData(['properties', 'collapsed']) as boolean;
   }
 
   /**

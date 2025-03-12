@@ -124,4 +124,15 @@ export class OgmaTools {
     }
     return false;
   }
+
+  /**
+   * Return true if the group is collapsed
+   */
+  public static isGroupCollapsed(node: Node): boolean {
+    return node.getData(['properties', 'collapsed']) as boolean;
+  }
+
+  public static setCollapsedGroupProperty(node: Node<LkNodeData>, collapsed: boolean): void {
+    node.setData(['properties', 'collapsed'], collapsed);
+  }
 }
