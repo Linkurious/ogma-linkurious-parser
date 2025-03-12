@@ -86,7 +86,7 @@ export class NodeGroupingTransformation {
           };
         },
         showContents: (metaNode) => {
-          return OgmaTools.isGroupCollapsed(metaNode);
+          return !OgmaTools.isGroupCollapsed(metaNode);
         },
         padding: 10
       });
@@ -150,10 +150,10 @@ export class NodeGroupingTransformation {
         },
         badges: {
           bottomLeft: (node) => {
-            const numberOfSubNodes = node.getSubNodes()?.size;
-            if (!Tools.isDefined(numberOfSubNodes)) {
-              return;
-            }
+            const numberOfSubNodes = node
+              .getSubNodes()!
+              .filter((node) => !node.hasClass('filtered'))?.size;
+
             return {
               color: BASE_GREY,
               minVisibleSize: 20,
