@@ -5,6 +5,8 @@ import {
   LkNodeData,
   MissingValue,
   NodeGroupingRule,
+  NodeGroupingRulePropertyKey,
+  NodeGroupingRuleRelationType,
   NodeGroupingType
 } from '@linkurious/rest-client';
 import sha1 from 'sha1';
@@ -28,7 +30,7 @@ interface CircularLayoutOptions {
 
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
-  public groupRule?: NodeGroupingRule<NodeGroupingType>;
+  public groupRule?: NodeGroupingRule;
   public nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   private _ogma: LKOgma;
 
@@ -40,7 +42,7 @@ export class NodeGroupingTransformation {
    * Set the grouping rule
    * @param rule of grouping
    */
-  public setGroupingRule(rule?: NodeGroupingRule<NodeGroupingType>): void {
+  public setGroupingRule(rule?: NodeGroupingRule): void {
     this.groupRule = rule;
   }
 
@@ -55,29 +57,19 @@ export class NodeGroupingTransformation {
         groupIdFunction: (node) => {
           if (this._isRuleNotApplicableToNode(node)) {
             return undefined;
+          }
+          // if groupRule is undefined, the early return would have catch it
+          const rule = this.groupRule!;
+          if (rule.groupingType === NodeGroupingType.RELATION_TYPE) {
+            const centralNode = NodeGroupingTransformation._getGroupCentralNode(node, rule);
+            return centralNode.getId().toString();
           } else {
-            if (this.groupRule?.groupingType === NodeGroupingType.RELATION_TYPE) {
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-              const rule = this.groupRule as NodeGroupingRule<NodeGroupingType.RELATION_TYPE>;
-              const edge = node
-                .getAdjacentEdges()
-                .filter((edge) => edge.getData('type') === rule.groupingOptions.edgeType)
-                .get(0);
-              const centralNode =
-                rule.groupingOptions.centralNodeIs === 'source'
-                  ? edge.getSource()
-                  : edge.getTarget();
-              return centralNode.getId().toString();
-            } else {
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-              const rule = this.groupRule as NodeGroupingRule<NodeGroupingType.PROPERTY_KEY>;
-              const propertyValue = this._findGroupingPropertyValue(node);
-              // groupRule is defined if not we returned undefined
-              // node with same value will be part of the same group
-              return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`
-                .toLowerCase()
-                .trim();
-            }
+            const propertyValue = this._findGroupingPropertyValue(node);
+            // groupRule is defined if not we returned undefined
+            // node with same value will be part of the same group
+            return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`
+              .toLowerCase()
+              .trim();
           }
         },
         nodeGenerator: (nodes) => {
@@ -85,7 +77,7 @@ export class NodeGroupingTransformation {
             data: {
               categories: [LKE_NODE_GROUPING_NODE],
               properties: {},
-              nodeGroupId: this._findNodeGroupId(nodes, this.groupRule!.groupingType)
+              nodeGroupId: this._findNodeGroupId(nodes)
             }
           };
         },
@@ -243,33 +235,28 @@ export class NodeGroupingTransformation {
     if (node === undefined) {
       return undefined;
     }
-    if (this.groupRule!.groupingType === NodeGroupingType.RELATION_TYPE) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const rule = this.groupRule as NodeGroupingRule<NodeGroupingType.RELATION_TYPE>;
-      const edge = node
+    if (this.groupRule === undefined) {
+      return undefined;
+    }
+    const rule = this.groupRule;
+    if (rule.groupingType === NodeGroupingType.RELATION_TYPE) {
+      const centralNode = NodeGroupingTransformation._getGroupCentralNode(
+        node.getSubNodes()!.get(0),
+        rule
+      );
+      return centralNode.getData(['properties', 'name']) as string;
+    }
+    // TODO: Normally there is no need to check if getSubNodes return a value, Ogma issue
+    //https://github.com/Linkurious/ogma/issues/3876
+    if (node.isVirtual() && node.getSubNodes()?.get(0) !== undefined) {
+      // get the property value of the first node of the group (all nodes share the same property value)
+      const lkPropertyValue = node
         .getSubNodes()!
         .get(0)
-        .getAdjacentEdges()
-        .filter((e) => e.getData('type') === rule.groupingOptions.edgeType)
-        .get(0);
-      const centralNode =
-        rule.groupingOptions.centralNodeIs === 'source' ? edge.getSource() : edge.getTarget();
-      return centralNode.getData(['properties', 'name']);
-    } else if (this.groupRule!.groupingType === NodeGroupingType.PROPERTY_KEY) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const rule = this.groupRule as NodeGroupingRule<NodeGroupingType.PROPERTY_KEY>;
-      // TODO: Normally there is no need to check if getSubNodes return a value, Ogma issue
-      //https://github.com/Linkurious/ogma/issues/3876
-      if (node.isVirtual() && node.getSubNodes()?.get(0) !== undefined) {
-        // get the property value of the first node of the group (all nodes share the same property value)
-        const lkPropertyValue = node
-          .getSubNodes()!
-          .get(0)
-          .getData(['properties', rule.groupingOptions.propertyKey]);
-        const propertyValue = Tools.getValueFromLkProperty(lkPropertyValue);
-        const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
-        return `${propertyValue} (${size})`;
-      }
+        .getData(['properties', rule.groupingOptions.propertyKey]);
+      const propertyValue = Tools.getValueFromLkProperty(lkPropertyValue);
+      const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
+      return `${propertyValue} (${size})`;
     }
   }
 
@@ -305,31 +292,24 @@ export class NodeGroupingTransformation {
   }
 
   private _isRuleNotApplicableToNode(node: Node<LkNodeData>): boolean {
-    if (this.groupRule === undefined) {
+    const rule = this.groupRule;
+    if (rule === undefined) {
       return true;
     }
-    if (this.groupRule?.groupingType === NodeGroupingType.PROPERTY_KEY) {
-      return this._isPropertyRuleNotApplicableToNode(
-        node,
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        this.groupRule as NodeGroupingRule<NodeGroupingType.PROPERTY_KEY>
-      );
-    } else if (this.groupRule?.groupingType === NodeGroupingType.RELATION_TYPE) {
-      return this._isRelationshipRuleNotApplicableToNode(
-        node,
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        this.groupRule as NodeGroupingRule<NodeGroupingType.RELATION_TYPE>
-      );
+    if (rule.groupingType === NodeGroupingType.PROPERTY_KEY) {
+      return this._isPropertyRuleNotApplicableToNode(node, rule);
+    } else if (rule.groupingType === NodeGroupingType.RELATION_TYPE) {
+      return this._isRelationshipRuleNotApplicableToNode(node, rule);
     }
     return true;
   }
 
   private _isRelationshipRuleNotApplicableToNode(
     node: Node<LkNodeData>,
-    rule: NodeGroupingRule<NodeGroupingType.RELATION_TYPE>
+    rule: NodeGroupingRuleRelationType
   ): boolean {
     // if the node does not have the relationship
-    return this.hasEdgeOfType(node, rule.groupingOptions.edgeType) === false;
+    return !this.hasEdgeOfType(node, rule.groupingOptions.edgeType);
   }
 
   private hasEdgeOfType(node: Node<LkNodeData>, type: string): boolean {
@@ -344,7 +324,7 @@ export class NodeGroupingTransformation {
 
   private _isPropertyRuleNotApplicableToNode(
     node: Node<LkNodeData>,
-    rule: NodeGroupingRule<NodeGroupingType.PROPERTY_KEY>
+    rule: NodeGroupingRulePropertyKey
   ): boolean {
     const propertyValue = node.getData(['properties', rule.groupingOptions.propertyKey ?? '']);
     return (
@@ -385,8 +365,7 @@ export class NodeGroupingTransformation {
 
   private _findGroupingPropertyValue(node: Node<LkNodeData>): string {
     // we only use this method when the grouping type is property key
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    const rule = this.groupRule as NodeGroupingRule<NodeGroupingType.PROPERTY_KEY>;
+    const rule = this.groupRule as NodeGroupingRulePropertyKey;
     const propertyValue = node.getData(['properties', rule.groupingOptions.propertyKey ?? '']);
     return `${Tools.getValueFromLkProperty(propertyValue)}`;
   }
@@ -394,29 +373,33 @@ export class NodeGroupingTransformation {
   /**
    * Return a hashed string that represents the group id
    */
-  private _findNodeGroupId(
-    nodes: NodeList<LkNodeData, LkEdgeData>,
-    groupType: NodeGroupingType
-  ): string {
-    if (groupType === NodeGroupingType.RELATION_TYPE) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const rule = this.groupRule as NodeGroupingRule<NodeGroupingType.RELATION_TYPE>;
-      const edge = nodes
-        .get(0)
-        .getAdjacentEdges()
-        .filter((edge) => edge.getData('type') === rule.groupingOptions.edgeType)
-        .get(0);
-      const centralNode =
-        rule.groupingOptions.centralNodeIs === 'source' ? edge.getSource() : edge.getTarget();
+  private _findNodeGroupId(nodes: NodeList<LkNodeData, LkEdgeData>): string {
+    const rule = this.groupRule!;
+    if (rule.groupingType === NodeGroupingType.RELATION_TYPE) {
+      const centralNode = NodeGroupingTransformation._getGroupCentralNode(nodes.get(0), rule);
       return sha1(`${this.groupRule?.name}-${centralNode.getId()}`);
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const rule = this.groupRule as NodeGroupingRule<NodeGroupingType.PROPERTY_KEY>;
       const propertyValue = this._findGroupingPropertyValue(nodes.get(0));
-      return sha1(
-        `${this.groupRule?.name}-${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`
-      );
+      return sha1(`${rule.name}-${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`);
     }
+  }
+
+  /**
+   * For a relation type grouping rule, return the central node from one of the nodes in the group
+   */
+  private static _getGroupCentralNode(
+    node: Node<LkNodeData, LkEdgeData>,
+    rule: NodeGroupingRuleRelationType
+  ): Node<LkNodeData, LkEdgeData> {
+    const firstAdjacentEdge = node
+      .getAdjacentEdges()
+      .filter((edge) => edge.getData('type') === rule.groupingOptions.edgeType)
+      .get(0);
+    const centralNode =
+      rule.groupingOptions.centralNodeIs === 'source'
+        ? firstAdjacentEdge.getSource()
+        : firstAdjacentEdge.getTarget();
+    return centralNode;
   }
 
   public _runCircularLayout({
