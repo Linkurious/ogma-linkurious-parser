@@ -5,8 +5,8 @@ import {
   LkNodeData,
   MissingValue,
   NodeGroupingRule,
-  NodeGroupingRulePropertyKey,
-  NodeGroupingRuleRelationType,
+  NodeGroupingByPropertyValue,
+  NodeGroupingByAdjacentEdgeType,
   NodeGroupingType
 } from '@linkurious/rest-client';
 import sha1 from 'sha1';
@@ -60,7 +60,7 @@ export class NodeGroupingTransformation {
           }
           // if groupRule is undefined, the early return would have catch it
           const rule = this.groupRule!;
-          if (rule.groupingType === NodeGroupingType.RELATION_TYPE) {
+          if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
             const centralNode = NodeGroupingTransformation._getGroupCentralNode(node, rule);
             return centralNode.getId().toString();
           } else {
@@ -239,7 +239,7 @@ export class NodeGroupingTransformation {
       return undefined;
     }
     const rule = this.groupRule;
-    if (rule.groupingType === NodeGroupingType.RELATION_TYPE) {
+    if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
       const centralNode = NodeGroupingTransformation._getGroupCentralNode(
         node.getSubNodes()!.get(0),
         rule
@@ -296,9 +296,9 @@ export class NodeGroupingTransformation {
     if (rule === undefined) {
       return true;
     }
-    if (rule.groupingType === NodeGroupingType.PROPERTY_KEY) {
+    if (rule.groupingType === NodeGroupingType.BY_PROPERTY_VALUE) {
       return this._isPropertyRuleNotApplicableToNode(node, rule);
-    } else if (rule.groupingType === NodeGroupingType.RELATION_TYPE) {
+    } else if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
       return this._isRelationshipRuleNotApplicableToNode(node, rule);
     }
     return true;
@@ -306,7 +306,7 @@ export class NodeGroupingTransformation {
 
   private _isRelationshipRuleNotApplicableToNode(
     node: Node<LkNodeData>,
-    rule: NodeGroupingRuleRelationType
+    rule: NodeGroupingByAdjacentEdgeType
   ): boolean {
     // if the node does not have the relationship
     return !this.hasEdgeOfType(node, rule.groupingOptions.edgeType);
@@ -324,7 +324,7 @@ export class NodeGroupingTransformation {
 
   private _isPropertyRuleNotApplicableToNode(
     node: Node<LkNodeData>,
-    rule: NodeGroupingRulePropertyKey
+    rule: NodeGroupingByPropertyValue
   ): boolean {
     const propertyValue = node.getData(['properties', rule.groupingOptions.propertyKey ?? '']);
     return (
@@ -365,7 +365,7 @@ export class NodeGroupingTransformation {
 
   private _findGroupingPropertyValue(node: Node<LkNodeData>): string {
     // we only use this method when the grouping type is property key
-    const rule = this.groupRule as NodeGroupingRulePropertyKey;
+    const rule = this.groupRule as NodeGroupingByPropertyValue;
     const propertyValue = node.getData(['properties', rule.groupingOptions.propertyKey ?? '']);
     return `${Tools.getValueFromLkProperty(propertyValue)}`;
   }
@@ -375,7 +375,7 @@ export class NodeGroupingTransformation {
    */
   private _findNodeGroupId(nodes: NodeList<LkNodeData, LkEdgeData>): string {
     const rule = this.groupRule!;
-    if (rule.groupingType === NodeGroupingType.RELATION_TYPE) {
+    if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
       const centralNode = NodeGroupingTransformation._getGroupCentralNode(nodes.get(0), rule);
       return sha1(`${this.groupRule?.name}-${centralNode.getId()}`);
     } else {
@@ -389,7 +389,7 @@ export class NodeGroupingTransformation {
    */
   private static _getGroupCentralNode(
     node: Node<LkNodeData, LkEdgeData>,
-    rule: NodeGroupingRuleRelationType
+    rule: NodeGroupingByAdjacentEdgeType
   ): Node<LkNodeData, LkEdgeData> {
     const firstAdjacentEdge = node
       .getAdjacentEdges()
