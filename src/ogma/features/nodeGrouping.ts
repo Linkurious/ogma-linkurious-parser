@@ -54,6 +54,7 @@ export class NodeGroupingTransformation {
   public async initTransformation(): Promise<void> {
     if (this.transformation === undefined) {
       this.transformation = this._ogma.transformations.addNodeGrouping({
+        // node with same value will be part of the same group
         groupIdFunction: (node) => {
           if (this._isRuleNotApplicableToNode(node)) {
             return undefined;
@@ -95,8 +96,6 @@ export class NodeGroupingTransformation {
     rule: NodeGroupingByPropertyValue
   ) {
     const propertyValue = this._findGroupingPropertyValue(node);
-    // groupRule is defined if not we returned undefined
-    // node with same value will be part of the same group
     return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`.toLowerCase().trim();
   }
 
