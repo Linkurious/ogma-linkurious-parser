@@ -61,15 +61,9 @@ export class NodeGroupingTransformation {
           // if groupRule is undefined, the early return would have catch it
           const rule = this.groupRule!;
           if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
-            const centralNode = NodeGroupingTransformation._getGroupCentralNode(node, rule);
-            return centralNode.getId().toString();
+            return this._getAdjacentEdgeGroupId(node, rule);
           } else {
-            const propertyValue = this._findGroupingPropertyValue(node);
-            // groupRule is defined if not we returned undefined
-            // node with same value will be part of the same group
-            return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`
-              .toLowerCase()
-              .trim();
+            return this._getPropertyValueGroupId(node, rule);
           }
         },
         nodeGenerator: (nodes) => {
@@ -94,6 +88,24 @@ export class NodeGroupingTransformation {
     } else {
       await this.refreshTransformation();
     }
+  }
+
+  private _getPropertyValueGroupId(
+    node: Node<LkNodeData, LkEdgeData>,
+    rule: NodeGroupingByPropertyValue
+  ) {
+    const propertyValue = this._findGroupingPropertyValue(node);
+    // groupRule is defined if not we returned undefined
+    // node with same value will be part of the same group
+    return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`.toLowerCase().trim();
+  }
+
+  private _getAdjacentEdgeGroupId(
+    node: Node<LkNodeData, LkEdgeData>,
+    rule: NodeGroupingByAdjacentEdgeType
+  ) {
+    const centralNode = NodeGroupingTransformation._getGroupCentralNode(node, rule);
+    return centralNode.getId().toString();
   }
 
   /**
@@ -240,12 +252,26 @@ export class NodeGroupingTransformation {
     }
     const rule = this.groupRule;
     if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
-      const centralNode = NodeGroupingTransformation._getGroupCentralNode(
-        node.getSubNodes()!.get(0),
-        rule
-      );
-      return centralNode.getData(['properties', 'name']) as string;
+      return this._getAdjacentEdgeNodeGroupingCaption(node, rule);
     }
+    return this._getPropertyValueNodeGroupingCaption(node, rule);
+  }
+
+  private _getAdjacentEdgeNodeGroupingCaption(
+    node: Node<LkNodeData>,
+    rule: NodeGroupingByAdjacentEdgeType
+  ): string {
+    const centralNode = NodeGroupingTransformation._getGroupCentralNode(
+      node.getSubNodes()!.get(0),
+      rule
+    );
+    return centralNode.getData(['properties', 'name']) as string;
+  }
+
+  private _getPropertyValueNodeGroupingCaption(
+    node: Node<LkNodeData>,
+    rule: NodeGroupingByPropertyValue
+  ): string | undefined {
     // TODO: Normally there is no need to check if getSubNodes return a value, Ogma issue
     //https://github.com/Linkurious/ogma/issues/3876
     if (node.isVirtual() && node.getSubNodes()?.get(0) !== undefined) {
