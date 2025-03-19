@@ -30,9 +30,10 @@ interface CircularLayoutOptions {
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public groupRule?: NodeGroupingRule;
-  public nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
+  private _nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   private _ogma: LKOgma;
-  private _nodeGroupingCollapsedStyleRule: StyleRule<LkNodeData, LkEdgeData> | undefined;
+  private _nodeGroupingCollapsedStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
+  private _collapsedDefaultValue = false;
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
@@ -72,7 +73,7 @@ export class NodeGroupingTransformation {
             data: {
               categories: Array.from(categories),
               properties: {
-                collapsed: false
+                collapsed: this._collapsedDefaultValue
               },
               nodeGroupId: this._findNodeGroupId(nodes)
             }
@@ -112,7 +113,7 @@ export class NodeGroupingTransformation {
    * init node grouping style
    */
   public initNodeGroupingStyle(): void {
-    this.nodeGroupingStyleRule = this._ogma.styles.addRule({
+    this._nodeGroupingStyleRule = this._ogma.styles.addRule({
       nodeAttributes: {
         // Any default style will go here
         text: {
@@ -185,7 +186,7 @@ export class NodeGroupingTransformation {
   }
 
   public async refreshNodeGroupingStyle(): Promise<void> {
-    await this.nodeGroupingStyleRule?.refresh();
+    await this._nodeGroupingStyleRule?.refresh();
     await this._nodeGroupingCollapsedStyleRule?.refresh();
   }
 
@@ -272,6 +273,13 @@ export class NodeGroupingTransformation {
           OgmaTools.setCollapsedGroupProperty(node, nodeGroupInfo.attributes.collapsed ?? false);
         }
       });
+  }
+
+  /**
+   * set collapse default value, this will be the state of newly created groups
+   */
+  public setCollapseDefaultValue(value: boolean) {
+    this._collapsedDefaultValue = value;
   }
 
   /**
