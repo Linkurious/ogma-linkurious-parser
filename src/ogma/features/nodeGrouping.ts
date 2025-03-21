@@ -71,10 +71,8 @@ export class NodeGroupingTransformation {
           const categories = new Set(nodes.getData('categories').flat());
           return {
             data: {
-              categories: Array.from(categories),
-              properties: {
-                collapsed: this._collapsedDefaultValue
-              },
+              subCategories: Array.from(categories),
+              collapsed: this._collapsedDefaultValue,
               nodeGroupId: this._findNodeGroupId(nodes)
             }
           };
@@ -145,7 +143,7 @@ export class NodeGroupingTransformation {
           style: 'bold'
         },
         halo: {
-          width: 20,
+          width: 10,
           color: '#e4ebea',
           strokeColor: '#ccc'
         },
@@ -173,7 +171,13 @@ export class NodeGroupingTransformation {
         },
         color: (node: Node | undefined) => {
           if (node !== undefined) {
-            return this._ogma.LKStyles.nodeAttributes.color(node.getData());
+            return this._ogma.LKStyles.nodeAttributes.color({
+              geo: {},
+              isVirtual: false,
+              properties: {},
+              readAt: 0,
+              categories: node.getData('subCategories')
+            });
           }
         }
       },
