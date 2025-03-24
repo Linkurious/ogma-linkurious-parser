@@ -71,11 +71,15 @@ export class NodeGroupingTransformation {
           const categories = new Set(nodes.getData('categories').flat());
           return {
             data: {
+              categories: [],
               subCategories: Array.from(categories),
               collapsed: this._collapsedDefaultValue,
               nodeGroupId: this._findNodeGroupId(nodes)
             }
           };
+        },
+        onGroupUpdate: async (_, subNodes) => {
+          return await this.runSubNodesLayout(subNodes);
         },
         edgeGenerator: () => {
           return {
@@ -197,7 +201,7 @@ export class NodeGroupingTransformation {
   /**
    * run layout on all subnodes of virtual nodes
    */
-  public async runLayoutOnAllSubNodes(): Promise<void> {
+  /* public async runLayoutOnAllSubNodes(): Promise<void> {
     await this._ogma.transformations.afterNextUpdate();
     const rawNodesList = this._getAllTransformationRawNodes();
     const promisesList: Promise<void>[] = [];
@@ -207,21 +211,22 @@ export class NodeGroupingTransformation {
       promisesList.push(this.runSubNodesLayout(subNodes));
     }
     await Promise.all(promisesList);
-  }
+  }*/
 
   /**
    * Run the layout on the subnodes of the virtual node
    * @param subNodes nodes part of a virtual node
    */
-  public async runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
+  public async runSubNodesLayout(
+    subNodes: NodeList<LkNodeData, LkEdgeData>
+  ): Promise<Point[] | undefined | void> {
     if (subNodes.size === 0 || subNodes.size === 1) {
       return;
     }
 
     // 2 nodes
     if (subNodes.size === 2) {
-      await this._runTwoNodesLayout(subNodes);
-      return;
+      return this._runTwoNodesLayout(subNodes);
     }
 
     const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
@@ -237,9 +242,7 @@ export class NodeGroupingTransformation {
         clockwise: false,
         distanceRatio: 5
       });
-      const list = center.toList().concat(satellites);
-      await list.setAttributes([center.getPosition(), ...positions]);
-      return;
+      return [center.getPosition(), ...positions];
     }
     // Chains: if al nodes have degree 1 or 2, place them in a line
     const degrees = subNodes.getDegree();
@@ -309,11 +312,12 @@ export class NodeGroupingTransformation {
    * Run the circle pack layout on the subnodes
    * @param subNodes
    */
-  private async _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
-    await this._ogma.algorithms.circlePack({
+  private async _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<Point[]> {
+    return this._ogma.algorithms.circlePack({
       nodes: subNodes,
       margin: 10,
-      sort: 'asc'
+      sort: 'asc',
+      dryRun: true
     });
   }
 
@@ -442,10 +446,7 @@ export class NodeGroupingTransformation {
     const radii = nodes.getAttribute('radius').map(Number);
     const positions = nodes.getPosition();
     const gap = Math.min(...radii);
-    await nodes.setAttributes([
-      positions[0],
-      {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}
-    ]);
+    return [positions[0], {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}];
   }
 
   private isStar(nodes: NodeList) {
