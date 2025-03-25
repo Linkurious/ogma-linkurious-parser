@@ -417,7 +417,13 @@ export class NodeGroupingTransformation {
     rule: NodeGroupingByAdjacentEdgeType
   ): Node<LkNodeData, LkEdgeData> {
     const firstAdjacentEdge = node
-      .getAdjacentEdges()
+      // 'all' will get even edges hidden by transformations
+      // Use case: in ER, 2 created entities are pointing to the same group
+      // Note: this should not happen but in case it happens due to some inconsistency, this fix will allow the grouping to kind of work
+      // limitation: one node will be alone in its own group
+      // however, without this 'all' filter, the edge would be hidden by the transformation (not found) and 'firstAdjacentEdge' would be undefined
+      // in this case, the next line would throw an error
+      .getAdjacentEdges({filter: 'all'})
       .filter((edge) => edge.getData('type') === rule.groupingOptions.edgeType)
       .get(0);
     const centralNode =
