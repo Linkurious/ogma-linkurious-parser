@@ -422,7 +422,7 @@ export class NodeGroupingTransformation {
       // node A RESOLVED node C
       // node B RESOLVED node C
       // when grouping by relationship, node A and C will be grouped together
-      // node B should also be grouped with node C but since it's already part of a group, 
+      // node B should also be grouped with node C but since it's already part of a group,
       // it will be alone in a group and point to the other group by a virtual edge
       // impact: without using 'raw', the firstAdjacentEdge will be the virtual edge which is not of the correct type 'RESOLVED'
       // firstAdjacentEdge will be undefined and next line will throw an error
