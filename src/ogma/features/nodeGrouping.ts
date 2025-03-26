@@ -199,21 +199,6 @@ export class NodeGroupingTransformation {
   }
 
   /**
-   * run layout on all subnodes of virtual nodes
-   */
-  /* public async runLayoutOnAllSubNodes(): Promise<void> {
-    await this._ogma.transformations.afterNextUpdate();
-    const rawNodesList = this._getAllTransformationRawNodes();
-    const promisesList: Promise<void>[] = [];
-    for (let i = 0; i < rawNodesList.length; i++) {
-      // rawNodesList[i] is not null because each group has at least one node
-      const subNodes = rawNodesList[i]!;
-      promisesList.push(this.runSubNodesLayout(subNodes));
-    }
-    await Promise.all(promisesList);
-  }*/
-
-  /**
    * Run the layout on the subnodes of the virtual node
    * @param subNodes nodes part of a virtual node
    */

@@ -107,6 +107,10 @@ export class OgmaTools {
     return items.isNode;
   }
 
+  /**
+   * Transform a nodelist to an array of node ids sorted by position in a chain and the length of the chain
+   * A chain is: (a)-(b)-(c)-(d)
+   */
   public static topologicalSort(nodes: NodeList): {chain: NodeId[]; numberOfChain: number} {
     const nodesArray = nodes.toArray();
     const startOfChains = nodesArray.filter((n) => n.getDegree() === 1);
