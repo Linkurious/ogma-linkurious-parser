@@ -8,9 +8,9 @@ import {
 } from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
-import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
+import {LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
-import {OgmaTools} from '../../tools/ogmaTool';
+import {FORCE_LAYOUT_CONFIG, OgmaTools} from '../../tools/ogmaTool';
 import {BASE_GREY} from '../../styles/itemAttributes';
 
 import {CLEAR_FONT_COLOR} from './styles';
@@ -232,7 +232,7 @@ export class NodeGroupingTransformation {
     const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
     if (noEdges) return this._runCirclePack(subNodes);
     // stars
-    const center = this.isStar(subNodes);
+    const center = OgmaTools.isStar(subNodes);
     if (center) {
       const satellites = subNodes.filter((n) => n !== center);
       const positions = this._runCircularLayout({
@@ -312,24 +312,27 @@ export class NodeGroupingTransformation {
    * Run the circle pack layout on the subnodes
    * @param subNodes
    */
-  private async _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<Point[]> {
-    return this._ogma.algorithms.circlePack({
-      nodes: subNodes,
-      margin: 10,
-      sort: 'asc',
-      dryRun: true
-    });
+  private _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<Point[]> {
+    return Promise.resolve(
+      this._ogma.algorithms.circlePack({
+        nodes: subNodes,
+        margin: 10,
+        sort: 'asc',
+        dryRun: true
+      })
+    );
   }
 
   private async _runChainLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     // straighten the chain
-    const sortedNodes = this._ogma.getNodes(OgmaTools.topologicalSort(subNodes));
+    const chain = OgmaTools.topologicalSort(subNodes);
+    const sortedNodes = this._ogma.getNodes(chain.chain);
     // we also need to sort the nodes so that they are following the chain
     await this._ogma.layouts.grid({
       nodes: sortedNodes,
       // TODO: test that visually
       colDistance: Math.max(...subNodes.getAttribute('radius').map(Number)) * 4,
-      rows: 1
+      rows: chain.numberOfChain
     });
   }
 
@@ -447,15 +450,5 @@ export class NodeGroupingTransformation {
     const positions = nodes.getPosition();
     const gap = Math.min(...radii);
     return [positions[0], {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}];
-  }
-
-  private isStar(nodes: NodeList) {
-    for (const id of nodes.getId()) {
-      const node = this._ogma.getNode(id)!;
-      const adjacent = node.getAdjacentNodes();
-      const isStar = node.getDegree() > 2 && adjacent.getDegree().every((d) => d === 1);
-      if (isStar && adjacent.size + 1 === nodes.size) return node;
-    }
-    return false;
   }
 }

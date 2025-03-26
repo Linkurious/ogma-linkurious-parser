@@ -1,9 +1,18 @@
-'use strict';
 import {Color, NodeList, Node, EdgeList, Edge, NodeId} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
+import {ANIMATION_DURATION} from '../ogma';
+
 import {Tools} from './tools';
 import {HTML_COLORS} from './colorPalette';
+
+export const FORCE_LAYOUT_CONFIG = {
+  steps: 120,
+  alignSiblings: true,
+  charge: 5,
+  theta: 0.34,
+  duration: ANIMATION_DURATION
+};
 
 export class OgmaTools {
   /**
@@ -98,22 +107,31 @@ export class OgmaTools {
     return items.isNode;
   }
 
-  public static topologicalSort(nodes: NodeList): NodeId[] {
+  public static topologicalSort(nodes: NodeList): {chain: NodeId[]; numberOfChain: number} {
     const nodesArray = nodes.toArray();
-    let currentNode: Node | null = nodesArray.find((n) => n.getDegree() === 1)!;
+    const startOfChains = nodesArray.filter((n) => n.getDegree() === 1);
     const visited = new Set();
-    const stack: Node[] = [];
-    while (currentNode) {
-      stack.push(currentNode);
-      visited.add(currentNode);
+    const stacks: Node[][] = [];
+    startOfChains.forEach((node) => {
+      let currentNode: Node<LkNodeData, LkEdgeData> | null = node;
+      if (visited.has(currentNode)) {
+        return;
+      }
+      const stack = [];
+      while (currentNode) {
+        stack.push(currentNode);
+        visited.add(currentNode);
 
-      const nextNode = currentNode
-        .getAdjacentNodes()
-        .filter((neighbor) => !visited.has(neighbor))
-        .get(0);
-      currentNode = nextNode === undefined ? null : nextNode;
-    }
-    return stack.map((n) => n.getId());
+        const nextNode = currentNode
+          .getAdjacentNodes()
+          .filter((neighbor) => !visited.has(neighbor))
+          .get(0);
+        currentNode = nextNode === undefined ? null : nextNode;
+      }
+      stacks.push(stack);
+    });
+    stacks.sort((a, b) => b.length - a.length);
+    return {chain: stacks.flat().map((n) => n.getId()), numberOfChain: startOfChains.length / 2};
   }
 
   public static isStar(nodes: NodeList) {
