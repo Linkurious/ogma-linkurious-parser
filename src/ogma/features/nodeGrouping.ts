@@ -4,7 +4,10 @@ import {
   LkEdgeData,
   LkNodeData,
   MissingValue,
-  NodeGroupingRule
+  NodeGroupingRule,
+  NodeGroupingByPropertyValue,
+  NodeGroupingByAdjacentEdgeType,
+  NodeGroupingType
 } from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
@@ -39,7 +42,7 @@ export class NodeGroupingTransformation {
    * Set the grouping rule
    * @param rule of grouping
    */
-  public setGroupingRule(rule: NodeGroupingRule | undefined): void {
+  public setGroupingRule(rule?: NodeGroupingRule): void {
     this.groupRule = rule;
   }
 
@@ -51,16 +54,17 @@ export class NodeGroupingTransformation {
   public async initTransformation(): Promise<void> {
     if (this.transformation === undefined) {
       this.transformation = this._ogma.transformations.addNodeGrouping({
+        // node with same value will be part of the same group
         groupIdFunction: (node) => {
           if (this._isRuleNotApplicableToNode(node)) {
             return undefined;
+          }
+          // if groupRule is undefined, the early return would have catch it
+          const rule = this.groupRule!;
+          if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
+            return this._getAdjacentEdgeGroupId(node, rule);
           } else {
-            const propertyValue = this._findGroupingPropertyValue(node);
-            // groupRule is defined if not we returned undefined
-            // node with same value will be part of the same group
-            return `${this.groupRule?.groupingOptions.itemTypes.join('-')}-${propertyValue}`
-              .toLowerCase()
-              .trim();
+            return this._getPropertyValueGroupId(node, rule);
           }
         },
         nodeGenerator: (nodes) => {
@@ -85,6 +89,22 @@ export class NodeGroupingTransformation {
     } else {
       await this.refreshTransformation();
     }
+  }
+
+  private _getPropertyValueGroupId(
+    node: Node<LkNodeData, LkEdgeData>,
+    rule: NodeGroupingByPropertyValue
+  ) {
+    const propertyValue = this._findGroupingPropertyValue(node);
+    return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`.toLowerCase().trim();
+  }
+
+  private _getAdjacentEdgeGroupId(
+    node: Node<LkNodeData, LkEdgeData>,
+    rule: NodeGroupingByAdjacentEdgeType
+  ) {
+    const centralNode = NodeGroupingTransformation._getGroupCentralNode(node, rule);
+    return centralNode.getId().toString();
   }
 
   /**
@@ -223,14 +243,42 @@ export class NodeGroupingTransformation {
    * @param node reference to the virtual node
    */
   private _getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
+    if (node === undefined) {
+      return undefined;
+    }
+    if (this.groupRule === undefined) {
+      return undefined;
+    }
+    const rule = this.groupRule;
+    if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
+      return this._getAdjacentEdgeNodeGroupingCaption(node, rule);
+    }
+    return this._getPropertyValueNodeGroupingCaption(node, rule);
+  }
+
+  private _getAdjacentEdgeNodeGroupingCaption(
+    node: Node<LkNodeData>,
+    rule: NodeGroupingByAdjacentEdgeType
+  ): string {
+    const centralNode = NodeGroupingTransformation._getGroupCentralNode(
+      node.getSubNodes()!.get(0),
+      rule
+    );
+    return centralNode.getData(['properties', 'name']) as string;
+  }
+
+  private _getPropertyValueNodeGroupingCaption(
+    node: Node<LkNodeData>,
+    rule: NodeGroupingByPropertyValue
+  ): string | undefined {
     // TODO: Normally there is no need to check if getSubNodes return a value, Ogma issue
     //https://github.com/Linkurious/ogma/issues/3876
-    if (node !== undefined && node.isVirtual() && node.getSubNodes()?.get(0) !== undefined) {
+    if (node.isVirtual() && node.getSubNodes()?.get(0) !== undefined) {
       // get the property value of the first node of the group (all nodes share the same property value)
       const lkPropertyValue = node
         .getSubNodes()!
         .get(0)
-        .getData(['properties', this.groupRule!.groupingOptions.propertyKey]);
+        .getData(['properties', rule.groupingOptions.propertyKey]);
       const propertyValue = Tools.getValueFromLkProperty(lkPropertyValue);
       const size = node.getSubNodes()!.filter((e) => !e.hasClass('filtered')).size;
       return `${propertyValue} (${size})`;
@@ -269,16 +317,45 @@ export class NodeGroupingTransformation {
   }
 
   private _isRuleNotApplicableToNode(node: Node<LkNodeData>): boolean {
-    const propertyValue = node.getData([
-      'properties',
-      this.groupRule?.groupingOptions.propertyKey ?? ''
-    ]);
+    const rule = this.groupRule;
+    if (rule === undefined) {
+      return true;
+    }
+    if (rule.groupingType === NodeGroupingType.BY_PROPERTY_VALUE) {
+      return this._isPropertyRuleNotApplicableToNode(node, rule);
+    } else if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
+      return this._isRelationshipRuleNotApplicableToNode(node, rule);
+    }
+    return true;
+  }
+
+  private _isRelationshipRuleNotApplicableToNode(
+    node: Node<LkNodeData>,
+    rule: NodeGroupingByAdjacentEdgeType
+  ): boolean {
+    // if the node does not have the relationship
+    return !this.hasEdgeOfType(node, rule.groupingOptions.edgeType);
+  }
+
+  private hasEdgeOfType(node: Node<LkNodeData>, type: string): boolean {
+    let hasEdge = false;
+    node.getAdjacentEdges().forEach((edge) => {
+      if (edge.getData('type') === type) {
+        hasEdge = true;
+      }
+    });
+    return hasEdge;
+  }
+
+  private _isPropertyRuleNotApplicableToNode(
+    node: Node<LkNodeData>,
+    rule: NodeGroupingByPropertyValue
+  ): boolean {
+    const propertyValue = node.getData(['properties', rule.groupingOptions.propertyKey ?? '']);
     return (
-      // if the group rule is not defined
-      this.groupRule === undefined ||
       // if rule is applied to a different category
-      this.groupRule.groupingOptions.itemTypes.every(
-        (itemType) => !node.getData('categories').includes(itemType)
+      rule.groupingOptions.itemTypes.every(
+        (itemType: string) => !node.getData('categories').includes(itemType)
       ) ||
       // if the property value is not defined
       !Tools.isDefined(propertyValue) ||
@@ -312,10 +389,9 @@ export class NodeGroupingTransformation {
   }
 
   private _findGroupingPropertyValue(node: Node<LkNodeData>): string {
-    const propertyValue = node.getData([
-      'properties',
-      this.groupRule?.groupingOptions.propertyKey ?? ''
-    ]);
+    // we only use this method when the grouping type is property key
+    const rule = this.groupRule as NodeGroupingByPropertyValue;
+    const propertyValue = node.getData(['properties', rule.groupingOptions.propertyKey ?? '']);
     return `${Tools.getValueFromLkProperty(propertyValue)}`;
   }
 
@@ -323,12 +399,42 @@ export class NodeGroupingTransformation {
    * Return a hashed string that represents the group id
    */
   private _findNodeGroupId(nodes: NodeList<LkNodeData, LkEdgeData>): string {
-    const propertyValue = this._findGroupingPropertyValue(nodes.get(0));
-    return sha1(
-      `${this.groupRule?.name}-${this.groupRule?.groupingOptions.itemTypes.join(
-        '-'
-      )}-${propertyValue}`
-    );
+    const rule = this.groupRule!;
+    if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
+      const centralNode = NodeGroupingTransformation._getGroupCentralNode(nodes.get(0), rule);
+      return sha1(`${this.groupRule?.name}-${centralNode.getId()}`);
+    } else {
+      const propertyValue = this._findGroupingPropertyValue(nodes.get(0));
+      return sha1(`${rule.name}-${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`);
+    }
+  }
+
+  /**
+   * For a relation type grouping rule, return the central node from one of the nodes in the group
+   */
+  private static _getGroupCentralNode(
+    node: Node<LkNodeData, LkEdgeData>,
+    rule: NodeGroupingByAdjacentEdgeType
+  ): Node<LkNodeData, LkEdgeData> {
+    const firstAdjacentEdge = node
+      // 'raw' will get edges hidden by transformations
+      // Use case: in ER, 2 created entities are pointing to the same node
+      // node A RESOLVED node C
+      // node B RESOLVED node C
+      // when grouping by relationship, node A and C will be grouped together
+      // node B should also be grouped with node C but since it's already part of a group,
+      // it will be alone in a group and point to the other group by a virtual edge
+      // impact: without using 'raw', the firstAdjacentEdge will be the virtual edge which is not of the correct type 'RESOLVED'
+      // firstAdjacentEdge will be undefined and next line will throw an error
+      // Note: this should not happen but in case it happens due to some inconsistency, this fix will prevent this method to throw an error
+      .getAdjacentEdges({filter: 'raw'})
+      .filter((edge) => edge.getData('type') === rule.groupingOptions.edgeType)
+      .get(0);
+    const centralNode =
+      rule.groupingOptions.centralNodeIs === 'source'
+        ? firstAdjacentEdge.getSource()
+        : firstAdjacentEdge.getTarget();
+    return centralNode;
   }
 
   public _runCircularLayout({
