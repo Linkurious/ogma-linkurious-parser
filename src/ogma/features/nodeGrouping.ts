@@ -196,6 +196,7 @@ export class NodeGroupingTransformation {
         },
         color: (node: Node | undefined) => {
           if (node !== undefined) {
+            // get the colors of the sub-nodes, passing a fake itemData to nodeAttributes.color
             return this._ogma.LKStyles.nodeAttributes.color({
               geo: {},
               isVirtual: false,
@@ -357,6 +358,9 @@ export class NodeGroupingTransformation {
     );
   }
 
+  /**
+   * return a grid layout when nodes are represented by multiple chains (a)-(b)-(c)-(d)
+   */
   private async _runChainLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     // straighten the chain
     const chain = OgmaTools.topologicalSort(subNodes);
