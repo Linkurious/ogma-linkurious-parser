@@ -87,6 +87,12 @@ export class RxViz {
     this._ogma.events.on('removeEdges', () => {
       this._store.dispatch(this.storeItems.bind(this));
     });
+    this._ogma.events.on('geoDisabled', () => {
+      this._store.dispatch(this.storeItems.bind(this));
+    });
+    this._ogma.events.on('geoEnabled', () => {
+      this._store.dispatch(this.storeItems.bind(this));
+    });
 
     this._ogma.events.on('nodesSelected', () => {
       this._store.dispatch(this.storeNodeSelection.bind(this));
