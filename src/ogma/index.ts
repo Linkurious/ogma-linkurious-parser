@@ -40,14 +40,6 @@ interface AddItemOptions {
   virtual?: boolean;
 }
 
-export const FORCE_LAYOUT_CONFIG = {
-  steps: 40,
-  alignSiblings: true,
-  charge: 5,
-  theta: 0.34,
-  duration: ANIMATION_DURATION
-};
-
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;

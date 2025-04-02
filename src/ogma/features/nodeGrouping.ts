@@ -11,9 +11,9 @@ import {
 } from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
-import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
+import {LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
-import {OgmaTools} from '../../tools/ogmaTool';
+import {FORCE_LAYOUT_CONFIG, OgmaTools} from '../../tools/ogmaTool';
 import {BASE_GREY} from '../../styles/itemAttributes';
 
 import {CLEAR_FONT_COLOR} from './styles';
@@ -75,13 +75,15 @@ export class NodeGroupingTransformation {
           const categories = new Set(nodes.getData('categories').flat());
           return {
             data: {
-              categories: Array.from(categories),
-              properties: {
-                collapsed: this._collapsedDefaultValue
-              },
+              categories: [],
+              subCategories: Array.from(categories),
+              collapsed: this._collapsedDefaultValue,
               nodeGroupId: this._findNodeGroupId(nodes)
             }
           };
+        },
+        onGroupUpdate: async (_, subNodes) => {
+          return await this.runSubNodesLayout(subNodes);
         },
         edgeGenerator: () => {
           return {
@@ -93,6 +95,7 @@ export class NodeGroupingTransformation {
         showContents: (metaNode) => {
           return !OgmaTools.isGroupCollapsed(metaNode);
         },
+        duration: 300,
         padding: 10
       });
     } else {
@@ -165,7 +168,7 @@ export class NodeGroupingTransformation {
           style: 'bold'
         },
         halo: {
-          width: 20,
+          width: 10,
           color: '#e4ebea',
           strokeColor: '#ccc'
         },
@@ -193,7 +196,14 @@ export class NodeGroupingTransformation {
         },
         color: (node: Node | undefined) => {
           if (node !== undefined) {
-            return this._ogma.LKStyles.nodeAttributes.color(node.getData());
+            // get the colors of the sub-nodes, passing a fake itemData to nodeAttributes.color
+            return this._ogma.LKStyles.nodeAttributes.color({
+              geo: {},
+              isVirtual: false,
+              properties: {},
+              readAt: 0,
+              categories: node.getData('subCategories')
+            });
           }
         }
       },
@@ -211,39 +221,25 @@ export class NodeGroupingTransformation {
   }
 
   /**
-   * run layout on all subnodes of virtual nodes
-   */
-  public async runLayoutOnAllSubNodes(): Promise<void> {
-    await this._ogma.transformations.afterNextUpdate();
-    const rawNodesList = this._getAllTransformationRawNodes();
-    const promisesList: Promise<void>[] = [];
-    for (let i = 0; i < rawNodesList.length; i++) {
-      // rawNodesList[i] is not null because each group has at least one node
-      const subNodes = rawNodesList[i]!;
-      promisesList.push(this.runSubNodesLayout(subNodes));
-    }
-    await Promise.all(promisesList);
-  }
-
-  /**
    * Run the layout on the subnodes of the virtual node
    * @param subNodes nodes part of a virtual node
    */
-  public async runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
+  public async runSubNodesLayout(
+    subNodes: NodeList<LkNodeData, LkEdgeData>
+  ): Promise<Point[] | undefined | void> {
     if (subNodes.size === 0 || subNodes.size === 1) {
       return;
     }
 
     // 2 nodes
     if (subNodes.size === 2) {
-      await this._runTwoNodesLayout(subNodes);
-      return;
+      return this._runTwoNodesLayout(subNodes);
     }
 
     const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
     if (noEdges) return this._runCirclePack(subNodes);
     // stars
-    const center = this.isStar(subNodes);
+    const center = OgmaTools.isStar(subNodes);
     if (center) {
       const satellites = subNodes.filter((n) => n !== center);
       const positions = this._runCircularLayout({
@@ -253,9 +249,7 @@ export class NodeGroupingTransformation {
         clockwise: false,
         distanceRatio: 5
       });
-      const list = center.toList().concat(satellites);
-      await list.setAttributes([center.getPosition(), ...positions]);
-      return;
+      return [center.getPosition(), ...positions];
     }
     // Chains: if al nodes have degree 1 or 2, place them in a line
     const degrees = subNodes.getDegree();
@@ -353,23 +347,30 @@ export class NodeGroupingTransformation {
    * Run the circle pack layout on the subnodes
    * @param subNodes
    */
-  private async _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
-    await this._ogma.algorithms.circlePack({
-      nodes: subNodes,
-      margin: 10,
-      sort: 'asc'
-    });
+  private _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<Point[]> {
+    return Promise.resolve(
+      this._ogma.algorithms.circlePack({
+        nodes: subNodes,
+        margin: 10,
+        sort: 'asc',
+        dryRun: true
+      })
+    );
   }
 
+  /**
+   * return a grid layout when nodes are represented by multiple chains (a)-(b)-(c)-(d)
+   */
   private async _runChainLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     // straighten the chain
-    const sortedNodes = this._ogma.getNodes(OgmaTools.topologicalSort(subNodes));
+    const chain = OgmaTools.topologicalSort(subNodes);
+    const sortedNodes = this._ogma.getNodes(chain.chain);
     // we also need to sort the nodes so that they are following the chain
     await this._ogma.layouts.grid({
       nodes: sortedNodes,
       // TODO: test that visually
       colDistance: Math.max(...subNodes.getAttribute('radius').map(Number)) * 4,
-      rows: 1
+      rows: chain.numberOfChain
     });
   }
 
@@ -544,19 +545,6 @@ export class NodeGroupingTransformation {
     const radii = nodes.getAttribute('radius').map(Number);
     const positions = nodes.getPosition();
     const gap = Math.min(...radii);
-    await nodes.setAttributes([
-      positions[0],
-      {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}
-    ]);
-  }
-
-  private isStar(nodes: NodeList) {
-    for (const id of nodes.getId()) {
-      const node = this._ogma.getNode(id)!;
-      const adjacent = node.getAdjacentNodes();
-      const isStar = node.getDegree() > 2 && adjacent.getDegree().every((d) => d === 1);
-      if (isStar && adjacent.size + 1 === nodes.size) return node;
-    }
-    return false;
+    return [positions[0], {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}];
   }
 }
