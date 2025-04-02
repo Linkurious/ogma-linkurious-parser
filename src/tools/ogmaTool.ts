@@ -7,11 +7,12 @@ import {Tools} from './tools';
 import {HTML_COLORS} from './colorPalette';
 
 export const FORCE_LAYOUT_CONFIG = {
-  steps: 120,
-  alignSiblings: true,
+  steps: 200,
+  alignSiblings: false,
   charge: 5,
   theta: 0.34,
-  duration: ANIMATION_DURATION
+  duration: ANIMATION_DURATION,
+  gravity: 0.01
 };
 
 export class OgmaTools {

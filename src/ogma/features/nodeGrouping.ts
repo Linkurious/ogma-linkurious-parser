@@ -83,6 +83,7 @@ export class NodeGroupingTransformation {
           };
         },
         onGroupUpdate: async (_, subNodes) => {
+          console.log('nodeGrouping', _.getId());
           return await this.runSubNodesLayout(subNodes);
         },
         edgeGenerator: () => {
