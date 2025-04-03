@@ -1,12 +1,12 @@
-import {Transformation, Node, NodeList, StyleRule, PixelSize, Point} from '@linkurious/ogma';
+import {Node, NodeList, PixelSize, Point, StyleRule, Transformation} from '@linkurious/ogma';
 import {
   IVizNodeGroupInfo,
   LkEdgeData,
   LkNodeData,
   MissingValue,
-  NodeGroupingRule,
-  NodeGroupingByPropertyValue,
   NodeGroupingByAdjacentEdgeType,
+  NodeGroupingByPropertyValue,
+  NodeGroupingRule,
   NodeGroupingType
 } from '@linkurious/rest-client';
 import sha1 from 'sha1';
@@ -14,7 +14,6 @@ import sha1 from 'sha1';
 import {LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
 import {FORCE_LAYOUT_CONFIG, OgmaTools} from '../../tools/ogmaTool';
-import {BASE_GREY} from '../../styles/itemAttributes';
 
 import {CLEAR_FONT_COLOR} from './styles';
 
@@ -179,7 +178,7 @@ export class NodeGroupingTransformation {
               .filter((node) => !node.hasClass('filtered'))?.size;
 
             return {
-              color: BASE_GREY,
+              color: '#3F3D5F',
               minVisibleSize: 20,
               stroke: {
                 width: 0,
@@ -190,6 +189,22 @@ export class NodeGroupingTransformation {
                 scale: 0.4,
                 color: CLEAR_FONT_COLOR,
                 content: `x${numberOfSubNodes}`
+              }
+            };
+          },
+          topLeft: () => {
+            return {
+              color: '#3F3D5F',
+              minVisibleSize: 20,
+              stroke: {
+                width: 0,
+                color: null
+              },
+              text: {
+                font: 'FontAwesome',
+                scale: 0.4,
+                color: CLEAR_FONT_COLOR,
+                content: ''
               }
             };
           }
