@@ -45,6 +45,9 @@ export interface StylesConfig {
   edgeWidthStyleRules: Array<LKStyleRule>;
   edgeShapeStyleRules?: Array<LKStyleRule>;
 }
+export const DEFAULT_OGMA_FONT = "'roboto', sans-serif";
+export const CLEAR_FONT_COLOR = '#FFF';
+export const FILTER_OPACITY = 0.2;
 
 const HOVERED_SELECTED_NODE_STYLE: NodeAttributesValue<LkNodeData, LkEdgeData> = {
   text: {
@@ -86,11 +89,8 @@ const EDGE_HALO_CONFIGURATION = {
   width: 4;
 };
 
-const DEFAULT_OGMA_FONT = "'roboto', sans-serif";
 const DARK_FONT_COLOR = '#000';
-export const CLEAR_FONT_COLOR = '#FFF';
 const ITEM_DEFAULT_COLOR = '#7f7f7f';
-export const FILTER_OPACITY = 0.2;
 
 export class StylesViz {
   private _ogma: LKOgma;
@@ -152,6 +152,10 @@ export class StylesViz {
 
   public get nodeAttributes(): NodeAttributes {
     return this._nodeAttributes;
+  }
+
+  public get nodeFont(): string | undefined {
+    return this._defaultConfiguration.node?.text?.font;
   }
 
   /**

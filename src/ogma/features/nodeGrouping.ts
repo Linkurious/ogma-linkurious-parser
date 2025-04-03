@@ -15,7 +15,7 @@ import {LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
 import {FORCE_LAYOUT_CONFIG, OgmaTools} from '../../tools/ogmaTool';
 
-import {CLEAR_FONT_COLOR} from './styles';
+import {CLEAR_FONT_COLOR, DEFAULT_OGMA_FONT} from './styles';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
 
@@ -32,6 +32,7 @@ interface CircularLayoutOptions {
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public groupRule?: NodeGroupingRule;
+  public nodeGroupingCollapsedIntermediateStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   private _nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   private _ogma: LKOgma;
   private _nodeGroupingCollapsedStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
@@ -158,6 +159,17 @@ export class NodeGroupingTransformation {
       nodeDependencies: {self: {data: true}}
     });
 
+    this.nodeGroupingCollapsedIntermediateStyleRule = this._ogma.styles.addRule({
+      nodeAttributes: {
+        color: 'rgba(240, 240, 240)'
+      },
+      nodeSelector: (node) => {
+        return node.isVirtual() && OgmaTools.isGroupCollapsed(node);
+      },
+      // the style will be updated when data object is updated
+      nodeDependencies: {self: {data: true}}
+    });
+
     this._nodeGroupingCollapsedStyleRule = this._ogma.styles.addRule({
       nodeAttributes: {
         text: {
@@ -167,7 +179,7 @@ export class NodeGroupingTransformation {
           style: 'bold'
         },
         halo: {
-          width: 10,
+          width: 4,
           color: '#e4ebea',
           strokeColor: '#ccc'
         },
@@ -185,7 +197,9 @@ export class NodeGroupingTransformation {
                 color: null
               },
               text: {
-                font: 'FontAwesome',
+                font: Tools.isDefined(this._ogma.LKStyles.nodeFont)
+                  ? this._ogma.LKStyles.nodeFont
+                  : DEFAULT_OGMA_FONT,
                 scale: 0.4,
                 color: CLEAR_FONT_COLOR,
                 content: `x${numberOfSubNodes}`
@@ -225,8 +239,7 @@ export class NodeGroupingTransformation {
       nodeSelector: (node) => {
         return node.isVirtual() && OgmaTools.isGroupCollapsed(node);
       },
-      // the style will be updated when data object is updated
-      nodeDependencies: {self: {data: true}}
+      nodeDependencies: {self: {attributes: ['styleRefreshIndex']}}
     });
   }
 
