@@ -32,7 +32,6 @@ interface CircularLayoutOptions {
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public groupRule?: NodeGroupingRule;
-  public nodeGroupingCollapsedIntermediateStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   private _nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   private _ogma: LKOgma;
   private _nodeGroupingCollapsedStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
@@ -57,6 +56,7 @@ export class NodeGroupingTransformation {
    */
   public async initTransformation(): Promise<void> {
     if (this.transformation === undefined) {
+      this._initIntermediateGroupStyle();
       this.transformation = this._ogma.transformations.addNodeGrouping({
         // node with same value will be part of the same group
         groupIdFunction: (node) => {
@@ -103,22 +103,6 @@ export class NodeGroupingTransformation {
     }
   }
 
-  private _getPropertyValueGroupId(
-    node: Node<LkNodeData, LkEdgeData>,
-    rule: NodeGroupingByPropertyValue
-  ) {
-    const propertyValue = this._findGroupingPropertyValue(node);
-    return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`.toLowerCase().trim();
-  }
-
-  private _getAdjacentEdgeGroupId(
-    node: Node<LkNodeData, LkEdgeData>,
-    rule: NodeGroupingByAdjacentEdgeType
-  ) {
-    const centralNode = NodeGroupingTransformation._getGroupCentralNode(node, rule);
-    return centralNode.getId().toString();
-  }
-
   /**
    * refresh the transformation
    * Called when there is a change in the rule
@@ -154,17 +138,6 @@ export class NodeGroupingTransformation {
       },
       nodeSelector: (node) => {
         return node.isVirtual() && !OgmaTools.isGroupCollapsed(node);
-      },
-      // the style will be updated when data object is updated
-      nodeDependencies: {self: {data: true}}
-    });
-
-    this.nodeGroupingCollapsedIntermediateStyleRule = this._ogma.styles.addRule({
-      nodeAttributes: {
-        color: 'rgba(240, 240, 240)'
-      },
-      nodeSelector: (node) => {
-        return node.isVirtual() && OgmaTools.isGroupCollapsed(node);
       },
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
@@ -574,5 +547,37 @@ export class NodeGroupingTransformation {
     const positions = nodes.getPosition();
     const gap = Math.min(...radii);
     return [positions[0], {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}];
+  }
+
+  private _getPropertyValueGroupId(
+    node: Node<LkNodeData, LkEdgeData>,
+    rule: NodeGroupingByPropertyValue
+  ) {
+    const propertyValue = this._findGroupingPropertyValue(node);
+    return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`.toLowerCase().trim();
+  }
+
+  private _getAdjacentEdgeGroupId(
+    node: Node<LkNodeData, LkEdgeData>,
+    rule: NodeGroupingByAdjacentEdgeType
+  ) {
+    const centralNode = NodeGroupingTransformation._getGroupCentralNode(node, rule);
+    return centralNode.getId().toString();
+  }
+
+  /**
+   * Initialize the style for the intermediate group state, when transitioning from expanded to collapsed
+   */
+  private _initIntermediateGroupStyle() {
+    this._ogma.styles.addRule({
+      nodeAttributes: {
+        color: 'rgba(240, 240, 240)'
+      },
+      nodeSelector: (node) => {
+        return node.isVirtual() && OgmaTools.isGroupCollapsed(node);
+      },
+      // the style will be updated when data object is updated
+      nodeDependencies: {self: {data: true}}
+    });
   }
 }
