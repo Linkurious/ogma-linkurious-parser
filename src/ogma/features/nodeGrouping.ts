@@ -207,6 +207,20 @@ export class NodeGroupingTransformation {
               categories: node.getData('subCategories')
             });
           }
+        },
+        icon: (node: Node | undefined) => {
+          const categories = node?.getData('subCategories') as Array<string>;
+          if (!Tools.isDefined(node) || categories.length > 1) {
+            return;
+          }
+          // get the icon of the sub-nodes, passing a fake itemData to nodeAttributes.icon
+          return this._ogma.LKStyles.nodeAttributes.icon({
+            geo: {},
+            isVirtual: false,
+            properties: {},
+            readAt: 0,
+            categories: categories
+          }).icon;
         }
       },
       nodeSelector: (node) => {
