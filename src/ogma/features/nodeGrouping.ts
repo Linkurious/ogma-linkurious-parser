@@ -210,7 +210,7 @@ export class NodeGroupingTransformation {
         }
       },
       nodeSelector: (node) => {
-        return node.isVirtual() && OgmaTools.isGroupCollapsed(node);
+        return node.isVirtual() && OgmaTools.isGroupCollapsed(node) && !node.hasClass('filtered');
       },
       nodeDependencies: {self: {attributes: ['styleRefreshIndex']}}
     });
