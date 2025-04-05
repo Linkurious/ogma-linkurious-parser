@@ -56,7 +56,6 @@ export class NodeGroupingTransformation {
    */
   public async initTransformation(): Promise<void> {
     if (this.transformation === undefined) {
-      this._initIntermediateGroupStyle();
       this.transformation = this._ogma.transformations.addNodeGrouping({
         // node with same value will be part of the same group
         groupIdFunction: (node) => {
@@ -142,6 +141,8 @@ export class NodeGroupingTransformation {
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
     });
+
+    this._initIntermediateGroupStyle();
 
     this._nodeGroupingCollapsedStyleRule = this._ogma.styles.addRule({
       nodeAttributes: {
