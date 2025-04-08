@@ -8,7 +8,7 @@ import {LKOgma} from '../index';
 import {OgmaStore} from './OgmaStore';
 
 export interface OgmaState {
-  selection: NodeList<LkNodeData, LkEdgeData> | EdgeList<LkEdgeData, LkNodeData>;
+  selection: NodeList<LkNodeData, LkEdgeData> | EdgeList<LkEdgeData, LkNodeData> | undefined;
   items: {node: Array<string | number>; edge: Array<string | number>};
   changes: {entityType: 'node' | 'edge'; input: string | string[] | null; value: any} | undefined;
   /**
@@ -20,7 +20,7 @@ export interface OgmaState {
 export class RxViz {
   private _ogma: Ogma;
   private _store: OgmaStore = new OgmaStore({
-    selection: new DummyNodeList() as any,
+    selection: undefined,
     items: {node: [], edge: []},
     changes: undefined,
     animation: false
@@ -173,9 +173,4 @@ export class RxViz {
       selection: this._ogma.getSelectedEdges()
     };
   }
-}
-
-export class DummyNodeList {
-  public size = 0;
-  public isNode = true;
 }
