@@ -167,8 +167,8 @@ export class NodeGroupingTransformation {
               color: '#3F3D5F',
               minVisibleSize: 20,
               stroke: {
-                width: 0,
-                color: null
+                width: 2,
+                color: '#FFFFFF'
               },
               text: {
                 font: Tools.isDefined(this._ogma.LKStyles.nodeFont)
@@ -185,8 +185,8 @@ export class NodeGroupingTransformation {
               color: '#3F3D5F',
               minVisibleSize: 20,
               stroke: {
-                width: 0,
-                color: null
+                width: 2,
+                color: '#FFFFFF'
               },
               text: {
                 font: 'FontAwesome',
