@@ -36,6 +36,7 @@ export class NodeGroupingTransformation {
   private _ogma: LKOgma;
   private _nodeGroupingCollapsedStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   private _collapsedDefaultValue = false;
+  private _nodeGroupingAttributes: IVizNodeGroupInfo[] = [];
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
@@ -72,12 +73,16 @@ export class NodeGroupingTransformation {
         },
         nodeGenerator: (nodes) => {
           const categories = new Set(nodes.getData('categories').flat());
+          const nodeGroupId = this._findNodeGroupId(nodes);
           return {
             data: {
               categories: [],
               subCategories: Array.from(categories),
-              collapsed: this._collapsedDefaultValue,
-              nodeGroupId: this._findNodeGroupId(nodes)
+              collapsed: this._getDefaultCollapsedState(nodeGroupId),
+              nodeGroupId: nodeGroupId
+            },
+            attributes: {
+              layoutable: this._getDefaultLayoutableValue(nodeGroupId)
             }
           };
         },
@@ -287,22 +292,11 @@ export class NodeGroupingTransformation {
   }
 
   /**
-   * Set the node group pin
+   * Set node initial attributes
    * @param nodeGroups object containing the node group id and the layoutable attribute
    */
-  public async setNodeGroupingAttributes(nodeGroups: IVizNodeGroupInfo[]): Promise<void> {
-    this._ogma
-      .getNodes()
-      .filter((node) => node.isVirtual())
-      .forEach((node) => {
-        const nodeGroupInfo = nodeGroups.find(
-          (nodeGroup) => nodeGroup.id === node.getData('nodeGroupId')
-        );
-        if (nodeGroupInfo !== undefined) {
-          void node.setAttribute('layoutable', nodeGroupInfo.attributes.layoutable ?? false);
-          OgmaTools.setCollapsedGroupProperty(node, nodeGroupInfo.attributes.collapsed ?? false);
-        }
-      });
+  public setNodeGroupingAttributes(nodeGroups: IVizNodeGroupInfo[]): void {
+    this._nodeGroupingAttributes = nodeGroups;
   }
 
   /**
@@ -594,5 +588,25 @@ export class NodeGroupingTransformation {
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
     });
+  }
+
+  private _getDefaultCollapsedState(nodeGroupId: string): boolean {
+    const nodeAttributes = this._nodeGroupingAttributes.find((node) => {
+      return node.id === nodeGroupId;
+    });
+    if (Tools.isDefined(nodeAttributes) && Tools.isDefined(nodeAttributes.attributes.collapsed)) {
+      return nodeAttributes.attributes.collapsed;
+    }
+    return this._collapsedDefaultValue;
+  }
+
+  private _getDefaultLayoutableValue(nodeGroupId: string): boolean {
+    const nodeAttributes = this._nodeGroupingAttributes.find((node) => {
+      return node.id === nodeGroupId;
+    });
+    if (Tools.isDefined(nodeAttributes) && Tools.isDefined(nodeAttributes.attributes.layoutable)) {
+      return nodeAttributes.attributes.layoutable;
+    }
+    return true;
   }
 }
