@@ -274,7 +274,9 @@ export class NodeGroupingTransformation {
     }
     // Chains: if al nodes have degree 1 or 2, place them in a line
     const degrees = subNodes.getDegree();
-    if (degrees.every((d) => d > 0 && d <= 2)) {
+    const isEachNodeDegree1Or2 = degrees.every((d) => d === 1 || d === 2);
+    const isNotATriangle = degrees.some((d) => d === 2);
+    if (isEachNodeDegree1Or2 && isNotATriangle) {
       await this._runChainLayout(subNodes);
       return;
     }
@@ -380,7 +382,7 @@ export class NodeGroupingTransformation {
       nodes: sortedNodes,
       // TODO: test that visually
       colDistance: Math.max(...subNodes.getAttribute('radius').map(Number)) * 4,
-      rows: chain.numberOfChain
+      rows: chain.numberOfChain ?? 1
     });
   }
 
