@@ -313,27 +313,24 @@ export class NodeGroupingTransformation {
    * @param node reference to the virtual node
    */
   private _getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
-    if (node === undefined) {
+    if (!Tools.isDefined(node) || !Tools.isDefined(this.groupRule)) {
       return undefined;
     }
-    if (this.groupRule === undefined) {
-      return undefined;
+    if (this.groupRule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
+      return this._getAdjacentEdgeNodeGroupingCaption(node, this.groupRule);
     }
-    const rule = this.groupRule;
-    if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
-      return this._getAdjacentEdgeNodeGroupingCaption(node, rule);
-    }
-    return this._getPropertyValueNodeGroupingCaption(node, rule);
+    return this._getPropertyValueNodeGroupingCaption(node, this.groupRule);
   }
 
   private _getAdjacentEdgeNodeGroupingCaption(
     node: Node<LkNodeData>,
     rule: NodeGroupingByAdjacentEdgeType
-  ): string {
-    const centralNode = NodeGroupingTransformation._getGroupCentralNode(
-      node.getSubNodes()!.get(0),
-      rule
-    );
+  ): string | undefined {
+    const subNodes = node.getSubNodes();
+    if (!Tools.isDefined(subNodes) || !Tools.isDefined(subNodes.get(0))) {
+      return undefined;
+    }
+    const centralNode = NodeGroupingTransformation._getGroupCentralNode(subNodes.get(0), rule);
     return centralNode.getData(['properties', 'name']) as string;
   }
 
