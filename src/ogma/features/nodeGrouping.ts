@@ -275,7 +275,7 @@ export class NodeGroupingTransformation {
     // Chains: if al nodes have degree 1 or 2, place them in a line
     const degrees = subNodes.getDegree();
     const isEachNodeDegree1Or2 = degrees.every((d) => d === 1 || d === 2);
-    const isNotATriangle = degrees.some((d) => d === 2);
+    const isNotATriangle = degrees.some((d) => d === 1);
     if (isEachNodeDegree1Or2 && isNotATriangle) {
       await this._runChainLayout(subNodes);
       return;
