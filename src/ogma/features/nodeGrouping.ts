@@ -1,22 +1,23 @@
-import {Transformation, Node, NodeList, StyleRule, PixelSize, Point} from '@linkurious/ogma';
+import {Node, NodeList, PixelSize, Point, StyleRule, Transformation} from '@linkurious/ogma';
 import {
   IVizNodeGroupInfo,
   LkEdgeData,
   LkNodeData,
   MissingValue,
-  NodeGroupingRule,
-  NodeGroupingByPropertyValue,
   NodeGroupingByAdjacentEdgeType,
+  NodeGroupingByPropertyValue,
+  NodeGroupingRule,
   NodeGroupingType
 } from '@linkurious/rest-client';
 import sha1 from 'sha1';
 
-import {FORCE_LAYOUT_CONFIG, LKOgma} from '../index';
+import {LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
-import {OgmaTools} from '../../tools/ogmaTool';
+import {FORCE_LAYOUT_CONFIG, OgmaTools} from '../../tools/ogmaTool';
+
+import {CLEAR_FONT_COLOR, DEFAULT_OGMA_FONT} from './styles';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
-export const LKE_NODE_GROUPING_NODE = 'LKE_NODE_GROUPING_NODE';
 
 interface CircularLayoutOptions {
   radii: PixelSize[] | number[];
@@ -31,8 +32,11 @@ interface CircularLayoutOptions {
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
   public groupRule?: NodeGroupingRule;
-  public nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
+  private _nodeGroupingStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
   private _ogma: LKOgma;
+  private _nodeGroupingCollapsedStyleRule?: StyleRule<LkNodeData, LkEdgeData>;
+  private _collapsedDefaultValue = false;
+  private _nodeGroupingAttributes: IVizNodeGroupInfo[] = [];
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
@@ -68,13 +72,22 @@ export class NodeGroupingTransformation {
           }
         },
         nodeGenerator: (nodes) => {
+          const categories = new Set(nodes.getData('categories').flat());
+          const nodeGroupId = this._findNodeGroupId(nodes);
           return {
             data: {
-              categories: [LKE_NODE_GROUPING_NODE],
-              properties: {},
-              nodeGroupId: this._findNodeGroupId(nodes)
+              categories: [],
+              subCategories: Array.from(categories),
+              collapsed: this._getDefaultCollapsedState(nodeGroupId),
+              nodeGroupId: nodeGroupId
+            },
+            attributes: {
+              layoutable: this._getDefaultLayoutableValue(nodeGroupId)
             }
           };
+        },
+        onGroupUpdate: async (_, subNodes) => {
+          return await this.runSubNodesLayout(subNodes);
         },
         edgeGenerator: () => {
           return {
@@ -83,28 +96,15 @@ export class NodeGroupingTransformation {
             }
           };
         },
-        showContents: true,
+        showContents: (metaNode) => {
+          return !OgmaTools.isGroupCollapsed(metaNode);
+        },
+        duration: 300,
         padding: 10
       });
     } else {
       await this.refreshTransformation();
     }
-  }
-
-  private _getPropertyValueGroupId(
-    node: Node<LkNodeData, LkEdgeData>,
-    rule: NodeGroupingByPropertyValue
-  ) {
-    const propertyValue = this._findGroupingPropertyValue(node);
-    return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`.toLowerCase().trim();
-  }
-
-  private _getAdjacentEdgeGroupId(
-    node: Node<LkNodeData, LkEdgeData>,
-    rule: NodeGroupingByAdjacentEdgeType
-  ) {
-    const centralNode = NodeGroupingTransformation._getGroupCentralNode(node, rule);
-    return centralNode.getId().toString();
   }
 
   /**
@@ -124,7 +124,7 @@ export class NodeGroupingTransformation {
    * init node grouping style
    */
   public initNodeGroupingStyle(): void {
-    this.nodeGroupingStyleRule = this._ogma.styles.addRule({
+    this._nodeGroupingStyleRule = this._ogma.styles.addRule({
       nodeAttributes: {
         // Any default style will go here
         text: {
@@ -141,53 +141,126 @@ export class NodeGroupingTransformation {
         }
       },
       nodeSelector: (node) => {
-        // TODO: Tools.isDefined(node.getSubNodes()) is a work around for an ogma issue visible when using image export plugin with Node grouping
-        // remove when updating to Ogma v5.1.x
-        return node.isVirtual() && Tools.isDefined(node.getSubNodes());
+        return node.isVirtual() && !OgmaTools.isGroupCollapsed(node);
       },
       // the style will be updated when data object is updated
       nodeDependencies: {self: {data: true}}
     });
+
+    this._initIntermediateGroupStyle();
+
+    this._nodeGroupingCollapsedStyleRule = this._ogma.styles.addRule({
+      nodeAttributes: {
+        text: {
+          content: (node: Node<LkNodeData> | undefined): string | undefined => {
+            return this._getNodeGroupingCaption(node);
+          },
+          style: 'bold'
+        },
+        halo: {
+          width: 4,
+          color: '#e4ebea',
+          strokeColor: '#ccc'
+        },
+        badges: {
+          bottomLeft: (node) => {
+            const numberOfSubNodes = node
+              .getSubNodes()!
+              .filter((node) => !node.hasClass('filtered'))?.size;
+
+            return {
+              color: '#3F3D5F',
+              minVisibleSize: 20,
+              stroke: {
+                width: 2,
+                color: '#FFFFFF'
+              },
+              text: {
+                font: Tools.isDefined(this._ogma.LKStyles.nodeFont)
+                  ? this._ogma.LKStyles.nodeFont
+                  : DEFAULT_OGMA_FONT,
+                scale: 0.4,
+                color: CLEAR_FONT_COLOR,
+                content: `x${numberOfSubNodes}`
+              }
+            };
+          },
+          topLeft: () => {
+            return {
+              color: '#3F3D5F',
+              minVisibleSize: 20,
+              stroke: {
+                width: 2,
+                color: '#FFFFFF'
+              },
+              text: {
+                font: 'FontAwesome',
+                scale: 0.4,
+                color: CLEAR_FONT_COLOR,
+                content: ''
+              }
+            };
+          }
+        },
+        color: (node: Node | undefined) => {
+          if (node !== undefined) {
+            // get the colors of the sub-nodes, passing a fake itemData to nodeAttributes.color
+            return this._ogma.LKStyles.nodeAttributes.color({
+              geo: {},
+              isVirtual: false,
+              properties: {},
+              readAt: 0,
+              categories: node.getData('subCategories')
+            });
+          }
+        },
+        icon: (node: Node | undefined) => {
+          const categories = node?.getData('subCategories') as Array<string>;
+          if (!Tools.isDefined(node) || categories.length > 1) {
+            return;
+          }
+          // get the icon of the sub-nodes, passing a fake itemData to nodeAttributes.icon
+          return this._ogma.LKStyles.nodeAttributes.icon({
+            geo: {},
+            isVirtual: false,
+            properties: {},
+            readAt: 0,
+            categories: categories
+          }).icon;
+        }
+      },
+      nodeSelector: (node) => {
+        return node.isVirtual() && OgmaTools.isGroupCollapsed(node) && !node.hasClass('filtered');
+      },
+      nodeDependencies: {self: {attributes: ['styleRefreshIndex']}}
+    });
   }
 
   public async refreshNodeGroupingStyle(): Promise<void> {
-    await this.nodeGroupingStyleRule?.refresh();
-  }
-
-  /**
-   * run layout on all subnodes of virtual nodes
-   */
-  public async runLayoutOnAllSubNodes(): Promise<void> {
-    await this._ogma.transformations.afterNextUpdate();
-    const rawNodesList = this._getAllTransformationRawNodes();
-    const promisesList: Promise<void>[] = [];
-    for (let i = 0; i < rawNodesList.length; i++) {
-      // rawNodesList[i] is not null because each group has at least one node
-      const subNodes = rawNodesList[i]!;
-      promisesList.push(this.runSubNodesLayout(subNodes));
-    }
-    await Promise.all(promisesList);
+    await this._nodeGroupingStyleRule?.refresh();
+    await this._nodeGroupingCollapsedStyleRule?.refresh();
   }
 
   /**
    * Run the layout on the subnodes of the virtual node
    * @param subNodes nodes part of a virtual node
    */
-  public async runSubNodesLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
+  public async runSubNodesLayout(
+    subNodes: NodeList<LkNodeData, LkEdgeData>
+  ): Promise<Point[] | undefined | void> {
     if (subNodes.size === 0 || subNodes.size === 1) {
       return;
     }
 
     // 2 nodes
     if (subNodes.size === 2) {
-      await this._runTwoNodesLayout(subNodes);
-      return;
+      return this._runTwoNodesLayout(subNodes);
     }
 
     const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
     if (noEdges) return this._runCirclePack(subNodes);
     // stars
-    const center = this.isStar(subNodes);
+    const center = OgmaTools.isStar(subNodes);
     if (center) {
       const satellites = subNodes.filter((n) => n !== center);
       const positions = this._runCircularLayout({
@@ -197,13 +270,13 @@ export class NodeGroupingTransformation {
         clockwise: false,
         distanceRatio: 5
       });
-      const list = center.toList().concat(satellites);
-      await list.setAttributes([center.getPosition(), ...positions]);
-      return;
+      return [center.getPosition(), ...positions];
     }
     // Chains: if al nodes have degree 1 or 2, place them in a line
     const degrees = subNodes.getDegree();
-    if (degrees.every((d) => d > 0 && d <= 2)) {
+    const isEachNodeDegree1Or2 = degrees.every((d) => d === 1 || d === 2);
+    const isNotATriangle = degrees.some((d) => d === 1);
+    if (isEachNodeDegree1Or2 && isNotATriangle) {
       await this._runChainLayout(subNodes);
       return;
     }
@@ -221,21 +294,18 @@ export class NodeGroupingTransformation {
   }
 
   /**
-   * Set the node group pin
+   * Set node initial attributes
    * @param nodeGroups object containing the node group id and the layoutable attribute
    */
-  public async setNodeGroupPin(nodeGroups: IVizNodeGroupInfo[]): Promise<void> {
-    this._ogma
-      .getNodes()
-      .filter((node) => node.isVirtual())
-      .forEach((node) => {
-        const nodeGroupInfo = nodeGroups.find(
-          (nodeGroup) => nodeGroup.id === node.getData('nodeGroupId')
-        );
-        if (nodeGroupInfo !== undefined) {
-          void node.setAttribute('layoutable', nodeGroupInfo.attributes.layoutable ?? false);
-        }
-      });
+  public setNodeGroupingAttributes(nodeGroups: IVizNodeGroupInfo[]): void {
+    this._nodeGroupingAttributes = nodeGroups;
+  }
+
+  /**
+   * set collapse default value, this will be the state of newly created groups
+   */
+  public setCollapseDefaultValue(value: boolean) {
+    this._collapsedDefaultValue = value;
   }
 
   /**
@@ -243,27 +313,24 @@ export class NodeGroupingTransformation {
    * @param node reference to the virtual node
    */
   private _getNodeGroupingCaption(node: Node<LkNodeData> | undefined): string | undefined {
-    if (node === undefined) {
+    if (!Tools.isDefined(node) || !Tools.isDefined(this.groupRule)) {
       return undefined;
     }
-    if (this.groupRule === undefined) {
-      return undefined;
+    if (this.groupRule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
+      return this._getAdjacentEdgeNodeGroupingCaption(node, this.groupRule);
     }
-    const rule = this.groupRule;
-    if (rule.groupingType === NodeGroupingType.BY_ADJACENT_EDGE_TYPE) {
-      return this._getAdjacentEdgeNodeGroupingCaption(node, rule);
-    }
-    return this._getPropertyValueNodeGroupingCaption(node, rule);
+    return this._getPropertyValueNodeGroupingCaption(node, this.groupRule);
   }
 
   private _getAdjacentEdgeNodeGroupingCaption(
     node: Node<LkNodeData>,
     rule: NodeGroupingByAdjacentEdgeType
-  ): string {
-    const centralNode = NodeGroupingTransformation._getGroupCentralNode(
-      node.getSubNodes()!.get(0),
-      rule
-    );
+  ): string | undefined {
+    const subNodes = node.getSubNodes();
+    if (!Tools.isDefined(subNodes) || !Tools.isDefined(subNodes.get(0))) {
+      return undefined;
+    }
+    const centralNode = NodeGroupingTransformation._getGroupCentralNode(subNodes.get(0), rule);
     return centralNode.getData(['properties', 'name']) as string;
   }
 
@@ -289,23 +356,30 @@ export class NodeGroupingTransformation {
    * Run the circle pack layout on the subnodes
    * @param subNodes
    */
-  private async _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
-    await this._ogma.algorithms.circlePack({
-      nodes: subNodes,
-      margin: 10,
-      sort: 'asc'
-    });
+  private _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<Point[]> {
+    return Promise.resolve(
+      this._ogma.algorithms.circlePack({
+        nodes: subNodes,
+        margin: 10,
+        sort: 'asc',
+        dryRun: true
+      })
+    );
   }
 
+  /**
+   * return a grid layout when nodes are represented by multiple chains (a)-(b)-(c)-(d)
+   */
   private async _runChainLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     // straighten the chain
-    const sortedNodes = this._ogma.getNodes(OgmaTools.topologicalSort(subNodes));
+    const chain = OgmaTools.topologicalSort(subNodes);
+    const sortedNodes = this._ogma.getNodes(chain.chain);
     // we also need to sort the nodes so that they are following the chain
     await this._ogma.layouts.grid({
       nodes: sortedNodes,
       // TODO: test that visually
       colDistance: Math.max(...subNodes.getAttribute('radius').map(Number)) * 4,
-      rows: 1
+      rows: chain.numberOfChain ?? 1
     });
   }
 
@@ -480,19 +554,58 @@ export class NodeGroupingTransformation {
     const radii = nodes.getAttribute('radius').map(Number);
     const positions = nodes.getPosition();
     const gap = Math.min(...radii);
-    await nodes.setAttributes([
-      positions[0],
-      {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}
-    ]);
+    return [positions[0], {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}];
   }
 
-  private isStar(nodes: NodeList) {
-    for (const id of nodes.getId()) {
-      const node = this._ogma.getNode(id)!;
-      const adjacent = node.getAdjacentNodes();
-      const isStar = node.getDegree() > 2 && adjacent.getDegree().every((d) => d === 1);
-      if (isStar && adjacent.size + 1 === nodes.size) return node;
+  private _getPropertyValueGroupId(
+    node: Node<LkNodeData, LkEdgeData>,
+    rule: NodeGroupingByPropertyValue
+  ) {
+    const propertyValue = this._findGroupingPropertyValue(node);
+    return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`.toLowerCase().trim();
+  }
+
+  private _getAdjacentEdgeGroupId(
+    node: Node<LkNodeData, LkEdgeData>,
+    rule: NodeGroupingByAdjacentEdgeType
+  ) {
+    const centralNode = NodeGroupingTransformation._getGroupCentralNode(node, rule);
+    return centralNode.getId().toString();
+  }
+
+  /**
+   * Initialize the style for the intermediate group state, when transitioning from expanded to collapsed
+   */
+  private _initIntermediateGroupStyle() {
+    this._ogma.styles.addRule({
+      nodeAttributes: {
+        color: 'rgba(240, 240, 240)'
+      },
+      nodeSelector: (node) => {
+        return node.isVirtual() && OgmaTools.isGroupCollapsed(node);
+      },
+      // the style will be updated when data object is updated
+      nodeDependencies: {self: {data: true}}
+    });
+  }
+
+  private _getDefaultCollapsedState(nodeGroupId: string): boolean {
+    const nodeAttributes = this._nodeGroupingAttributes.find((node) => {
+      return node.id === nodeGroupId;
+    });
+    if (Tools.isDefined(nodeAttributes) && Tools.isDefined(nodeAttributes.attributes.collapsed)) {
+      return nodeAttributes.attributes.collapsed;
     }
-    return false;
+    return this._collapsedDefaultValue;
+  }
+
+  private _getDefaultLayoutableValue(nodeGroupId: string): boolean {
+    const nodeAttributes = this._nodeGroupingAttributes.find((node) => {
+      return node.id === nodeGroupId;
+    });
+    if (Tools.isDefined(nodeAttributes) && Tools.isDefined(nodeAttributes.attributes.layoutable)) {
+      return nodeAttributes.attributes.layoutable;
+    }
+    return true;
   }
 }
