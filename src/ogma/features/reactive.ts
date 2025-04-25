@@ -1,6 +1,6 @@
 'use strict';
 
-import Ogma, {NodeList, EdgeList} from '@linkurious/ogma';
+import Ogma, {EdgeList, NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {LKOgma} from '../index';
@@ -158,9 +158,10 @@ export class RxViz {
    * Store new node selection in state
    */
   private storeNodeSelection(state: OgmaState): OgmaState {
+    const selectedNodes = this._ogma.getNodes('all').filter((node) => node.isSelected());
     return {
       ...state,
-      selection: this._ogma.getSelectedNodes()
+      selection: selectedNodes
     };
   }
 
