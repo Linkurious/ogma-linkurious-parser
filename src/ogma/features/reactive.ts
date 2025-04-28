@@ -158,10 +158,9 @@ export class RxViz {
    * Store new node selection in state
    */
   private storeNodeSelection(state: OgmaState): OgmaState {
-    const selectedNodes = this._ogma.getNodes('all').filter((node) => node.isSelected());
     return {
       ...state,
-      selection: selectedNodes
+      selection: this._ogma.getSelectedNodes()
     };
   }
 
