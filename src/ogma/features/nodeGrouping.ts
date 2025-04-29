@@ -55,7 +55,7 @@ export class NodeGroupingTransformation {
    * It uses groupRule to define the rule
    * Group the nodes based on a category type and a property value
    */
-  public async initTransformation(): Promise<void> {
+  public async initTransformation(isEnabled = true): Promise<void> {
     if (this.transformation === undefined) {
       this.transformation = this._ogma.transformations.addNodeGrouping({
         // node with same value will be part of the same group
@@ -99,6 +99,7 @@ export class NodeGroupingTransformation {
         showContents: (metaNode) => {
           return !OgmaTools.isGroupCollapsed(metaNode);
         },
+        enabled: isEnabled,
         duration: 300,
         padding: 10
       });
