@@ -1,5 +1,5 @@
 'use strict';
-import {Color} from '@linkurious/ogma';
+import type {Color} from '@linkurious/ogma';
 import {
   AutoRangeScale,
   IImageDataValue,
