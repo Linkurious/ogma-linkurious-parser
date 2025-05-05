@@ -1,4 +1,4 @@
-import {Node, NodeList, PixelSize, Point, StyleRule, Transformation} from '@linkurious/ogma';
+import type {Node, NodeList, PixelSize, Point, StyleRule, Transformation} from '@linkurious/ogma';
 import {
   IVizNodeGroupInfo,
   LkEdgeData,
