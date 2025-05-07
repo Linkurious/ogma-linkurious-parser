@@ -1,4 +1,4 @@
-import {Color, NodeList, Node, EdgeList, Edge, NodeId} from '@linkurious/ogma';
+import type {Color, Edge, EdgeList, Node, NodeId, NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {ANIMATION_DURATION} from '../ogma';
