@@ -1,7 +1,6 @@
 'use strict';
 
-import * as o from '@linkurious/ogma';
-import {
+import type {
   Badge,
   Edge,
   EdgeAttributesValue,
@@ -10,6 +9,7 @@ import {
   StyleClass,
   StyleRule
 } from '@linkurious/ogma';
+import * as o from '@linkurious/ogma';
 import {
   GenericObject,
   IEdgeStyle,

@@ -1,7 +1,7 @@
 'use strict';
 
 import {EntityType, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
-import {Edge, ItemList, Node} from '@linkurious/ogma';
+import type {Edge, ItemList, Node} from '@linkurious/ogma';
 
 import {Tools} from '../../tools/tools';
 

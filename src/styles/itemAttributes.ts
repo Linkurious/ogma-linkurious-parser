@@ -1,7 +1,7 @@
 'use strict';
 
 import sha1 from 'sha1';
-import {Color} from '@linkurious/ogma';
+import type {Color} from '@linkurious/ogma';
 import {IEdgeStyle, INodeStyle, IStyleAutoRange} from '@linkurious/rest-client';
 
 import {Tools} from '../tools/tools';

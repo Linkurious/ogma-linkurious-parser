@@ -1,7 +1,7 @@
 'use strict';
 
 import {GenericObject, IEdgeGroupStyle, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
-import {
+import type {
   Edge,
   EdgeAttributesValue,
   EdgeExtremity,

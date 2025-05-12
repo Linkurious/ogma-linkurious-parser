@@ -9,7 +9,7 @@ import {
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
-import Ogma, {
+import type {
   EdgeList,
   ForceLayoutOptions,
   HierarchicalLayoutOptions,
@@ -21,6 +21,7 @@ import Ogma, {
   RawGraph,
   RawNode
 } from '@linkurious/ogma';
+import Ogma from '@linkurious/ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
