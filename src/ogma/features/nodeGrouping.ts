@@ -234,6 +234,8 @@ export class NodeGroupingTransformation {
       },
       nodeDependencies: {self: {attributes: ['styleRefreshIndex']}}
     });
+
+    this._setSubSelectedClass();
   }
 
   public async refreshNodeGroupingStyle(): Promise<void> {
@@ -607,5 +609,21 @@ export class NodeGroupingTransformation {
       return nodeAttributes.attributes.layoutable;
     }
     return true;
+  }
+
+  /**
+   * Set styles for the class "filtered"
+   */
+  private _setSubSelectedClass(): void {
+    this._ogma.styles.createClass({
+      name: 'subSelection',
+      nodeAttributes: {
+        halo: {
+          width: 4,
+          color: '#e67a8f',
+          strokeColor: '#ccc'
+        }
+      }
+    });
   }
 }

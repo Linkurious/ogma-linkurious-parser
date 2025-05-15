@@ -58,11 +58,11 @@
     "sha1": "1.1.1"
   },
   "peerDependencies": {
-    "@linkurious/ogma": "5.2.5"
+    "@linkurious/ogma": "5.2.5-PR-4062.6"
   },
   "devDependencies": {
-    "@linkurious/ogma": "5.2.5",
-    "@linkurious/rest-client": "~4.2.1-develop-stable.252",
+    "@linkurious/ogma": "5.2.5-PR-4062.6",
+    "@linkurious/rest-client": "~4.2.0-develop-stable.252",
     "@types/chai": "4.2.17",
     "@types/lodash": "4.14.182",
     "@types/mocha": "5.2.7",
