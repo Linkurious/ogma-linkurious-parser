@@ -1,11 +1,11 @@
 'use strict';
-import {Color} from '@linkurious/ogma';
+import type {Color} from '@linkurious/ogma';
 import {
   AutoRangeScale,
   IEdgeStyle,
+  IStyleAutoRange,
   LkEdgeData,
-  OgmaEdgeShape,
-  IStyleAutoRange
+  OgmaEdgeShape
 } from '@linkurious/rest-client';
 
 import {Tools} from '../tools/tools';
