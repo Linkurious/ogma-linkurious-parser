@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "@linkurious/ogma": "5.2.6",
-    "@linkurious/rest-client": "~4.2.1-develop-stable.257",
+    "@linkurious/rest-client": "~4.2.1-develop-stable.259",
     "@types/chai": "4.2.17",
     "@types/lodash": "4.14.182",
     "@types/mocha": "5.2.7",
