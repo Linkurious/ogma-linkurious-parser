@@ -20,6 +20,7 @@ import {CLEAR_FONT_COLOR, DEFAULT_OGMA_FONT} from './styles';
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
 
 interface CircularLayoutOptions {
+  center: Node<LkNodeData, LkEdgeData>;
   radii: PixelSize[] | number[];
   cx?: number;
   cy?: number;
@@ -264,15 +265,24 @@ export class NodeGroupingTransformation {
     // stars
     const center = OgmaTools.isStar(subNodes);
     if (center) {
-      const satellites = subNodes.filter((n) => n !== center);
+      let centerIndex = 0;
+      const satellites = subNodes.filter((n, i) => {
+        if(n === center){
+          centerIndex = i;
+          return false;
+        }
+        return true;
+      });
       const positions = this._runCircularLayout({
+        center,
         radii: satellites.getAttribute('radius'),
         cx: center.getAttribute('x'),
         cy: center.getAttribute('y'),
         clockwise: false,
         distanceRatio: 5
       });
-      return [center.getPosition(), ...positions];
+      positions.splice(centerIndex,0, center.getPosition());
+      return positions;
     }
     // Chains: if al nodes have degree 1 or 2, place them in a line
     const degrees = subNodes.getDegree();
