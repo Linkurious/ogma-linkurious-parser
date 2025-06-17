@@ -370,4 +370,23 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     this.setStyles(this._configuration, baseUrl);
     this.setCaptions(this._configuration);
   }
+
+  /**
+   * An override of the Ogma method getSelectedNodes
+   * originally it was returning only the visible selected nodes
+   * but we need to return all selected nodes, including the one that are part of collapsed groups
+   */
+  public getSelectedNodes(): NodeList<LkNodeData, LkEdgeData> {
+    return this.getNodes('all').filter((node) => node.isSelected());
+  }
+
+  /**
+   * An override of the Ogma method clearSelection
+   * originally it was unselecting only the visible selected nodes
+   * but we need also to unselect invisible nodes, including the one that are part of collapsed groups
+   */
+  public clearSelection(): void {
+    this.getSelectedNodes().setSelected(false);
+    this.getSelectedEdges().setSelected(false);
+  }
 }

@@ -1,6 +1,6 @@
 'use strict';
 
-import Ogma, {NodeList, EdgeList} from '@linkurious/ogma';
+import Ogma, {EdgeList, NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {LKOgma} from '../index';
