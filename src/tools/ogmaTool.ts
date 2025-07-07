@@ -57,14 +57,14 @@ export class OgmaTools {
     if (color === null || !Tools.isStringFilled(color)) {
       return true;
     }
-    const hexRegExp = /#[A-Fa-f0-9]{3,6}/;
+    const hexadecimalColor = /#[A-Fa-f0-9]{3,6}/;
     const rgbRegExp =
       /^rgb\(\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*\)$/i;
     const rgbaRegExp =
       /^rgba\(\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*(?:0|1|0?\.\d+)\s*\)$/i;
     let rgb: string;
 
-    if (hexRegExp.test(color)) {
+    if (hexadecimalColor.test(color)) {
       if (color.length < 5) {
         color += color.slice(1);
       }
@@ -85,7 +85,7 @@ export class OgmaTools {
       return true;
     }
 
-    const [r, g, b] = /rgba?\((\d{1,3}),(\d{1,3}),(\d{1,3})(,\d{1,3})?\)/
+    const [r, g, b] = /rgba?\((\d{1,3}),(\d{1,3}),(\d{1,3})(,(?:0|1|0?\.\d+))?\)/
       .exec(rgb.replace(/\s/g, ''))!
       .slice(1, 4);
 
