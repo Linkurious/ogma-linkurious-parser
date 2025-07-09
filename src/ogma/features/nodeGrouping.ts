@@ -14,6 +14,7 @@ import sha1 from 'sha1';
 import {LKOgma} from '../index';
 import {Tools} from '../../tools/tools';
 import {FORCE_LAYOUT_CONFIG, OgmaTools} from '../../tools/ogmaTool';
+import {BADGE_COLOR} from '../../tools/colorPalette';
 
 import {CLEAR_FONT_COLOR, DEFAULT_OGMA_FONT} from './styles';
 
@@ -169,7 +170,7 @@ export class NodeGroupingTransformation {
               .filter((node) => !node.hasClass('filtered'))?.size;
 
             return {
-              color: '#3F3D5F',
+              color: BADGE_COLOR,
               minVisibleSize: 20,
               stroke: {
                 width: 2,
@@ -187,7 +188,7 @@ export class NodeGroupingTransformation {
           },
           topLeft: () => {
             return {
-              color: '#3F3D5F',
+              color: BADGE_COLOR,
               minVisibleSize: 20,
               stroke: {
                 width: 2,
