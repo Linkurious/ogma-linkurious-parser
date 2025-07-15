@@ -87,8 +87,11 @@ export class NodeGroupingTransformation {
             }
           };
         },
-        onGroupUpdate: async (_, subNodes) => {
-          return await this.runSubNodesLayout(subNodes);
+        onGroupUpdate: () => {
+          return {
+            layout: 'force',
+            params: {...FORCE_LAYOUT_CONFIG}
+          };
         },
         edgeGenerator: () => {
           return {
@@ -251,7 +254,7 @@ export class NodeGroupingTransformation {
   public async runSubNodesLayout(
     subNodes: NodeList<LkNodeData, LkEdgeData>
   ): Promise<Point[] | undefined | void> {
-    if (subNodes.size === 0 || subNodes.size === 1) {
+    /* if (subNodes.size === 0 || subNodes.size === 1) {
       return;
     }
 
@@ -283,7 +286,7 @@ export class NodeGroupingTransformation {
       await this._runChainLayout(subNodes);
       return;
     }
-
+*/
     return await this._runForceLayout(subNodes);
   }
 
@@ -359,7 +362,7 @@ export class NodeGroupingTransformation {
    * Run the circle pack layout on the subnodes
    * @param subNodes
    */
-  private _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<Point[]> {
+  /*private _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<Point[]> {
     return Promise.resolve(
       this._ogma.algorithms.circlePack({
         nodes: subNodes,
@@ -368,12 +371,12 @@ export class NodeGroupingTransformation {
         dryRun: true
       })
     );
-  }
+  }*/
 
   /**
    * return a grid layout when nodes are represented by multiple chains (a)-(b)-(c)-(d)
    */
-  private async _runChainLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
+  /*private async _runChainLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     // straighten the chain
     const chain = OgmaTools.topologicalSort(subNodes);
     const sortedNodes = this._ogma.getNodes(chain.chain);
@@ -384,7 +387,7 @@ export class NodeGroupingTransformation {
       colDistance: Math.max(...subNodes.getAttribute('radius').map(Number)) * 4,
       rows: chain.numberOfChain ?? 1
     });
-  }
+  }*/
 
   private async _runForceLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
     await this._ogma.layouts.force({
@@ -553,12 +556,12 @@ export class NodeGroupingTransformation {
     });
   }
 
-  private async _runTwoNodesLayout(nodes: NodeList<LkNodeData, LkEdgeData>) {
+  /* private async _runTwoNodesLayout(nodes: NodeList<LkNodeData, LkEdgeData>) {
     const radii = nodes.getAttribute('radius').map(Number);
     const positions = nodes.getPosition();
     const gap = Math.min(...radii);
     return [positions[0], {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}];
-  }
+  }*/
 
   private _getPropertyValueGroupId(
     node: Node<LkNodeData, LkEdgeData>,
