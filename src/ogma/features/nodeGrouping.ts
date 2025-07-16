@@ -1,4 +1,4 @@
-import type {Node, NodeList, PixelSize, Point, StyleRule, Transformation} from '@linkurious/ogma';
+import type {Node, NodeList, StyleRule, Transformation} from '@linkurious/ogma';
 import {
   IVizNodeGroupInfo,
   LkEdgeData,
@@ -19,16 +19,6 @@ import {BADGE_COLOR} from '../../tools/colorPalette';
 import {CLEAR_FONT_COLOR, DEFAULT_OGMA_FONT} from './styles';
 
 export const LKE_NODE_GROUPING_EDGE = 'LKE_NODE_GROUPING_EDGE';
-
-interface CircularLayoutOptions {
-  radii: PixelSize[] | number[];
-  cx?: number;
-  cy?: number;
-  startAngle?: number;
-  clockwise?: boolean;
-  getRadius?: (radius: PixelSize) => number;
-  distanceRatio?: number;
-}
 
 export class NodeGroupingTransformation {
   public transformation?: Transformation<LkNodeData, LkEdgeData>;
@@ -87,7 +77,10 @@ export class NodeGroupingTransformation {
             }
           };
         },
-        onGroupUpdate: () => {
+        onGroupUpdate: (n, subNodes) => {
+          if (subNodes.size === 1) {
+            return;
+          }
           return {
             layout: 'force',
             params: {...FORCE_LAYOUT_CONFIG}
@@ -248,49 +241,6 @@ export class NodeGroupingTransformation {
   }
 
   /**
-   * Run the layout on the subnodes of the virtual node
-   * @param subNodes nodes part of a virtual node
-   */
-  public async runSubNodesLayout(
-    subNodes: NodeList<LkNodeData, LkEdgeData>
-  ): Promise<Point[] | undefined | void> {
-    /* if (subNodes.size === 0 || subNodes.size === 1) {
-      return;
-    }
-
-    // 2 nodes
-    if (subNodes.size === 2) {
-      return this._runTwoNodesLayout(subNodes);
-    }
-
-    const noEdges = subNodes.getAdjacentEdges({bothExtremities: true}).size === 0;
-    if (noEdges) return this._runCirclePack(subNodes);
-    // stars
-    const center = OgmaTools.isStar(subNodes);
-    if (center) {
-      const satellites = subNodes.filter((n) => n !== center);
-      const positions = this._runCircularLayout({
-        radii: satellites.getAttribute('radius'),
-        cx: center.getAttribute('x'),
-        cy: center.getAttribute('y'),
-        clockwise: false,
-        distanceRatio: 5
-      });
-      return [center.getPosition(), ...positions];
-    }
-    // Chains: if al nodes have degree 1 or 2, place them in a line
-    const degrees = subNodes.getDegree();
-    const isEachNodeDegree1Or2 = degrees.every((d) => d === 1 || d === 2);
-    const isNotATriangle = degrees.some((d) => d === 1);
-    if (isEachNodeDegree1Or2 && isNotATriangle) {
-      await this._runChainLayout(subNodes);
-      return;
-    }
-*/
-    return await this._runForceLayout(subNodes);
-  }
-
-  /**
    * Get the virtual nodes of the transformation
    * @private
    */
@@ -358,44 +308,6 @@ export class NodeGroupingTransformation {
     }
   }
 
-  /**
-   * Run the circle pack layout on the subnodes
-   * @param subNodes
-   */
-  /*private _runCirclePack(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<Point[]> {
-    return Promise.resolve(
-      this._ogma.algorithms.circlePack({
-        nodes: subNodes,
-        margin: 10,
-        sort: 'asc',
-        dryRun: true
-      })
-    );
-  }*/
-
-  /**
-   * return a grid layout when nodes are represented by multiple chains (a)-(b)-(c)-(d)
-   */
-  /*private async _runChainLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
-    // straighten the chain
-    const chain = OgmaTools.topologicalSort(subNodes);
-    const sortedNodes = this._ogma.getNodes(chain.chain);
-    // we also need to sort the nodes so that they are following the chain
-    await this._ogma.layouts.grid({
-      nodes: sortedNodes,
-      // TODO: test that visually
-      colDistance: Math.max(...subNodes.getAttribute('radius').map(Number)) * 4,
-      rows: chain.numberOfChain ?? 1
-    });
-  }*/
-
-  private async _runForceLayout(subNodes: NodeList<LkNodeData, LkEdgeData>): Promise<void> {
-    await this._ogma.layouts.force({
-      nodes: subNodes,
-      ...FORCE_LAYOUT_CONFIG
-    });
-  }
-
   private _isRuleNotApplicableToNode(node: Node<LkNodeData>): boolean {
     const rule = this.groupRule;
     if (rule === undefined) {
@@ -414,10 +326,10 @@ export class NodeGroupingTransformation {
     rule: NodeGroupingByAdjacentEdgeType
   ): boolean {
     // if the node does not have the relationship
-    return !this.hasEdgeOfType(node, rule.groupingOptions.edgeType);
+    return !this._hasEdgeOfType(node, rule.groupingOptions.edgeType);
   }
 
-  private hasEdgeOfType(node: Node<LkNodeData>, type: string): boolean {
+  private _hasEdgeOfType(node: Node<LkNodeData>, type: string): boolean {
     let hasEdge = false;
     node.getAdjacentEdges().forEach((edge) => {
       if (edge.getData('type') === type) {
@@ -516,52 +428,6 @@ export class NodeGroupingTransformation {
         : firstAdjacentEdge.getTarget();
     return centralNode;
   }
-
-  public _runCircularLayout({
-    radii,
-    clockwise = true,
-    cx = 0,
-    cy = 0,
-    startAngle = (3 / 2) * Math.PI,
-    getRadius = (radius: PixelSize) => Number(radius),
-    distanceRatio = 0.0
-  }: CircularLayoutOptions): Point[] {
-    const N = radii.length;
-    // dummy checks
-    if (N === 0) return [];
-    if (N === 1) return [{x: cx, y: cy}];
-
-    // minDistance
-    const minDistance =
-      radii.map(getRadius).reduce((acc, r) => Math.max(acc, r), 0) * (2 + distanceRatio);
-
-    const sweep = 2 * Math.PI - (2 * Math.PI) / N;
-    const deltaAngle = sweep / Math.max(1, N - 1);
-
-    const dcos = Math.cos(deltaAngle) - Math.cos(0);
-    const dsin = Math.sin(deltaAngle) - Math.sin(0);
-
-    const rMin = Math.sqrt((minDistance * minDistance) / (dcos * dcos + dsin * dsin));
-    const r = Math.max(rMin, 0);
-
-    return radii.map((_, i) => {
-      const angle = startAngle + i * deltaAngle * (clockwise ? 1 : -1);
-
-      const rx = r * Math.cos(angle);
-      const ry = r * Math.sin(angle);
-      return {
-        x: cx + rx,
-        y: cy + ry
-      };
-    });
-  }
-
-  /* private async _runTwoNodesLayout(nodes: NodeList<LkNodeData, LkEdgeData>) {
-    const radii = nodes.getAttribute('radius').map(Number);
-    const positions = nodes.getPosition();
-    const gap = Math.min(...radii);
-    return [positions[0], {x: positions[0].x + gap + radii[0] + radii[1], y: positions[0].y}];
-  }*/
 
   private _getPropertyValueGroupId(
     node: Node<LkNodeData, LkEdgeData>,
