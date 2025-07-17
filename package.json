@@ -1,6 +1,6 @@
 {
   "name": "@linkurious/ogma-linkurious-parser",
-  "version": "4.2.1",
+  "version": "4.2.2",
   "author": "Linkurious SAS",
   "description": "Parse and load a Linkurious visualization in Ogma with one line of code ",
   "files": [
@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "@linkurious/ogma": "5.2.6",
-    "@linkurious/rest-client": "4.2.1",
+    "@linkurious/rest-client": "4.2.2",
     "@types/chai": "4.2.17",
     "@types/lodash": "4.14.182",
     "@types/mocha": "5.2.7",

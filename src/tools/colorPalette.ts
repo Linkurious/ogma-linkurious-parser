@@ -141,3 +141,5 @@ export const HTML_COLORS: GenericObject<{hex: string; rgb: string}> = {
   brown: {hex: '#A52A2A', rgb: 'rgb(165,42,42)'},
   maroon: {hex: '#800000', rgb: 'rgb(128,0,0)'}
 };
+
+export const BADGE_COLOR = '#3F3D5F';
