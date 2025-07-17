@@ -47,6 +47,9 @@ export class NodeGroupingTransformation {
    * Group the nodes based on a category type and a property value
    */
   public async initTransformation(): Promise<void> {
+    // We use this flag to avoid running the layout in onGroupUpdate the first time the transformation is created
+    let init = true;
+
     if (this.transformation === undefined) {
       this.transformation = this._ogma.transformations.addNodeGrouping({
         // node with same value will be part of the same group
@@ -78,7 +81,7 @@ export class NodeGroupingTransformation {
           };
         },
         onGroupUpdate: (n, subNodes) => {
-          if (subNodes.size === 1) {
+          if (subNodes.size === 1 || init) {
             return;
           }
           return {
@@ -102,6 +105,8 @@ export class NodeGroupingTransformation {
     } else {
       await this.refreshTransformation();
     }
+    await this._ogma.transformations.afterNextUpdate();
+    init = false;
   }
 
   /**
