@@ -9,7 +9,7 @@ import {
   VizEdge,
   VizNode
 } from '@linkurious/rest-client';
-import Ogma, {
+import type {
   EdgeList,
   ForceLayoutOptions,
   HierarchicalLayoutOptions,
@@ -21,6 +21,7 @@ import Ogma, {
   RawGraph,
   RawNode
 } from '@linkurious/ogma';
+import Ogma from '@linkurious/ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
@@ -39,14 +40,6 @@ interface AddItemOptions {
   batchSize?: number;
   virtual?: boolean;
 }
-
-export const FORCE_LAYOUT_CONFIG = {
-  steps: 40,
-  alignSiblings: true,
-  charge: 5,
-  theta: 0.34,
-  duration: ANIMATION_DURATION
-};
 
 export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   public LKStyles!: StylesViz;
@@ -376,5 +369,24 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
     }
     this.setStyles(this._configuration, baseUrl);
     this.setCaptions(this._configuration);
+  }
+
+  /**
+   * An override of the Ogma method getSelectedNodes
+   * originally it was returning only the visible selected nodes
+   * but we need to return all selected nodes, including the one that are part of collapsed groups
+   */
+  public getSelectedNodes(): NodeList<LkNodeData, LkEdgeData> {
+    return this.getNodes('all').filter((node) => node.isSelected());
+  }
+
+  /**
+   * An override of the Ogma method clearSelection
+   * originally it was unselecting only the visible selected nodes
+   * but we need also to unselect invisible nodes, including the one that are part of collapsed groups
+   */
+  public clearSelection(): void {
+    this.getSelectedNodes().setSelected(false);
+    this.getSelectedEdges().setSelected(false);
   }
 }

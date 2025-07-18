@@ -1,7 +1,6 @@
 'use strict';
 
-import * as o from '@linkurious/ogma';
-import {
+import type {
   Badge,
   Edge,
   EdgeAttributesValue,
@@ -10,6 +9,7 @@ import {
   StyleClass,
   StyleRule
 } from '@linkurious/ogma';
+import * as o from '@linkurious/ogma';
 import {
   GenericObject,
   IEdgeStyle,
@@ -35,6 +35,7 @@ import {
 } from '../..';
 import {Tools} from '../../tools/tools';
 import {OgmaImage} from '../../styles/nodeAttributes';
+import {BADGE_COLOR} from '../../tools/colorPalette';
 
 export interface StylesConfig {
   nodeColorStyleRules: Array<LKStyleRule>;
@@ -45,6 +46,9 @@ export interface StylesConfig {
   edgeWidthStyleRules: Array<LKStyleRule>;
   edgeShapeStyleRules?: Array<LKStyleRule>;
 }
+export const DEFAULT_OGMA_FONT = "'roboto', sans-serif";
+export const CLEAR_FONT_COLOR = '#FFF';
+export const FILTER_OPACITY = 0.2;
 
 const HOVERED_SELECTED_NODE_STYLE: NodeAttributesValue<LkNodeData, LkEdgeData> = {
   text: {
@@ -86,11 +90,7 @@ const EDGE_HALO_CONFIGURATION = {
   width: 4;
 };
 
-const DEFAULT_OGMA_FONT = "'roboto', sans-serif";
-const DARK_FONT_COLOR = '#000';
-const CLEAR_FONT_COLOR = '#FFF';
 const ITEM_DEFAULT_COLOR = '#7f7f7f';
-export const FILTER_OPACITY = 0.2;
 
 export class StylesViz {
   private _ogma: LKOgma;
@@ -148,6 +148,14 @@ export class StylesViz {
     this._ogma = ogma;
     this._defaultConfiguration = configuration;
     this._nodeAttributes.setBaseUrl(configuration.baseUrl);
+  }
+
+  public get nodeAttributes(): NodeAttributes {
+    return this._nodeAttributes;
+  }
+
+  public get nodeFont(): string | undefined {
+    return this._defaultConfiguration.node?.text?.font;
   }
 
   /**
@@ -212,7 +220,8 @@ export class StylesViz {
           width: 3
         },
         outline: false
-      }
+      },
+      nodeSelector: (node) => !node.isVirtual()
     });
   }
 
@@ -274,7 +283,7 @@ export class StylesViz {
   public setNodesDefaultHalo(): void {
     // setting default halo style
     this._nodeDefaultHaloRules = this._ogma.styles.addRule({
-      nodeSelector: (node) => node && !node.hasClass('filtered'),
+      nodeSelector: (node) => node && !node.hasClass('filtered') && !node.isVirtual(),
       nodeAttributes: {
         halo: (node) => {
           if (
@@ -473,28 +482,22 @@ export class StylesViz {
       name: 'degreeIndicator',
       nodeAttributes: {
         badges: {
-          topRight: (node) => {
+          bottomLeft: (node) => {
             if (node !== undefined) {
               const degree = Tools.getHiddenNeighbors(node.toList());
               const badgeContent = Tools.formatNumber(degree);
               if (degree > 0) {
-                const nodeColor = Array.isArray(node.getAttribute('color'))
-                  ? node.getAttribute('color')![0]
-                  : node.getAttribute('color');
-                const textColor = OgmaTools.isBright(nodeColor as o.Color)
-                  ? DARK_FONT_COLOR
-                  : CLEAR_FONT_COLOR;
                 const isSupernode = node.getData(['statistics', 'supernode']);
                 let content = null;
                 if (+badgeContent !== 0) {
                   content = isSupernode ? badgeContent + '+' : badgeContent;
                 }
                 return {
-                  color: 'inherit',
+                  color: BADGE_COLOR,
                   minVisibleSize: 20,
                   stroke: {
-                    width: 0,
-                    color: null
+                    width: 2,
+                    color: '#FFFFFF'
                   },
                   text: {
                     font:
@@ -503,7 +506,7 @@ export class StylesViz {
                         ? this._defaultConfiguration.node.text.font
                         : DEFAULT_OGMA_FONT,
                     scale: 0.4,
-                    color: textColor,
+                    color: CLEAR_FONT_COLOR,
                     content: content
                   }
                 };
@@ -517,20 +520,20 @@ export class StylesViz {
       name: 'pinnedIndicator',
       nodeAttributes: {
         badges: {
-          bottomRight: (node): Badge | undefined => {
+          topRight: (node): Badge | undefined => {
             if (node !== undefined && !node.getAttribute('layoutable')) {
               return {
-                color: this._findPinBadgeBackgroundColor(node),
+                color: BADGE_COLOR,
                 minVisibleSize: 20,
                 scale: this._findPinBadgeScale(node),
                 stroke: {
-                  width: 0,
-                  color: null
+                  width: 2,
+                  color: '#FFFFFF'
                 },
                 text: {
                   font: 'FontAwesome',
                   scale: 0.4,
-                  color: this._findPinBadgeTextColor(node),
+                  color: CLEAR_FONT_COLOR,
                   content: node.getAttribute('layoutable') ? null : '\uf08d'
                 }
               };
@@ -585,7 +588,8 @@ export class StylesViz {
             }
           }
         },
-        nodeDependencies: {self: {data: true}}
+        nodeDependencies: {self: {data: true}},
+        nodeSelector: (node) => !node.isVirtual()
       });
     } else {
       this._nodeAttributes.refresh({color: colorStyleRules});
@@ -679,7 +683,8 @@ export class StylesViz {
             }
           }
         },
-        nodeDependencies: {self: {data: true}}
+        nodeDependencies: {self: {data: true}},
+        nodeSelector: (node) => !node.isVirtual()
       });
     } else {
       this._nodeAttributes.refresh({icon: iconStyleRules});
@@ -703,7 +708,8 @@ export class StylesViz {
             }
           }
         },
-        nodeDependencies: {self: {data: true}}
+        nodeDependencies: {self: {data: true}},
+        nodeSelector: (node) => !node.isVirtual()
       });
     } else {
       this._nodeAttributes.refresh({size: sizeStyleRules});
@@ -809,21 +815,6 @@ export class StylesViz {
   }
 
   /**
-   * Get node radius
-   * This is a workaround for an ogma issue where the radius of virtual nodes is always set to 5
-   * TODO: check if this is still needed after ogma release the new improvement for transformation v5.X
-   */
-  private _getNodeRadius(node: Node<LkNodeData, LkEdgeData>): number {
-    if (!node.isVirtual()) {
-      return node.getAttribute('radius') as number;
-    } else {
-      // get the width and height of the box that contains the nodes inside the virtual node
-      const {width, height} = node.getSubNodes()?.getBoundingBox()!;
-      return Math.max(width, height);
-    }
-  }
-
-  /**
    * Calculate the scale of the pin badge related to the node radius
    * This is useful when dealing wih huge nodes, and we don't want the badge to be big
    * If the node is small enough, the badge will be 0.46 of the node radius
@@ -839,22 +830,17 @@ export class StylesViz {
   }
 
   /**
-   * Find the color of the pin badge text
+   * Get node radius
+   * This is a workaround for an ogma issue where the radius of virtual nodes is always set to 5.
+   * The issue is still present in Ogma 5.2
    */
-  private _findPinBadgeTextColor(node: Node<LkNodeData, LkEdgeData>): string {
-    if (node.isVirtual()) {
-      return CLEAR_FONT_COLOR;
+  private _getNodeRadius(node: Node<LkNodeData, LkEdgeData>): number {
+    if (!node.isVirtual() && OgmaTools.isGroupCollapsed(node)) {
+      return node.getAttribute('radius') as number;
+    } else {
+      // get the width and height of the box that contains the nodes inside the virtual node
+      const {width, height} = node.getSubNodes()?.getBoundingBox()!;
+      return Math.max(width, height);
     }
-    const nodeColor = Array.isArray(node.getAttribute('color'))
-      ? node.getAttribute('color')![0]
-      : node.getAttribute('color');
-    return OgmaTools.isBright(nodeColor as o.Color) ? DARK_FONT_COLOR : CLEAR_FONT_COLOR;
-  }
-
-  /**
-   * Find the color of the pin badge background
-   */
-  private _findPinBadgeBackgroundColor(node: Node<LkNodeData, LkEdgeData>): string {
-    return node.isVirtual() ? BASE_GREY : 'inherit';
   }
 }

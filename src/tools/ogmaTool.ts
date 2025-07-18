@@ -1,9 +1,19 @@
-'use strict';
-import {Color, NodeList, Node, EdgeList, Edge, NodeId} from '@linkurious/ogma';
+import type {Color, Edge, EdgeList, Node, NodeId, NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
+
+import {ANIMATION_DURATION} from '../ogma';
 
 import {Tools} from './tools';
 import {HTML_COLORS} from './colorPalette';
+
+export const FORCE_LAYOUT_CONFIG = {
+  steps: 250,
+  alignSiblings: true,
+  charge: 20,
+  theta: 0.34,
+  duration: ANIMATION_DURATION,
+  gravity: 0.0475
+};
 
 export class OgmaTools {
   /**
@@ -47,14 +57,14 @@ export class OgmaTools {
     if (color === null || !Tools.isStringFilled(color)) {
       return true;
     }
-    const hexRegExp = /#[A-Fa-f0-9]{3,6}/;
+    const hexadecimalColor = /#[A-Fa-f0-9]{3,6}/;
     const rgbRegExp =
       /^rgb\(\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*\)$/i;
     const rgbaRegExp =
       /^rgba\(\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*,\s*(?:0|1|0?\.\d+)\s*\)$/i;
     let rgb: string;
 
-    if (hexRegExp.test(color)) {
+    if (hexadecimalColor.test(color)) {
       if (color.length < 5) {
         color += color.slice(1);
       }
@@ -75,7 +85,7 @@ export class OgmaTools {
       return true;
     }
 
-    const [r, g, b] = /rgba?\((\d{1,3}),(\d{1,3}),(\d{1,3})(,\d{1,3})?\)/
+    const [r, g, b] = /rgba?\((\d{1,3}),(\d{1,3}),(\d{1,3})(,(?:0|1|0?\.\d+))?\)/
       .exec(rgb.replace(/\s/g, ''))!
       .slice(1, 4);
 
@@ -98,22 +108,35 @@ export class OgmaTools {
     return items.isNode;
   }
 
-  public static topologicalSort(nodes: NodeList): NodeId[] {
+  /**
+   * Transform a nodelist to an array of node ids sorted by position in a chain and the length of the chain
+   * A chain is: (a)-(b)-(c)-(d)
+   */
+  public static topologicalSort(nodes: NodeList): {chain: NodeId[]; numberOfChain: number} {
     const nodesArray = nodes.toArray();
-    let currentNode: Node | null = nodesArray.find((n) => n.getDegree() === 1)!;
+    const startOfChains = nodesArray.filter((n) => n.getDegree() === 1);
     const visited = new Set();
-    const stack: Node[] = [];
-    while (currentNode) {
-      stack.push(currentNode);
-      visited.add(currentNode);
+    const stacks: Node[][] = [];
+    startOfChains.forEach((node) => {
+      let currentNode: Node<LkNodeData, LkEdgeData> | null = node;
+      if (visited.has(currentNode)) {
+        return;
+      }
+      const stack = [];
+      while (currentNode) {
+        stack.push(currentNode);
+        visited.add(currentNode);
 
-      const nextNode = currentNode
-        .getAdjacentNodes()
-        .filter((neighbor) => !visited.has(neighbor))
-        .get(0);
-      currentNode = nextNode === undefined ? null : nextNode;
-    }
-    return stack.map((n) => n.getId());
+        const nextNode = currentNode
+          .getAdjacentNodes()
+          .filter((neighbor) => !visited.has(neighbor))
+          .get(0);
+        currentNode = nextNode === undefined ? null : nextNode;
+      }
+      stacks.push(stack);
+    });
+    stacks.sort((a, b) => b.length - a.length);
+    return {chain: stacks.flat().map((n) => n.getId()), numberOfChain: startOfChains.length / 2};
   }
 
   public static isStar(nodes: NodeList) {
@@ -123,5 +146,16 @@ export class OgmaTools {
       if (isStar && adjacent.size + 1 === nodes.size) return node;
     }
     return false;
+  }
+
+  /**
+   * Return true if the group is collapsed
+   */
+  public static isGroupCollapsed(node: Node): boolean {
+    return node.getData('collapsed') as boolean;
+  }
+
+  public static setCollapsedGroupProperty(node: Node<LkNodeData>, collapsed: boolean): void {
+    node.setData('collapsed', collapsed);
   }
 }

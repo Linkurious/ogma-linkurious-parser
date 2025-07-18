@@ -1,7 +1,9 @@
 'use strict';
 
 import {EntityType, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
-import {Edge, ItemList, Node} from '@linkurious/ogma';
+import type {Edge, ItemList, Node} from '@linkurious/ogma';
+
+import {Tools} from '../../tools/tools';
 
 import {OgmaState} from './reactive';
 
@@ -34,7 +36,7 @@ export const getSelectionState = (state: OgmaState): SelectionState => {
  * Get the entityType of the current selection
  */
 export const getSelectionEntity = (state: OgmaState): EntityType | undefined => {
-  if (state.selection.size === 0) {
+  if (!Tools.isDefined(state.selection) || state.selection.size === 0) {
     return undefined;
   }
   return (state.selection as ItemList<LkNodeData>).isNode ? EntityType.NODE : EntityType.EDGE;
@@ -46,7 +48,9 @@ export const getSelectionEntity = (state: OgmaState): EntityType | undefined => 
 export const getUniqSelection = (
   state: OgmaState
 ): Node<LkNodeData, LkEdgeData> | Edge<LkEdgeData, LkNodeData> | undefined => {
-  return state.selection.size === 1 ? state.selection.get(0) : undefined;
+  return Tools.isDefined(state.selection) && state.selection.size === 1
+    ? state.selection.get(0)
+    : undefined;
 };
 
 /**

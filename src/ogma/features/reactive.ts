@@ -1,6 +1,6 @@
 'use strict';
 
-import Ogma, {NodeList, EdgeList} from '@linkurious/ogma';
+import Ogma, {EdgeList, NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {LKOgma} from '../index';
@@ -8,7 +8,7 @@ import {LKOgma} from '../index';
 import {OgmaStore} from './OgmaStore';
 
 export interface OgmaState {
-  selection: NodeList<LkNodeData, LkEdgeData> | EdgeList<LkEdgeData, LkNodeData>;
+  selection: NodeList<LkNodeData, LkEdgeData> | EdgeList<LkEdgeData, LkNodeData> | undefined;
   items: {node: Array<string | number>; edge: Array<string | number>};
   changes: {entityType: 'node' | 'edge'; input: string | string[] | null; value: any} | undefined;
   /**
@@ -20,7 +20,7 @@ export interface OgmaState {
 export class RxViz {
   private _ogma: Ogma;
   private _store: OgmaStore = new OgmaStore({
-    selection: new DummyNodeList() as any,
+    selection: undefined,
     items: {node: [], edge: []},
     changes: undefined,
     animation: false
@@ -85,6 +85,12 @@ export class RxViz {
       this._store.dispatch(this.storeItems.bind(this));
     });
     this._ogma.events.on('removeEdges', () => {
+      this._store.dispatch(this.storeItems.bind(this));
+    });
+    this._ogma.events.on('geoDisabled', () => {
+      this._store.dispatch(this.storeItems.bind(this));
+    });
+    this._ogma.events.on('geoEnabled', () => {
       this._store.dispatch(this.storeItems.bind(this));
     });
 
@@ -167,9 +173,4 @@ export class RxViz {
       selection: this._ogma.getSelectedEdges()
     };
   }
-}
-
-export class DummyNodeList {
-  public size = 0;
-  public isNode = true;
 }
