@@ -15,7 +15,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "engines": {
-    "node": "22.15.1"
+    "node": "22.17.1"
   },
   "exports": {
     ".": {
