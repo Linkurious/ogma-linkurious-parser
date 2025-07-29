@@ -12,7 +12,8 @@ export const FORCE_LAYOUT_CONFIG = {
   charge: 20,
   theta: 0.34,
   duration: ANIMATION_DURATION,
-  gravity: 0.0475
+  gravity: 0.0475,
+  gpu: true
 };
 
 export class OgmaTools {
