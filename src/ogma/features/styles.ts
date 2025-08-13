@@ -831,16 +831,15 @@ export class StylesViz {
 
   /**
    * Get node radius
-   * This is a workaround for an ogma issue where the radius of virtual nodes is always set to 5.
+   * This is a workaround for an ogma issue where the radius of virtual nodes is always set to 5.x
    * The issue is still present in Ogma 5.2
    */
   private _getNodeRadius(node: Node<LkNodeData, LkEdgeData>): number {
-    if (!node.isVirtual() && OgmaTools.isGroupCollapsed(node)) {
+    if (!node.isVirtual() || OgmaTools.isGroupCollapsed(node)) {
       return node.getAttribute('radius') as number;
     } else {
       // get the width and height of the box that contains the nodes inside the virtual node
-      const {width, height} = node.getSubNodes()?.getBoundingBox()!;
-      return Math.max(width, height);
+      return this._ogma.transformations.getXYR(node.toList())[0].radius;
     }
   }
 }

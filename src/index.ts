@@ -52,3 +52,5 @@ export {LKOgma, ANIMATION_DURATION} from './ogma';
 export {Tools} from './tools/tools';
 
 export {LKE_NODE_GROUPING_EDGE} from './ogma/features/nodeGrouping';
+
+export {FORCE_LAYOUT_CONFIG} from './tools/ogmaTool';
