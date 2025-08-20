@@ -523,6 +523,7 @@ export class StylesViz {
 
   /**
    * Used in other repos to refresh the pin badge style rule
+   * LKE-13639: we are using a style rule instead of an Ogma class to get the right size of the nodes when calling _findPinBadgeScale
    */
   public async refreshPinBadgeStyleRule(): Promise<void> {
     if (!Tools.isDefined(this._pinnedIndicatorRule)) {
