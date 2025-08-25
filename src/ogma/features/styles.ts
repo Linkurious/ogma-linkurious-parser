@@ -1,7 +1,6 @@
 'use strict';
 
 import type {
-  Badge,
   Edge,
   EdgeAttributesValue,
   Node,
@@ -531,7 +530,7 @@ export class StylesViz {
         nodeSelector: (node) => !node.getAttribute('layoutable'),
         nodeAttributes: {
           badges: {
-            topRight: (node): Badge | undefined => {
+            topRight: (node) => {
               return {
                 color: BADGE_COLOR,
                 minVisibleSize: 20,
@@ -554,13 +553,16 @@ export class StylesViz {
           self: {attributes: ['layoutable']}
         }
       });
-      await this._pinnedIndicatorRule.update({
-        // @ts-ignore Suggested  by Ogma team to increase the priority of the rule, but it doesn't work as expected
-        // We are using a timeout in the frontend to ensure that this rule will be applied last
-        priority: 1000
+      void this._pinnedIndicatorRule.update({
+        // @ts-ignore Suggested  by Ogma team to increase the priority of the rule
+        priority: 100
       });
     } else {
       await this._pinnedIndicatorRule.refresh();
+      void this._pinnedIndicatorRule.update({
+        // @ts-ignore Suggested  by Ogma team to increase the priority of the rule
+        priority: 100
+      });
     }
   }
 
@@ -846,6 +848,7 @@ export class StylesViz {
     if (!node.isVirtual() || OgmaTools.isGroupCollapsed(node)) {
       return node.getAttribute('radius') as number;
     } else {
+      console.log('_getNodeRadius', this._ogma.transformations.getXYR(node.toList())[0].radius);
       // get the width and height of the box that contains the nodes inside the virtual node
       return this._ogma.transformations.getXYR(node.toList())[0].radius;
     }
