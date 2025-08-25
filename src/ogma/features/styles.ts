@@ -848,7 +848,6 @@ export class StylesViz {
     if (!node.isVirtual() || OgmaTools.isGroupCollapsed(node)) {
       return node.getAttribute('radius') as number;
     } else {
-      console.log('_getNodeRadius', this._ogma.transformations.getXYR(node.toList())[0].radius);
       // get the width and height of the box that contains the nodes inside the virtual node
       return this._ogma.transformations.getXYR(node.toList())[0].radius;
     }
