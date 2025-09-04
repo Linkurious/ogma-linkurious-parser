@@ -28,7 +28,6 @@ module.exports = {
     '@typescript-eslint/require-await': ['off'], // Allows async without await
     'import/no-unresolved': ['off'], // Disable non working rule
     'import/order': ['error', {'newlines-between': 'always'}], // Orders imports by ['builtin', 'external', 'parent', 'sibling', 'index']
-    "import/no-named-as-default": ["off"], // Ogma use named exports as default.
     '@typescript-eslint/no-misused-promises': ['error'],
 
     // Shared specific

@@ -3,7 +3,7 @@
 import {expect} from 'chai';
 import 'mocha';
 import type {RawEdge, RawNode} from '@linkurious/ogma';
-import Ogma from '@linkurious/ogma';
+import {Ogma} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {Filters} from '../../src';
