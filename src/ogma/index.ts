@@ -19,9 +19,10 @@ import type {
   RadialLayoutOptions,
   RawEdge,
   RawGraph,
-  RawNode
+  RawNode,
+  Filter
 } from '@linkurious/ogma';
-import Ogma from '@linkurious/ogma';
+import {Ogma, Edge} from '@linkurious/ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
@@ -314,7 +315,13 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
   /**
    * Return the list of non filtered edges
    */
-  public getNonFilteredEdges(items?: Array<any>): EdgeList<LkEdgeData, LkNodeData> {
+  public getNonFilteredEdges(
+    items?:
+      | Array<string>
+      | Filter
+      | Edge<LkEdgeData, LkNodeData>[]
+      | EdgeList<LkEdgeData, LkNodeData>
+  ): EdgeList<LkEdgeData, LkNodeData> {
     return Tools.isDefined(items)
       ? this.getEdges(items).filter((i) => !i.hasClass('filtered'))
       : this.getEdges('raw').filter((i) => !i.hasClass('filtered'));
@@ -324,7 +331,7 @@ export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
    * Return the list of filtered edges
    */
   public getFilteredEdges(
-    items?: Array<any>,
+    items?: Array<string>,
     filter: 'visible' | 'raw' | 'all' = 'raw'
   ): EdgeList<LkEdgeData, LkNodeData> {
     return Tools.isDefined(items)

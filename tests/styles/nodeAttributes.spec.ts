@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import 'mocha';
-import Ogma, {Node} from '@linkurious/ogma';
+import {Ogma, Node} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData, SelectorType} from '@linkurious/rest-client';
 
 import {NodeAttributes, StyleRule, StyleRules} from '../../src';

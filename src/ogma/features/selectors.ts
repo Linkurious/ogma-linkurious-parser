@@ -2,6 +2,7 @@
 
 import {EntityType, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 import type {Edge, ItemList, Node} from '@linkurious/ogma';
+import {LkProperty} from '@linkurious/rest-client/dist/src/api/graphItemTypes';
 
 import {Tools} from '../../tools/tools';
 
@@ -85,7 +86,9 @@ export const getUniqSelectionEntity = (state: OgmaState): 'node' | 'edge' | unde
 /**
  * Return the properties of the current selection if there's only one item selected
  */
-export const getSelectionProperties = (state: OgmaState): Array<{key: string; value: any}> => {
+export const getSelectionProperties = (
+  state: OgmaState
+): Array<{key: string; value: LkProperty}> => {
   const uniqSelection = getUniqSelection(state);
   if (uniqSelection !== undefined) {
     const properties = uniqSelection.getData().properties;
