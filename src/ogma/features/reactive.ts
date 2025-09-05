@@ -25,7 +25,7 @@ export class RxViz {
     changes: undefined,
     animation: false
   });
-  private _animationThrottle: any;
+  private _animationThrottle?: NodeJS.Timeout;
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;

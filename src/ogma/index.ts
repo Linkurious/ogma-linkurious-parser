@@ -10,7 +10,9 @@ import {
   VizNode
 } from '@linkurious/rest-client';
 import type {
+  Edge,
   EdgeList,
+  Filter,
   ForceLayoutOptions,
   HierarchicalLayoutOptions,
   NodeId,
@@ -314,7 +316,13 @@ export class LKOgma extends OgmaLib<LkNodeData, LkEdgeData> {
   /**
    * Return the list of non filtered edges
    */
-  public getNonFilteredEdges(items?: Array<any>): EdgeList<LkEdgeData, LkNodeData> {
+  public getNonFilteredEdges(
+    items?:
+      | Array<string>
+      | Filter
+      | Edge<LkEdgeData, LkNodeData>[]
+      | EdgeList<LkEdgeData, LkNodeData>
+  ): EdgeList<LkEdgeData, LkNodeData> {
     return Tools.isDefined(items)
       ? this.getEdges(items).filter((i) => !i.hasClass('filtered'))
       : this.getEdges('raw').filter((i) => !i.hasClass('filtered'));
@@ -324,7 +332,11 @@ export class LKOgma extends OgmaLib<LkNodeData, LkEdgeData> {
    * Return the list of filtered edges
    */
   public getFilteredEdges(
-    items?: Array<any>,
+    items?:
+      | Array<string>
+      | Filter
+      | Edge<LkEdgeData, LkNodeData>[]
+      | EdgeList<LkEdgeData, LkNodeData>,
     filter: 'visible' | 'raw' | 'all' = 'raw'
   ): EdgeList<LkEdgeData, LkNodeData> {
     return Tools.isDefined(items)
