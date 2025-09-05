@@ -21,7 +21,7 @@ import type {
   RawGraph,
   RawNode
 } from '@linkurious/ogma';
-import Ogma from '@linkurious/ogma';
+import OgmaLib from '@linkurious/ogma';
 
 import {StyleRules} from '..';
 import {Tools} from '../tools/tools';
@@ -41,7 +41,7 @@ interface AddItemOptions {
   virtual?: boolean;
 }
 
-export class LKOgma extends Ogma<LkNodeData, LkEdgeData> {
+export class LKOgma extends OgmaLib<LkNodeData, LkEdgeData> {
   public LKStyles!: StylesViz;
   public LKCaptions!: CaptionsViz;
   public LKTransformation!: TransformationsViz;
