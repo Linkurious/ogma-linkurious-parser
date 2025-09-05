@@ -1,6 +1,6 @@
 'use strict';
 
-import {EdgeList, NodeList, Ogma} from '@linkurious/ogma';
+import Ogma, {EdgeList, NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {LKOgma} from '../index';
@@ -10,9 +10,7 @@ import {OgmaStore} from './OgmaStore';
 export interface OgmaState {
   selection: NodeList<LkNodeData, LkEdgeData> | EdgeList<LkEdgeData, LkNodeData> | undefined;
   items: {node: Array<string | number>; edge: Array<string | number>};
-  changes:
-    | {entityType: 'node' | 'edge'; input: string | string[] | null; value: unknown}
-    | undefined;
+  changes: {entityType: 'node' | 'edge'; input: string | string[] | null; value: any} | undefined;
   /**
    * Indicates whether the positions of nodes or edges are currently transitioning.
    */
@@ -27,7 +25,7 @@ export class RxViz {
     changes: undefined,
     animation: false
   });
-  private _animationThrottle?: NodeJS.Timeout;
+  private _animationThrottle: any;
 
   constructor(ogma: LKOgma) {
     this._ogma = ogma;
