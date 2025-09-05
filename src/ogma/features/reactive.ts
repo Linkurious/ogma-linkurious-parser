@@ -1,6 +1,6 @@
 'use strict';
 
-import {EdgeList, NodeList, Ogma} from '@linkurious/ogma';
+import OgmaLib, {EdgeList, NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {LKOgma} from '../index';
@@ -20,7 +20,7 @@ export interface OgmaState {
 }
 
 export class RxViz {
-  private _ogma: Ogma;
+  private _ogma: OgmaLib;
   private _store: OgmaStore = new OgmaStore({
     selection: undefined,
     items: {node: [], edge: []},

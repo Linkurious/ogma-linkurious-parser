@@ -2,14 +2,14 @@
 
 import {expect} from 'chai';
 import 'mocha';
-import {Ogma, NodeList} from '@linkurious/ogma';
+import OgmaLib, {NodeList} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {Tools} from '../../src/tools/tools';
 
 describe('Tools.getHiddenNeighbors', () => {
   it('should return the number of hidden neighbors', () => {
-    const ogma = new Ogma();
+    const ogma = new OgmaLib();
     ogma.addGraph({
       nodes: [
         {id: 0},

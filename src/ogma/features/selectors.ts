@@ -1,8 +1,7 @@
 'use strict';
 
-import {EntityType, LkEdgeData, LkNodeData} from '@linkurious/rest-client';
+import {EntityType, LkEdgeData, LkNodeData, LkProperty} from '@linkurious/rest-client';
 import type {Edge, ItemList, Node} from '@linkurious/ogma';
-import {LkProperty} from '@linkurious/rest-client/dist/src/api/graphItemTypes';
 
 import {Tools} from '../../tools/tools';
 

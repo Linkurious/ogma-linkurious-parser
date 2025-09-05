@@ -1,15 +1,15 @@
 import {expect} from 'chai';
 import 'mocha';
-import {Ogma, Edge} from '@linkurious/ogma';
+import OgmaLib, {Edge} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData, OgmaEdgeShape, SelectorType} from '@linkurious/rest-client';
 
 import {EdgeAttributes, StyleRules, StyleRule} from '../../src';
 
 describe('EdgeAttributes', () => {
   let edge: Edge<LkEdgeData, LkNodeData>;
-  let ogma: Ogma;
+  let ogma: OgmaLib;
   beforeEach(() => {
-    ogma = new Ogma();
+    ogma = new OgmaLib();
     ogma.addNodes([
       {id: 0, data: {categories: ['CITY'], properties: {name: 'Paris'}}},
       {
