@@ -3,7 +3,7 @@
 import {expect} from 'chai';
 import 'mocha';
 import type {RawEdge, RawNode} from '@linkurious/ogma';
-import Ogma from '@linkurious/ogma';
+import OgmaLib from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData} from '@linkurious/rest-client';
 
 import {Filters} from '../../src';
@@ -243,7 +243,7 @@ describe('Filters', () => {
     target: 19
   } as RawEdge<LkEdgeData>;
 
-  const ogma = new Ogma<LkNodeData, LkEdgeData>();
+  const ogma = new OgmaLib<LkNodeData, LkEdgeData>();
   ogma.addNodes(ogmaFilteredNodes);
   ogma.addEdge(ogmaFilteredEdge);
 

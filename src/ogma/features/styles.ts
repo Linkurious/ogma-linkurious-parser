@@ -1,7 +1,6 @@
 'use strict';
 
 import type {
-  Badge,
   Edge,
   EdgeAttributesValue,
   Node,
@@ -126,6 +125,7 @@ export class StylesViz {
       text?: TextOptions;
     };
   };
+  private _pinnedIndicatorRule?: StyleRule<LkNodeData, LkEdgeData>;
 
   constructor(
     ogma: LKOgma,
@@ -516,12 +516,21 @@ export class StylesViz {
         }
       }
     });
-    this._ogma.styles.createClass({
-      name: 'pinnedIndicator',
-      nodeAttributes: {
-        badges: {
-          topRight: (node): Badge | undefined => {
-            if (node !== undefined && !node.getAttribute('layoutable')) {
+
+    this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent.nodes.addClass('degreeIndicator'));
+  }
+
+  /**
+   * Used in other repos to refresh the pin badge style rule
+   * LKE-13639: we are using a style rule instead of an Ogma class to get the right size of the nodes when calling _findPinBadgeScale
+   */
+  public async refreshPinBadgeStyleRule(): Promise<void> {
+    if (!Tools.isDefined(this._pinnedIndicatorRule)) {
+      this._pinnedIndicatorRule = this._ogma.styles.addRule({
+        nodeSelector: (node) => !node.getAttribute('layoutable'),
+        nodeAttributes: {
+          badges: {
+            topRight: (node) => {
               return {
                 color: BADGE_COLOR,
                 minVisibleSize: 20,
@@ -534,26 +543,27 @@ export class StylesViz {
                   font: 'FontAwesome',
                   scale: 0.4,
                   color: CLEAR_FONT_COLOR,
-                  content: node.getAttribute('layoutable') ? null : '\uf08d'
+                  content: '\uf08d'
                 }
               };
             }
           }
+        },
+        nodeDependencies: {
+          self: {attributes: ['layoutable']}
         }
-      },
-      nodeDependencies: {
-        self: {attributes: ['layoutable']}
-      }
-    });
-    this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent.nodes.addClass('degreeIndicator'));
-    this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent.nodes.addClass('pinnedIndicator'));
-  }
-
-  /**
-   * Delete the rule to display badges
-   */
-  public deleteBadgeRule() {
-    this._ogma.getNodes().removeClasses(['degreeIndicator', 'pinnedIndicator'], 0);
+      });
+      void this._pinnedIndicatorRule.update({
+        // @ts-ignore Suggested  by Ogma team to increase the priority of the rule
+        priority: 100
+      });
+    } else {
+      await this._pinnedIndicatorRule.refresh();
+      void this._pinnedIndicatorRule.update({
+        // @ts-ignore Suggested  by Ogma team to increase the priority of the rule
+        priority: 100
+      });
+    }
   }
 
   /**

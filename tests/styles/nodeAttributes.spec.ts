@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import 'mocha';
-import Ogma, {Node} from '@linkurious/ogma';
+import OgmaLib, {Node} from '@linkurious/ogma';
 import {LkEdgeData, LkNodeData, SelectorType} from '@linkurious/rest-client';
 
 import {NodeAttributes, StyleRule, StyleRules} from '../../src';
@@ -17,9 +17,9 @@ const widgetNode_2_category = {
 let node_1_category: Node<LkNodeData, LkEdgeData>, node_2_category: Node<LkNodeData, LkEdgeData>;
 
 describe('NodeAttributes', function () {
-  let ogma: Ogma;
+  let ogma: OgmaLib;
   beforeEach(() => {
-    ogma = new Ogma();
+    ogma = new OgmaLib();
     ogma.addNodes([
       {id: 2, data: {categories: ['CITY'], properties: {name: 'Paris'}}},
       {id: 1, data: {categories: ['CITY', 'TRANSACTION'], properties: {name: 'Lyon'}}}
