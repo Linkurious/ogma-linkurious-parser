@@ -5,6 +5,7 @@ nodeJob {
   projectName = "linkurious/ogma-linkurious-parser"
   podTemplateNames = ['jnlp-agent-node']
 
+  abortPreviousBuild =  true
   runForwardMerge = false
 
   createGitTag = true
