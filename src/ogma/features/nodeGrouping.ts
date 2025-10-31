@@ -437,9 +437,7 @@ export class NodeGroupingTransformation {
     rule: NodeGroupingByPropertyValue
   ) {
     const propertyValue = this._findGroupingPropertyValue(node);
-    return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}-${Math.random()}`
-      .toLowerCase()
-      .trim();
+    return `${rule.groupingOptions.itemTypes.join('-')}-${propertyValue}`.toLowerCase().trim();
   }
 
   private _getAdjacentEdgeGroupId(
