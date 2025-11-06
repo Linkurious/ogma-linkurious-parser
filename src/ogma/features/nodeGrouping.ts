@@ -427,11 +427,9 @@ export class NodeGroupingTransformation {
       .getAdjacentEdges({filter: 'raw'})
       .filter((edge) => edge.getData('type') === rule.groupingOptions.edgeType)
       .get(0);
-    const centralNode =
-      rule.groupingOptions.centralNodeIs === 'source'
-        ? firstAdjacentEdge.getSource()
-        : firstAdjacentEdge.getTarget();
-    return centralNode;
+    return rule.groupingOptions.centralNodeIs === 'source'
+      ? firstAdjacentEdge.getSource()
+      : firstAdjacentEdge.getTarget();
   }
 
   private _getPropertyValueGroupId(
