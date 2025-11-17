@@ -48,7 +48,7 @@ export class NodeGroupingTransformation {
    */
   public async initTransformation(): Promise<void> {
     // We use this flag to avoid running the layout in onGroupUpdate the first time the transformation is created
-    let init = true;
+    let init = false;
 
     if (this.transformation === undefined) {
       this.transformation = this._ogma.transformations.addNodeGrouping({
