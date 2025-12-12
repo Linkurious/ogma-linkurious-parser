@@ -126,6 +126,7 @@ export class StylesViz {
     };
   };
   private _pinnedIndicatorRule?: StyleRule<LkNodeData, LkEdgeData>;
+  private _degreeIndicatorClass?: StyleClass;
 
   constructor(
     ogma: LKOgma,
@@ -478,46 +479,64 @@ export class StylesViz {
    * Set the rule to display badges
    */
   public setBadgeRule() {
-    this._ogma.styles.createClass({
+    this._degreeIndicatorClass = this._ogma.styles.createClass({
       name: 'degreeIndicator',
       nodeAttributes: {
         badges: {
-          bottomLeft: (node) => {
-            if (node !== undefined) {
-              const degree = Tools.getHiddenNeighbors(node.toList());
-              const badgeContent = Tools.formatNumber(degree);
-              if (degree > 0) {
-                const isSupernode = node.getData(['statistics', 'supernode']);
-                let content = null;
-                if (+badgeContent !== 0) {
-                  content = isSupernode ? badgeContent + '+' : badgeContent;
-                }
-                return {
-                  color: BADGE_COLOR,
-                  minVisibleSize: 20,
-                  stroke: {
-                    width: 2,
-                    color: '#FFFFFF'
-                  },
-                  text: {
-                    font:
-                      this._defaultConfiguration.node.text !== undefined &&
-                      this._defaultConfiguration.node.text.font !== undefined
-                        ? this._defaultConfiguration.node.text.font
-                        : DEFAULT_OGMA_FONT,
-                    scale: 0.4,
-                    color: CLEAR_FONT_COLOR,
-                    content: content
-                  }
-                };
-              }
-            }
-          }
+          bottomLeft: (node) => this._getDegreeIndicatorBadge(node)
         }
-      }
+      },
+      nodeDependencies: {self: {data: true}}
     });
 
     this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent.nodes.addClass('degreeIndicator'));
+  }
+
+  /**
+   * Refresh the degree indicator badge
+   */
+  public refreshDegreeIndicator(): void {
+    if (this._degreeIndicatorClass) {
+      this._degreeIndicatorClass.update({
+        nodeAttributes: {
+          badges: {
+            bottomLeft: (node: Node) => this._getDegreeIndicatorBadge(node)
+          }
+        }
+      });
+    }
+  }
+
+  private _getDegreeIndicatorBadge(node: Node): o.Badge | undefined {
+    if (node !== undefined) {
+      const degree = Tools.getHiddenNeighbors(node.toList());
+      const badgeContent = Tools.formatNumber(degree);
+      if (degree > 0) {
+        const isSupernode = node.getData(['statistics', 'supernode']);
+        let content = null;
+        if (+badgeContent !== 0) {
+          content = isSupernode ? badgeContent + '+' : badgeContent;
+        }
+        return {
+          color: BADGE_COLOR,
+          minVisibleSize: 20,
+          stroke: {
+            width: 2,
+            color: '#FFFFFF'
+          },
+          text: {
+            font:
+              this._defaultConfiguration.node.text !== undefined &&
+              this._defaultConfiguration.node.text.font !== undefined
+                ? this._defaultConfiguration.node.text.font
+                : DEFAULT_OGMA_FONT,
+            scale: 0.4,
+            color: CLEAR_FONT_COLOR,
+            content: content
+          }
+        };
+      }
+    }
   }
 
   /**
