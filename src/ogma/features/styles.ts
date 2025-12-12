@@ -126,7 +126,7 @@ export class StylesViz {
     };
   };
   private _pinnedIndicatorRule?: StyleRule<LkNodeData, LkEdgeData>;
-  private _degreeIndicatorClass?: StyleClass;
+  private _degreeIndicatorRule?: StyleRule<LkNodeData, LkEdgeData>;
 
   constructor(
     ogma: LKOgma,
@@ -479,25 +479,23 @@ export class StylesViz {
    * Set the rule to display badges
    */
   public setBadgeRule() {
-    this._degreeIndicatorClass = this._ogma.styles.createClass({
-      name: 'degreeIndicator',
+    this._degreeIndicatorRule = this._ogma.styles.addRule({
       nodeAttributes: {
         badges: {
-          bottomLeft: (node) => this._getDegreeIndicatorBadge(node)
+          bottomLeft: (node: Node) => this._getDegreeIndicatorBadge(node)
         }
       },
       nodeDependencies: {self: {data: true}}
     });
-
-    this._ogma.events.on('addNodes', (nodesEvent) => nodesEvent.nodes.addClass('degreeIndicator'));
   }
 
   /**
    * Refresh the degree indicator badge
    */
   public refreshDegreeIndicator(): void {
-    if (this._degreeIndicatorClass) {
-      this._degreeIndicatorClass.update({
+    if (this._degreeIndicatorRule) {
+      this._degreeIndicatorRule.refresh();
+      this._degreeIndicatorRule.update({
         nodeAttributes: {
           badges: {
             bottomLeft: (node: Node) => this._getDegreeIndicatorBadge(node)
