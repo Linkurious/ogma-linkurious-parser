@@ -6,5 +6,5 @@ lkeSubReleaseJob {
 
   releasing = false
 
-  nextReleaseJobs = ["stitch"]
+  nextReleaseJobs = ["linkurious-ui"]
 }
