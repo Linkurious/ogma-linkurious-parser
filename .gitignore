@@ -6,6 +6,10 @@ node_modules/
 
 # Compiled code
 dist/
+
+# ESLint cache
+.eslintcache
+
 .npmrc
 
 .nyc_output
