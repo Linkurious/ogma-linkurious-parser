@@ -5,5 +5,5 @@ lkeSubReleaseJob {
   projectName = "linkurious/ogma-linkurious-parser"
   useReleaseBranches = true
 
-  nextReleaseJobs = ["linkurious-ui"]
+  nextReleaseJobs = ["linkurious-server"]
 }
