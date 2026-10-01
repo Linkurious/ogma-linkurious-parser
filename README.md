@@ -1,3 +1,11 @@
+# ⚠️ This repository has been moved
+This repository is now archived and will not be updated anymore (since v4.3.4).
+You can still use the ogma-linkurious-parser via this NPM package: https://www.npmjs.com/package/@linkurious/ogma-linkurious-parser
+
+If you need help, please [contact our support team](https://doc.linkurious.com/admin-manual/latest/support/).
+
+---
+
 # Ogma-Linkurious-Parser
 
 ## Description
